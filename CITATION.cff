@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+type: software
+message: If you use this software, please cite it using this metadata.
+
+title: "fdo-usecases"
+version: "0.0.1"
+abstract: "This repo contains a collection of FDO use-cases that create or consume
+  FDOs."
+repository-code: "https://github.com/maximiliani/fdo-usecases"
+license: "Apache-2.0"
+keywords:
+- fdo
+- usecase
+- python
+authors:
+- family-names: Inckmann
+  given-names: Maximilian
+  email: maximilian.inckmann@kit.edu
+  orcid: https://orcid.org/0009-0005-2800-4833
+  affiliation: Karlsruhe Institute of Technology (KIT)
+- given-names: Andreas
+  orcid: https://orcid.org/0000-0001-6575-1022
+  family-names: Pfeil
+  email: andreas.pfeil@kit.edu
+contact:
+- given-names: Maximilian
+  orcid: https://orcid.org/0009-0005-2800-4833
+  family-names: Inckmann
+  email: maximilian.inckmann@kit.edu
+- given-names: Andreas
+  orcid: https://orcid.org/0000-0001-6575-1022
+  family-names: Pfeil
+  email: andreas.pfeil@kit.edu
+url: https://maximiliani.github.io/fdo-usecases

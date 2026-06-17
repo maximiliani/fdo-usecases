@@ -1,0 +1,61 @@
+{
+  "@context": [
+    "https://doi.org/10.5063/schema/codemeta-2.0",
+    "https://w3id.org/software-iodata",
+    "https://raw.githubusercontent.com/jantman/repostatus.org/master/badges/latest/ontology.jsonld",
+    "https://schema.org",
+    "https://w3id.org/software-types"
+  ],
+  "@type": "SoftwareSourceCode",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Maximilian",
+      "familyName": "Inckmann",
+      "email": "maximilian.inckmann@kit.edu",
+      "@id": "https://orcid.org/0009-0005-2800-4833",
+      "identifier": "https://orcid.org/0009-0005-2800-4833"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Andreas",
+      "familyName": "Pfeil",
+      "email": "andreas.pfeil@kit.edu",
+      "@id": "https://orcid.org/0000-0001-6575-1022",
+      "identifier": "https://orcid.org/0000-0001-6575-1022"
+    }
+  ],
+  "name": "fdo-usecases",
+  "description": "This repo contains a collection of FDO use-cases that create or consume FDOs.",
+  "version": "0.0.1",
+  "keywords": [
+    "fdo",
+    "usecase",
+    "python"
+  ],
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Maximilian",
+      "familyName": "Inckmann",
+      "email": "maximilian.inckmann@kit.edu",
+      "@id": "https://orcid.org/0009-0005-2800-4833",
+      "identifier": "https://orcid.org/0009-0005-2800-4833"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Andreas",
+      "familyName": "Pfeil",
+      "email": "andreas.pfeil@kit.edu",
+      "@id": "https://orcid.org/0000-0001-6575-1022",
+      "identifier": "https://orcid.org/0000-0001-6575-1022"
+    }
+  ],
+  "license": [
+    "https://spdx.org/licenses/Apache-2.0"
+  ],
+  "softwareHelp": "https://maximiliani.github.io/fdo-usecases",
+  "codeRepository": "https://github.com/maximiliani/fdo-usecases",
+  "buildInstructions": "https://maximiliani.github.io/fdo-usecases",
+  "url": "https://maximiliani.github.io/fdo-usecases"
+}

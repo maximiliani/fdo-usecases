@@ -1,0 +1,45 @@
+# NOTE: this repository uses the tool somesy to help you easily maintain
+# and synchronize all the high-level project metadata across multiple files.
+# To see which other metadata can be added, check out the somesy documentation
+# https://materials-data-science-and-informatics.github.io/somesy/main/
+[project]
+name = "fdo-usecases"
+version = "0.0.1"
+description = "This repo contains a collection of FDO use-cases that create or consume FDOs."
+license = "Apache-2.0"
+
+keywords = [
+    "fdo",
+    "usecase",
+    "python"
+]
+repository = "https://github.com/maximiliani/fdo-usecases"
+homepage = "https://maximiliani.github.io/fdo-usecases"
+documentation = "https://maximiliani.github.io/fdo-usecases"
+
+[[project.people]]
+given-names = "Maximilian"
+family-names = "Inckmann"
+email = "maximilian.inckmann@kit.edu"
+orcid = "https://orcid.org/0009-0005-2800-4833"
+author = true
+maintainer = true
+
+[[project.people]]
+given-names = "Andreas"
+family-names = "Pfeil"
+email = "andreas.pfeil@kit.edu"
+orcid = "https://orcid.org/0000-0001-6575-1022"
+author = true
+maintainer = true
+
+# You also can add more authors, maintainers or contributors here:
+# [[project.people]]
+# given-names = "Another"
+# family-names = "Contributor"
+# email = "contributor@email.com"
+# orcid = "https://orcid.org/0123-4567-8910-1112"
+# ...
+
+[config]
+verbose = true
