@@ -8,6 +8,32 @@ This document lists all BasicInfoTypes, InfoTypes, and Profiles with their Type 
 
 ---
 
+## Table of Contents
+
+- [MeasurementUnits](#measurementunits)
+- [BasicInfoTypes (Syntax Definitions)](#basicinfotypes-syntax-definitions)
+  - [Newly Created](#newly-created)
+  - [Existing (Reused from Type Registry)](#existing-reused-from-type-registry)
+- [InfoTypes (Attributes)](#infotypes-attributes)
+- [Profiles](#profiles)
+  - [Base](#base)
+  - [Helmholtz](#helmholtz)
+  - [NFDI](#nfdi)
+  - [Versionable](#versionable)
+  - [DataResource](#dataresource)
+  - [Publication](#publication)
+  - [CreepExperiment](#creepexperiment)
+  - [Material](#material)
+- [Registration Status Summary](#registration-status-summary)
+- [External References](#external-references)
+  - [Standards](#standards)
+  - [Identifier Systems](#identifier-systems)
+  - [Licensing & Classification](#licensing--classification)
+  - [Technical Standards](#technical-standards)
+  - [Institutional Frameworks](#institutional-frameworks)
+
+---
+
 ## MeasurementUnits
 
 | Name | PID | Local File | DTR Entry |
@@ -97,9 +123,9 @@ Profiles combine InfoTypes with specific cardinalities. Property names match Inf
 
 ### Base
 
-**PID**: `<<TBD>>`
+**PID**: `21.T11969/077fe9c54ed5ed26fa54`
 **Local File**: [`Base.json`](dtr/profiles/Base.json)
-**DTR Entry**: *pending*
+**DTR Entry**: [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/077fe9c54ed5ed26fa54)
 
 | Property | InfoType | Cardinality |
 |----------|----------|-------------|
@@ -114,9 +140,9 @@ Profiles combine InfoTypes with specific cardinalities. Property names match Inf
 
 ### Helmholtz
 
-**PID**: `<<TBD>>`
+**PID**: `21.T11969/4f19ada2a020aaa8a14a`
 **Local File**: [`Helmholtz.json`](dtr/profiles/Helmholtz.json)
-**DTR Entry**: *pending*
+**DTR Entry**: [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/4f19ada2a020aaa8a14a)
 
 | Property | InfoType | Cardinality |
 |----------|----------|-------------|
@@ -125,9 +151,9 @@ Profiles combine InfoTypes with specific cardinalities. Property names match Inf
 
 ### NFDI
 
-**PID**: `<<TBD>>`
+**PID**: `21.T11969/175a75397933f1b370af`
 **Local File**: [`NFDI.json`](dtr/profiles/NFDI.json)
-**DTR Entry**: *pending*
+**DTR Entry**: [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/175a75397933f1b370af)
 
 | Property | InfoType | Cardinality |
 |----------|----------|-------------|
@@ -136,9 +162,9 @@ Profiles combine InfoTypes with specific cardinalities. Property names match Inf
 
 ### Versionable
 
-**PID**: `<<TBD>>`
+**PID**: `21.T11969/6c663a0695a411803d70`
 **Local File**: [`Versionable.json`](dtr/profiles/Versionable.json)
-**DTR Entry**: *pending*
+**DTR Entry**: [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/6c663a0695a411803d70)
 
 | Property | InfoType | Cardinality |
 |----------|----------|-------------|
@@ -149,9 +175,9 @@ Profiles combine InfoTypes with specific cardinalities. Property names match Inf
 
 ### DataResource
 
-**PID**: `<<TBD>>`
+**PID**: `21.T11969/0738c2ef35faef0fb552`
 **Local File**: [`DataResource.json`](dtr/profiles/DataResource.json)
-**DTR Entry**: *pending*
+**DTR Entry**: [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/0738c2ef35faef0fb552)
 
 | Property | InfoType | Cardinality |
 |----------|----------|-------------|
@@ -162,9 +188,9 @@ Profiles combine InfoTypes with specific cardinalities. Property names match Inf
 
 ### Publication
 
-**PID**: `<<TBD>>`
+**PID**: `21.T11969/e00441c49bf6cb62a4a5`
 **Local File**: [`Publication.json`](dtr/profiles/Publication.json)
-**DTR Entry**: *pending*
+**DTR Entry**: [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/e00441c49bf6cb62a4a5)
 
 | Property | InfoType | Cardinality |
 |----------|----------|-------------|
@@ -176,9 +202,9 @@ Profiles combine InfoTypes with specific cardinalities. Property names match Inf
 
 ### CreepExperiment
 
-**PID**: `<<TBD>>`
+**PID**: `21.T11969/222fb86c0b3bece35729`
 **Local File**: [`CreepExperiment.json`](dtr/profiles/CreepExperiment.json)
-**DTR Entry**: *pending*
+**DTR Entry**: [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/222fb86c0b3bece35729)
 
 | Property | InfoType | Cardinality |
 |----------|----------|-------------|
@@ -195,9 +221,9 @@ Profiles combine InfoTypes with specific cardinalities. Property names match Inf
 
 ### Material
 
-**PID**: `<<TBD>>`
+**PID**: `21.T11969/d8169782b57c7a9e9f01`
 **Local File**: [`Material.json`](dtr/profiles/Material.json)
-**DTR Entry**: *pending*
+**DTR Entry**: [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/d8169782b57c7a9e9f01)
 
 | Property | InfoType | Cardinality |
 |----------|----------|-------------|
@@ -216,8 +242,8 @@ Profiles combine InfoTypes with specific cardinalities. Property names match Inf
 | MeasurementUnits | 1 | 1 | 0 |
 | BasicInfoTypes | 7 | 7 | 0 |
 | InfoTypes | 39 | 39 | 0 |
-| Profiles | 8 | *pending* | 8 |
-| **Total** | **55** | **47** | **8** |
+| Profiles | 8 | 8 | 0 |
+| **Total** | **55** | **55** | **0** |
 
 ---
 
