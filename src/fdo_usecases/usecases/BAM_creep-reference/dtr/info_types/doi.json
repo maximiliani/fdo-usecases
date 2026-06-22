@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/48e563f148dc04d8b31c",
   "name": "doi",
   "description": "DOI (Digital Object Identifier) providing a persistent, resolvable identifier for a digital object.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:50:53.256Z",
+    "lastModificationDate": "2026-06-22T15:50:53.256Z"
+  },
   "ExpectedUse": "Persistent identification and citation of research outputs including publications, datasets, software, and other scholarly works with guaranteed long-term resolvability.",
   "References": [
     "https://www.doi.org/",
@@ -25,6 +30,8 @@
     "Properties": [
       {
         "Name": "doi",
+        "Title": "DOI",
+        "Description": "DOI (Digital Object Identifier) providing a persistent, resolvable identifier for a digital object.",
         "Type": "21.T11969/48ba02e08f1185e3f854",
         "Properties": {
           "Cardinality": "1",
@@ -32,8 +39,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

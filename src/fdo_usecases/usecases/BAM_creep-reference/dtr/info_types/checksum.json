@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/a80ed2ef79e22f1d8af8",
   "name": "checksum",
   "description": "Cryptographic checksum value for verifying data integrity and detecting file corruption or tampering.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:45:55.241Z",
+    "lastModificationDate": "2026-06-22T15:45:55.241Z"
+  },
   "ExpectedUse": "Data integrity verification, fixity checking in digital preservation, download validation, and detection of accidental or malicious modifications.",
   "References": [],
   "Aliases": [
@@ -23,6 +28,8 @@
     "Properties": [
       {
         "Name": "checksum",
+        "Title": "Checksum",
+        "Description": "Cryptographic checksum value for verifying data integrity and detecting file corruption or tampering.",
         "Type": "21.T11969/3df63b7acb0522da685d",
         "Properties": {
           "Cardinality": "1",
@@ -30,8 +37,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/2dced98076fda9cbf0ef",
   "name": "usesMaterial",
   "description": "Handle identifier(s) for material samples or substances used in an experiment or process.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:18:14.108Z",
+    "lastModificationDate": "2026-06-22T16:18:14.108Z"
+  },
   "ExpectedUse": "Tracking material inputs in experimental workflows, linking experiments to starting materials, and establishing provenance chains in materials science research.",
   "References": [],
   "Aliases": [
@@ -22,6 +27,8 @@
     "Properties": [
       {
         "Name": "usesMaterial",
+        "Title": "Uses Material",
+        "Description": "Handle identifier(s) for material samples or substances used in an experiment or process.",
         "Type": "21.T11969/3bbedeeb04fa80daf501",
         "Properties": {
           "Cardinality": "1",
@@ -29,8 +36,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

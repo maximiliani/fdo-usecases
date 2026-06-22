@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/766ae14d72b49cfb5273",
   "name": "hasHeatTreatment",
   "description": "Handle identifier for a resource documenting the heat treatment process applied to a material sample.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:53:00.969Z",
+    "lastModificationDate": "2026-06-22T15:53:00.969Z"
+  },
   "ExpectedUse": "Recording thermal processing history for materials, linking samples to annealing, quenching, tempering, or other heat treatment procedures affecting microstructure and properties.",
   "References": [],
   "Aliases": [
@@ -22,6 +27,8 @@
     "Properties": [
       {
         "Name": "hasHeatTreatment",
+        "Title": "Has Heat Treatment",
+        "Description": "Handle identifier for a resource documenting the heat treatment process applied to a material sample.",
         "Type": "21.T11969/3bbedeeb04fa80daf501",
         "Properties": {
           "Cardinality": "1",
@@ -29,8 +36,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

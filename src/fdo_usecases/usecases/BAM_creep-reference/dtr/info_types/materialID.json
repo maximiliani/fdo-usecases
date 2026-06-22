@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/716805eef0349802dc9a",
   "name": "materialID",
   "description": "Unique identifier assigned to a specific material sample, alloy batch, or substance.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:05:13.585Z",
+    "lastModificationDate": "2026-06-22T16:05:13.585Z"
+  },
   "ExpectedUse": "Unambiguous identification of material samples in laboratory workflows, enabling traceability between physical specimens, characterization data, and experimental results.",
   "References": [],
   "Aliases": [
@@ -23,6 +28,8 @@
     "Properties": [
       {
         "Name": "materialID",
+        "Title": "Material ID",
+        "Description": "Unique identifier assigned to a specific material sample, alloy batch, or substance.",
         "Type": "21.T11969/3df63b7acb0522da685d",
         "Properties": {
           "Cardinality": "1",
@@ -30,8 +37,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/1a34a6966f91cc341f58",
   "name": "testID",
   "description": "Unique identifier assigned to a specific test, experiment, or measurement procedure instance.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:17:40.155Z",
+    "lastModificationDate": "2026-06-22T16:17:40.155Z"
+  },
   "ExpectedUse": "Unambiguous identification of experimental runs, test instances, and measurement campaigns for traceability, data linkage, and laboratory information management.",
   "References": [],
   "Aliases": [
@@ -23,6 +28,8 @@
     "Properties": [
       {
         "Name": "testID",
+        "Title": "Test ID",
+        "Description": "Unique identifier assigned to a specific test, experiment, or measurement procedure instance.",
         "Type": "21.T11969/3df63b7acb0522da685d",
         "Properties": {
           "Cardinality": "1",
@@ -30,8 +37,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

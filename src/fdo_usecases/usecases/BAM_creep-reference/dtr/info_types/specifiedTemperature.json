@@ -1,19 +1,25 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/ac4a911ffb09772718e3",
   "name": "specifiedTemperature",
   "description": "Test temperature value in degrees Celsius (°C) for experimental conditions or material testing procedures.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:15:50.673Z",
+    "lastModificationDate": "2026-06-22T16:16:49.912Z"
+  },
   "ExpectedUse": "Specification of thermal conditions in materials testing, heat treatment processes, environmental chambers, and temperature-dependent property measurements across all experimental sciences.",
   "References": [
     "https://dx.doi.org/10.31030/3485273",
-    "https://www.dinmedia.de/en/standard/din-en-iso-204/371676068"
+    "https://www.dinmedia.de/en/standard/din-en-iso-204/371676068",
+    "21.T11969/d878eec28d528a3ee5e8"
   ],
   "Aliases": [
     "Test Temperature",
@@ -26,15 +32,14 @@
     "Properties": [
       {
         "Name": "specifiedTemperature",
-        "Type": "<<PLACEHOLDER_DecimalNumber>>",
+        "Title": "Specified Temperature",
+        "Description": "Test temperature value in degrees Celsius (°C) for experimental conditions or material testing procedures.",
+        "Type": "21.T11969/112c248def0a38f01234",
         "Properties": {
           "Cardinality": "1",
           "extractProperties": true
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

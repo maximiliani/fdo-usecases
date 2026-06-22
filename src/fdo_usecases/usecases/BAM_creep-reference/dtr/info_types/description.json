@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/880724416f5857987e70",
   "name": "description",
   "description": "Free-text description providing contextual information about a resource's content, purpose, or characteristics.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:50:22.268Z",
+    "lastModificationDate": "2026-06-22T15:50:22.268Z"
+  },
   "ExpectedUse": "Abstracts, summaries, scope notes, and explanatory text supporting resource discovery, understanding, and appropriate reuse.",
   "References": [],
   "Aliases": [
@@ -23,6 +28,8 @@
     "Properties": [
       {
         "Name": "description",
+        "Title": "Description",
+        "Description": "Free-text description providing contextual information about a resource's content, purpose, or characteristics.",
         "Type": "21.T11969/3df63b7acb0522da685d",
         "Properties": {
           "Cardinality": "1",
@@ -30,8 +37,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

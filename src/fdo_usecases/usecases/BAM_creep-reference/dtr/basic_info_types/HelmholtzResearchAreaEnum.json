@@ -1,0 +1,44 @@
+{
+  "Identifier": "21.T11969/2170780414163d16542d",
+  "name": "HelmholtzResearchAreaEnum",
+  "description": "Enumeration of the six strategic research areas defined by the Helmholtz Association for classifying research activities and outputs.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:58:36.884Z",
+    "lastModificationDate": "2026-06-22T15:58:36.884Z"
+  },
+  "ExpectedUse": "Classification of research projects, publications, datasets, and other outputs according to Helmholtz Association's strategic research portfolio structure for reporting, portfolio analysis, and institutional alignment.",
+  "References": [
+    "https://www.helmholtz.de/en/research/"
+  ],
+  "Aliases": [
+    "Helmholtz Research Field",
+    "Strategic Research Area",
+    "Helmholtz Program Area"
+  ],
+  "Schema": {
+    "Type": "Enum",
+    "PropRelations": "",
+    "Properties": [
+      {
+        "Property": "String Enum",
+        "Value": [
+          "Health",
+          "Information",
+          "Earth & Environment",
+          "Aeronautics, Space and Transport",
+          "Energy",
+          "Matter"
+        ]
+      }
+    ]
+  }
+}

@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/1c25f48eb6a47b22a9cc",
   "name": "grantNumber",
   "description": "Grant award number or identifier assigned by a funding organization to a research project.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:51:20.104Z",
+    "lastModificationDate": "2026-06-22T15:51:20.104Z"
+  },
   "ExpectedUse": "Acknowledgment of funding sources, tracking of grant-funded outputs, compliance with funder requirements, and research impact assessment.",
   "References": [],
   "Aliases": [
@@ -23,6 +28,8 @@
     "Properties": [
       {
         "Name": "grantNumber",
+        "Title": "Grant Number",
+        "Description": "Grant award number or identifier assigned by a funding organization to a research project.",
         "Type": "21.T11969/3df63b7acb0522da685d",
         "Properties": {
           "Cardinality": "1",
@@ -30,8 +37,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

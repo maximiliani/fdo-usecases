@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/793ff5c33c3aeb32907a",
   "name": "keyword",
   "description": "Subject keyword or phrase describing the topical content of a resource for discovery and classification purposes.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:04:13.726Z",
+    "lastModificationDate": "2026-06-22T16:04:13.726Z"
+  },
   "ExpectedUse": "Subject indexing, content discovery, search optimization, thematic classification, and faceted browsing across repositories and knowledge organization systems.",
   "References": [],
   "Aliases": [
@@ -24,6 +29,8 @@
     "Properties": [
       {
         "Name": "keyword",
+        "Title": "Keyword",
+        "Description": "Subject keyword or phrase describing the topical content of a resource for discovery and classification purposes.",
         "Type": "21.T11969/3df63b7acb0522da685d",
         "Properties": {
           "Cardinality": "1",
@@ -31,8 +38,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

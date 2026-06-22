@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/3313b863118ed5eb0ded",
   "name": "mimeType",
   "description": "Media type (MIME type) identifier specifying the format of a digital resource or bitstream.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:08:19.778Z",
+    "lastModificationDate": "2026-06-22T16:08:19.778Z"
+  },
   "ExpectedUse": "Format identification for digital files, enabling proper handling, rendering, validation, and processing of diverse data types in repositories and computational workflows.",
   "References": [
     "https://www.iana.org/assignments/media-types/media-types.xhtml"
@@ -25,15 +30,14 @@
     "Properties": [
       {
         "Name": "mimeType",
-        "Type": "21.T11969/3df63b7acb0522da685d",
+        "Title": "MIME_Type",
+        "Description": "The MIME-Type of the object, written in the form \"type/subtype\". Some often used examples are: image/png, text/csv, application/pdf, ... ",
+        "Type": "21.T11969/2e65ab903763fae254ed",
         "Properties": {
           "Cardinality": "1",
           "extractProperties": true
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

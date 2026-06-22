@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/925e3f9925a88476ffba",
   "name": "previewImage",
   "description": "URL(s) to thumbnail or preview images providing visual representation of a resource's content.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:12:54.113Z",
+    "lastModificationDate": "2026-06-22T16:12:54.113Z"
+  },
   "ExpectedUse": "Visual discovery aids in repositories, quick content assessment, browse interfaces, and representative imagery for datasets, publications, and multimedia resources.",
   "References": [],
   "Aliases": [
@@ -23,6 +28,8 @@
     "Properties": [
       {
         "Name": "previewImage",
+        "Title": "Preview Image",
+        "Description": "URL(s) to thumbnail or preview images providing visual representation of a resource's content.",
         "Type": "21.T11969/e0efc41346cda4ba84ca",
         "Properties": {
           "Cardinality": "1",
@@ -30,8 +37,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/ed4732b6dc70be0f1b22",
   "name": "helmholtzResearchArea",
   "description": "Helmholtz Association research area classification from the predefined set of six strategic research fields.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:59:30.834Z",
+    "lastModificationDate": "2026-06-22T15:59:30.834Z"
+  },
   "ExpectedUse": "Classification of research activities, projects, and outputs according to Helmholtz Association's strategic research portfolio structure.",
   "References": [
     "https://www.helmholtz.de/en/research/"
@@ -24,15 +29,14 @@
     "Properties": [
       {
         "Name": "helmholtzResearchArea",
-        "Type": "21.T11969/3df63b7acb0522da685d",
+        "Title": "Helmholtz Research Area",
+        "Description": "Helmholtz Association research area classification from the predefined set of six strategic research fields.",
+        "Type": "21.T11969/2170780414163d16542d",
         "Properties": {
           "Cardinality": "1",
           "extractProperties": true
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

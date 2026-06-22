@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/e5cb2389246c17ee0503",
   "name": "helmholtzPoFStructure",
   "description": "Helmholtz Program-Oriented Funding (PoF) structure identifier indicating the hierarchical research program classification.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:54:04.180Z",
+    "lastModificationDate": "2026-06-22T15:54:04.180Z"
+  },
   "ExpectedUse": "Mapping research outputs to Helmholtz Association's program-oriented funding structure for reporting, portfolio analysis, and strategic planning.",
   "References": [
     "https://www.helmholtz.de/en/research/"
@@ -24,6 +29,8 @@
     "Properties": [
       {
         "Name": "helmholtzPoFStructure",
+        "Title": "Program-Oriented Funding Structure",
+        "Description": "Helmholtz Program-Oriented Funding (PoF) structure identifier indicating the hierarchical research program classification.",
         "Type": "21.T11969/3df63b7acb0522da685d",
         "Properties": {
           "Cardinality": "1",
@@ -31,8 +38,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

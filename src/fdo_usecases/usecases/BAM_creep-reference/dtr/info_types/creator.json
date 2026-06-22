@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/7c67083a5d218e544063",
   "name": "creator",
   "description": "ORCID URL(s) identifying the creator(s) or author(s) of a research output, dataset, or digital object.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:46:30.885Z",
+    "lastModificationDate": "2026-06-22T15:46:30.885Z"
+  },
   "ExpectedUse": "Attribution of scholarly works, datasets, software, and other research outputs to individual researchers using persistent identifiers.",
   "References": [
     "https://orcid.org"
@@ -17,23 +22,21 @@
   "Aliases": [
     "Author",
     "Contributor",
-    "Researcher ID",
-    "Principal Investigator"
+    "Researcher ID"
   ],
   "Schema": {
     "Type": "Object",
     "Properties": [
       {
         "Name": "creator",
-        "Type": "<<PLACEHOLDER_ORCID_URL>>",
+        "Title": "Creator",
+        "Description": "ORCID URL(s) identifying the creator(s) or author(s) of a research output, dataset, or digital object.",
+        "Type": "21.T11969/fee5f6c1a7da0c627591",
         "Properties": {
           "Cardinality": "1",
           "extractProperties": true
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

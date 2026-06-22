@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/623654b1072ae7b88202",
   "name": "spdxLicense",
   "description": "SPDX license URL(s) specifying the license terms under which a resource is distributed.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:15:25.989Z",
+    "lastModificationDate": "2026-06-22T16:15:25.989Z"
+  },
   "ExpectedUse": "Clear specification of usage rights, redistribution terms, and legal conditions for software, data, and other digital resources using standardized SPDX license identifiers.",
   "References": [
     "https://spdx.github.io/spdx-spec/v3.0.1/",
@@ -26,15 +31,14 @@
     "Properties": [
       {
         "Name": "spdxLicense",
-        "Type": "<<PLACEHOLDER_SPDX_URL>>",
+        "Title": "SPDX License",
+        "Description": "SPDX license URL(s) specifying the license terms under which a resource is distributed.",
+        "Type": "21.T11969/c153e86078bc231756ac",
         "Properties": {
           "Cardinality": "1",
           "extractProperties": true
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

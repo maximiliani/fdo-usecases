@@ -1,16 +1,21 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
-  "name": "kernelInformationProfile",
-  "description": "Handle identifier(s) pointing to the kernel information profile that defines the metadata structure for a FAIR Digital Object.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
-  "ExpectedUse": "Reference to the profile schema that validates and describes the structure of PID kernel information for any FAIR Digital Object type.",
+  "Identifier": "21.T11969/01e3f7ccb897f9c724dd",
+  "name": "FDO_profile",
+  "description": "Handle identifier(s) pointing to the FDO profile that defines the metadata structure for a FAIR Digital Object.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:03:47.973Z",
+    "lastModificationDate": "2026-06-22T16:03:47.973Z"
+  },
+  "ExpectedUse": "Reference to the profile schema that validates and describes the structure of the FDO record for any FAIR Digital Object.",
   "References": [],
   "Aliases": [
     "KIP Reference",
@@ -21,7 +26,9 @@
     "Type": "Object",
     "Properties": [
       {
-        "Name": "kernelInformationProfile",
+        "Name": "FDO_profile",
+        "Title": "FDO Profile",
+        "Description": "Handle identifier(s) pointing to the FDO profile that defines the record structure for a FAIR Digital Object.",
         "Type": "21.T11969/3bbedeeb04fa80daf501",
         "Properties": {
           "Cardinality": "1",
@@ -29,8 +36,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

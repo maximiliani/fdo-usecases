@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/2b4d6ceda80ddd63f7a9",
   "name": "latestVersion",
   "description": "Handle identifier pointing to the most current published version of a resource.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:04:45.835Z",
+    "lastModificationDate": "2026-06-22T16:04:45.835Z"
+  },
   "ExpectedUse": "Direct access to the current release, ensuring users retrieve the most up-to-date version without manual version chain traversal.",
   "References": [],
   "Aliases": [
@@ -22,6 +27,8 @@
     "Properties": [
       {
         "Name": "latestVersion",
+        "Title": "Latest Version",
+        "Description": "Handle identifier pointing to the most current published version of a resource.",
         "Type": "21.T11969/3bbedeeb04fa80daf501",
         "Properties": {
           "Cardinality": "1",
@@ -29,8 +36,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

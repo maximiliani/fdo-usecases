@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/4597cf0db467d7e365a9",
   "name": "SingleCrystalOrientation",
   "description": "Crystallographic orientation angle in degrees (0-360) specifying the angular position of a single crystal relative to a reference axis.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:15:00.787Z",
+    "lastModificationDate": "2026-06-22T16:15:00.787Z"
+  },
   "ExpectedUse": "Specification of crystal orientations in single crystal samples for X-ray diffraction, electron backscatter diffraction (EBSD), mechanical testing along specific crystallographic directions, and anisotropy studies.",
   "References": [],
   "Aliases": [
@@ -23,15 +28,14 @@
     "Properties": [
       {
         "Name": "SingleCrystalOrientation",
-        "Type": "<<PLACEHOLDER_DecimalAngle>>",
+        "Title": "Single Crystal Orientation",
+        "Description": "Crystallographic orientation angle in degrees (0-360) specifying the angular position of a single crystal relative to a reference axis.",
+        "Type": "21.T11969/2fe7b9f68268094eb3d2",
         "Properties": {
           "Cardinality": "1",
           "extractProperties": true
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

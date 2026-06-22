@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/48dbf6a89f9748ae4ead",
   "name": "dataCitePublicationType",
   "description": "DataCite ResourceTypeGeneral term indicating the broad category of a registered resource.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:47:33.488Z",
+    "lastModificationDate": "2026-06-22T15:47:33.488Z"
+  },
   "ExpectedUse": "Classification of research outputs according to DataCite's controlled vocabulary for resource types, enabling consistent categorization across repositories and DOI registration agencies.",
   "References": [
     "https://datacite-metadata-schema.readthedocs.io/en/4.7/properties/resourcetype/#a-resourcetypegeneral"
@@ -25,6 +30,8 @@
     "Properties": [
       {
         "Name": "dataCitePublicationType",
+        "Title": "Publication Type",
+        "Description": "DataCite ResourceTypeGeneral term indicating the broad category of a registered resource.",
         "Type": "21.T11969/3df63b7acb0522da685d",
         "Properties": {
           "Cardinality": "1",
@@ -32,8 +39,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

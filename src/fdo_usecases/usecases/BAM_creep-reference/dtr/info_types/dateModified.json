@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/397d831aa3a9d18eb52c",
   "name": "dateModified",
   "description": "ISO 8601 datetime stamp indicating when a resource, dataset, or digital object was last modified or updated.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:49:31.610Z",
+    "lastModificationDate": "2026-06-22T15:49:31.610Z"
+  },
   "ExpectedUse": "Tracking modification history, version currency, data freshness, and update cycles for dynamic resources and iteratively developed research outputs.",
   "References": [
     "https://www.iso.org/iso-8601-date-and-time-format.html"
@@ -25,6 +30,8 @@
     "Properties": [
       {
         "Name": "dateModified",
+        "Title": "Date Modified",
+        "Description": "ISO 8601 datetime stamp indicating when a resource, dataset, or digital object was last modified or updated.",
         "Type": "21.T11969/f1e5baf5ecc358963108",
         "Properties": {
           "Cardinality": "1",
@@ -32,8 +39,5 @@
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

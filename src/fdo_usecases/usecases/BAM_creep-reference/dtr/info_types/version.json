@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/be1ae3492b235faad933",
   "name": "version",
   "description": "Semantic version identifier for a specific iteration or release of a resource.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:18:39.704Z",
+    "lastModificationDate": "2026-06-22T16:18:39.704Z"
+  },
   "ExpectedUse": "Version control, release management, citation of specific versions, dependency specification, and tracking of iterative development in software and data products.",
   "References": [
     "https://semver.org"
@@ -25,15 +30,14 @@
     "Properties": [
       {
         "Name": "version",
-        "Type": "<<PLACEHOLDER_SemVerVersion>>",
+        "Title": "Version",
+        "Description": "Semantic version identifier for a specific iteration or release of a resource.",
+        "Type": "21.T11969/965752be13522e6032a4",
         "Properties": {
           "Cardinality": "1",
           "extractProperties": true
         }
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }
