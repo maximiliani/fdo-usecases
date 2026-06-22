@@ -1,0 +1,39 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "mimeType",
+  "description": "Media type (MIME type) identifier specifying the format of a digital resource or bitstream.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Format identification for digital files, enabling proper handling, rendering, validation, and processing of diverse data types in repositories and computational workflows.",
+  "References": [
+    "https://www.iana.org/assignments/media-types/media-types.xhtml"
+  ],
+  "Aliases": [
+    "Media Type",
+    "Content Type",
+    "File Format",
+    "Internet Media Type"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "mimeType",
+        "Type": "21.T11969/3df63b7acb0522da685d",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

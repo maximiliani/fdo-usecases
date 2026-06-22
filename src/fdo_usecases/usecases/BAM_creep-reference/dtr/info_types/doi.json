@@ -1,0 +1,39 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "doi",
+  "description": "DOI (Digital Object Identifier) providing a persistent, resolvable identifier for a digital object.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Persistent identification and citation of research outputs including publications, datasets, software, and other scholarly works with guaranteed long-term resolvability.",
+  "References": [
+    "https://www.doi.org/",
+    "https://www.datacite.org/"
+  ],
+  "Aliases": [
+    "Digital Object Identifier",
+    "DOI Name",
+    "Persistent Identifier"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "doi",
+        "Type": "21.T11969/48ba02e08f1185e3f854",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

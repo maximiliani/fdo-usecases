@@ -1,0 +1,36 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/BasicInfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "SemVerVersion",
+  "description": "Semantic version number following the MAJOR.MINOR.PATCH format with an optional 'v' prefix. Semantic versioning provides a systematic way to communicate changes in software and data versions.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Version identification for software releases, data schemas, APIs, digital objects, and any artifacts requiring clear version progression semantics with backward compatibility indicators.",
+  "References": [
+    "https://semver.org",
+    "https://en.wikipedia.org/wiki/Software_versioning"
+  ],
+  "Aliases": [
+    "Semantic Version",
+    "Version Number",
+    "MAJOR.MINOR.PATCH"
+  ],
+  "Schema": {
+    "Type": "String",
+    "PropRelations": "AND",
+    "Properties": [
+      {
+        "Property": "pattern",
+        "Value": "^v?[0-9]+\\.[0-9]+\\.[0-9]+$"
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

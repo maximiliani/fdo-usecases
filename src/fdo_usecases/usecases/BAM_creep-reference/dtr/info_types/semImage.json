@@ -1,0 +1,36 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "semImage",
+  "description": "Handle identifier for a scanning electron microscopy (SEM) image associated with a material sample or experiment.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Linking microstructural characterization data to material samples, experiments, and derived datasets in materials science workflows.",
+  "References": [],
+  "Aliases": [
+    "SEM Micrograph",
+    "Electron Microscopy Image",
+    "Microstructure Image"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "semImage",
+        "Type": "21.T11969/3bbedeeb04fa80daf501",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

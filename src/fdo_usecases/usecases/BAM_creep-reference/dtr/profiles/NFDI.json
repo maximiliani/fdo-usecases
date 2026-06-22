@@ -1,0 +1,44 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "NFDI",
+  "description": "National Research Data Infrastructure (NFDI) profile for recording consortium affiliations and grant funding information.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Documentation of NFDI consortium involvement and funding acknowledgments for German research data infrastructure initiatives.",
+  "References": [
+    "https://www.nfdi.de/"
+  ],
+  "Aliases": [
+    "NFDI Consortium Profile",
+    "German RDI Profile"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "nfdiConsortia",
+        "Title": "NFDI Consortium",
+        "Description": "NFDI consortium membership or affiliation",
+        "Type": "<<PLACEHOLDER_nfdiConsortia>>",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      },
+      {
+        "Name": "grantNumber",
+        "Title": "Grant Number",
+        "Description": "Funding grant award identifier",
+        "Type": "<<PLACEHOLDER_grantNumber>>",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      }
+    ]
+  }
+}

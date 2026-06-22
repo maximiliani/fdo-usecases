@@ -1,0 +1,70 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "Material",
+  "description": "Profile for material samples documenting identification, visual characterization, composition, and thermal processing history.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Metadata for physical material specimens, alloy batches, and reference materials in materials science workflows, linking samples to characterization data and experimental use.",
+  "References": [],
+  "Aliases": [
+    "Material Sample Profile",
+    "Specimen Metadata Profile",
+    "Alloy Characterization Profile"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "materialID",
+        "Title": "Material ID",
+        "Description": "Unique identifier for this material sample",
+        "Type": "<<PLACEHOLDER_materialID>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "previewImage",
+        "Title": "Preview Image",
+        "Description": "URL(s) to representative visual images",
+        "Type": "<<PLACEHOLDER_previewImage>>",
+        "Properties": {
+          "Cardinality": "0 - n"
+        }
+      },
+      {
+        "Name": "semImage",
+        "Title": "SEM Image",
+        "Description": "Handle to scanning electron microscopy micrograph",
+        "Type": "<<PLACEHOLDER_semImage>>",
+        "Properties": {
+          "Cardinality": "0 - 1"
+        }
+      },
+      {
+        "Name": "hasChemicalComposition",
+        "Title": "Has Chemical Composition",
+        "Description": "Handle to elemental composition data",
+        "Type": "<<PLACEHOLDER_hasChemicalComposition>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "hasHeatTreatment",
+        "Title": "Has Heat Treatment",
+        "Description": "Handle to thermal processing record",
+        "Type": "<<PLACEHOLDER_hasHeatTreatment>>",
+        "Properties": {
+          "Cardinality": "0 - 1"
+        }
+      }
+    ]
+  }
+}

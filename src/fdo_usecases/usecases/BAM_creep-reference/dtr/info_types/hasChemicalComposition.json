@@ -1,0 +1,36 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "hasChemicalComposition",
+  "description": "Handle identifier for a resource containing the chemical composition data of a material sample.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Linking materials to their compositional characterization data, enabling traceability between physical samples and analytical results in materials science workflows.",
+  "References": [],
+  "Aliases": [
+    "Chemical Composition Data",
+    "Elemental Composition",
+    "Material Composition"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "hasChemicalComposition",
+        "Type": "21.T11969/3bbedeeb04fa80daf501",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

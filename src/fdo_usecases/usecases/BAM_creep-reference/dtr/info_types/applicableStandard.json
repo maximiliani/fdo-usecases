@@ -1,0 +1,37 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "applicableStandard",
+  "description": "Identifier or designation of a technical standard, specification, or protocol governing a procedure, test, or data format.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Reference to standardized methods, protocols, and specifications ensuring reproducibility, interoperability, and compliance with established best practices.",
+  "References": [],
+  "Aliases": [
+    "Standard Reference",
+    "Test Standard",
+    "Protocol Specification",
+    "Normative Document"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "applicableStandard",
+        "Type": "21.T11969/3df63b7acb0522da685d",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

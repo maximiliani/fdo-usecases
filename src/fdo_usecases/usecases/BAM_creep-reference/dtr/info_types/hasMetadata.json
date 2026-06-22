@@ -1,0 +1,36 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "hasMetadata",
+  "description": "Handle identifier(s) for metadata resources describing or accompanying this resource.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Linking data objects to their descriptive metadata records, schema definitions, documentation, and contextual information resources.",
+  "References": [],
+  "Aliases": [
+    "Metadata Record",
+    "Descriptive Metadata",
+    "Documentation Reference"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "hasMetadata",
+        "Type": "21.T11969/3bbedeeb04fa80daf501",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

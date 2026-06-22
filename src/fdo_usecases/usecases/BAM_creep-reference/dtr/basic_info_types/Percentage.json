@@ -1,0 +1,39 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/BasicInfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "Percentage",
+  "description": "Dimensionless ratio expressed as a decimal value between 0 and 1 (inclusive). Represents fractions, proportions, probabilities, and relative quantities without associated units.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Expression of ratios, fractions, probabilities, efficiency values, composition percentages, relative uncertainties, and normalized quantities in scientific, engineering, and statistical contexts.",
+  "References": [],
+  "Aliases": [
+    "Ratio",
+    "Fraction",
+    "Proportion",
+    "Normalized Value",
+    "Probability"
+  ],
+  "Schema": {
+    "Type": "Number",
+    "PropRelations": "AND",
+    "Properties": [
+      {
+        "Property": "minimum",
+        "Value": 0
+      },
+      {
+        "Property": "maximum",
+        "Value": 1
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

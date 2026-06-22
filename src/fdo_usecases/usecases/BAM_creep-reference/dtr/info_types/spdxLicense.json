@@ -1,0 +1,40 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "spdxLicense",
+  "description": "SPDX license URL(s) specifying the license terms under which a resource is distributed.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Clear specification of usage rights, redistribution terms, and legal conditions for software, data, and other digital resources using standardized SPDX license identifiers.",
+  "References": [
+    "https://spdx.github.io/spdx-spec/v3.0.1/",
+    "https://spdx.org/licenses/"
+  ],
+  "Aliases": [
+    "Software License",
+    "Data License",
+    "Usage License",
+    "Open License"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "spdxLicense",
+        "Type": "<<PLACEHOLDER_SPDX_URL>>",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

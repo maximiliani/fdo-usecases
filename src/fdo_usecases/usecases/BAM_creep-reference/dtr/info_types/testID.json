@@ -1,0 +1,37 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "testID",
+  "description": "Unique identifier assigned to a specific test, experiment, or measurement procedure instance.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Unambiguous identification of experimental runs, test instances, and measurement campaigns for traceability, data linkage, and laboratory information management.",
+  "References": [],
+  "Aliases": [
+    "Experiment ID",
+    "Test Number",
+    "Measurement ID",
+    "Run Identifier"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "testID",
+        "Type": "21.T11969/3df63b7acb0522da685d",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

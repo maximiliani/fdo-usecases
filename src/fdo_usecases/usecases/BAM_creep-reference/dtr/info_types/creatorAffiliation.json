@@ -1,0 +1,38 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "creatorAffiliation",
+  "description": "ROR (Research Organization Registry) identifier(s) for the institutional affiliation(s) of creators and contributors.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Unambiguous identification of research organizations, universities, laboratories, and other institutions associated with creators of research outputs.",
+  "References": [
+    "https://ror.org"
+  ],
+  "Aliases": [
+    "Institution Affiliation",
+    "Organization Identifier",
+    "Research Institution"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "creatorAffiliation",
+        "Type": "21.T11969/9810c562f8a6deb1f22c",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

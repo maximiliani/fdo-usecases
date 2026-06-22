@@ -1,0 +1,39 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "datePublished",
+  "description": "ISO 8601 datetime stamp indicating when a resource was formally published or made publicly available.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Citation metadata, version of record identification, publication timeline tracking, and compliance with funder/publication policies requiring timely release.",
+  "References": [
+    "https://www.iso.org/iso-8601-date-and-time-format.html"
+  ],
+  "Aliases": [
+    "Publication Date",
+    "Date of Publication",
+    "Release Date",
+    "Available Date"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "datePublished",
+        "Type": "21.T11969/f1e5baf5ecc358963108",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

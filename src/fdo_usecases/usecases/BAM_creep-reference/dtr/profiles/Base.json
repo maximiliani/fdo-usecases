@@ -1,0 +1,81 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "Base",
+  "description": "Base profile containing fundamental metadata attributes for any FAIR Digital Object. Provides essential provenance, identification, and descriptive information.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Foundation profile for all FAIR Digital Objects, ensuring consistent core metadata across diverse research outputs including datasets, software, publications, and experimental records.",
+  "References": [],
+  "Aliases": [
+    "Core Profile",
+    "Foundation Profile",
+    "Minimal Metadata Profile"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "kernelInformationProfile",
+        "Type": "<<PLACEHOLDER_kernelInformationProfile>>",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      },
+      {
+        "Name": "creatorAffiliation",
+        "Type": "<<PLACEHOLDER_creatorAffiliation>>",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      },
+      {
+        "Name": "creator",
+        "Type": "<<PLACEHOLDER_creator>>",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      },
+      {
+        "Name": "dateCreated",
+        "Type": "<<PLACEHOLDER_dateCreated>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "dateModified",
+        "Type": "<<PLACEHOLDER_dateModified>>",
+        "Properties": {
+          "Cardinality": "0 - 1"
+        }
+      },
+      {
+        "Name": "keyword",
+        "Type": "<<PLACEHOLDER_keyword>>",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      },
+      {
+        "Name": "name",
+        "Type": "<<PLACEHOLDER_name>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "description",
+        "Type": "<<PLACEHOLDER_description>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      }
+    ]
+  }
+}

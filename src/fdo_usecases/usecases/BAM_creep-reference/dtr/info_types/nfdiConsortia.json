@@ -1,0 +1,38 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "nfdiConsortia",
+  "description": "NFDI (National Research Data Infrastructure) consortium name or identifier indicating membership or affiliation.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Identification of NFDI consortia involvement in research projects, data management activities, and community-specific metadata practices.",
+  "References": [
+    "https://www.nfdi.de/"
+  ],
+  "Aliases": [
+    "NFDI Consortium",
+    "Research Data Infrastructure Consortium",
+    "German RDI Consortium"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "nfdiConsortia",
+        "Type": "21.T11969/3df63b7acb0522da685d",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

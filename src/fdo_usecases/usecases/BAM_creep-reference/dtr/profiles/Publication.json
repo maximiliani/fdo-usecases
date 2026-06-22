@@ -1,0 +1,72 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "Publication",
+  "description": "Profile for scholarly publications and citable research outputs with persistent identifiers, publication metadata, and attribution information.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Metadata for journal articles, conference papers, preprints, datasets with DOIs, software publications, and other formally published research outputs requiring citation metadata.",
+  "References": [
+    "https://datacite-metadata-schema.readthedocs.io/en/4.7/properties/resourcetype/#a-resourcetypegeneral"
+  ],
+  "Aliases": [
+    "Scholarly Publication Profile",
+    "Citable Resource Profile",
+    "DOI Publication Profile"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "doi",
+        "Title": "DOI",
+        "Description": "Digital Object Identifier for persistent citation",
+        "Type": "<<PLACEHOLDER_doi>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "dataCitePublicationType",
+        "Title": "Publication Type",
+        "Description": "DataCite ResourceTypeGeneral classification",
+        "Type": "<<PLACEHOLDER_dataCitePublicationType>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "publisher",
+        "Title": "Publisher",
+        "Description": "Organization responsible for making the resource available",
+        "Type": "<<PLACEHOLDER_publisher>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "datePublished",
+        "Title": "Publication Date",
+        "Description": "Date when the resource was formally published",
+        "Type": "<<PLACEHOLDER_datePublished>>",
+        "Properties": {
+          "Cardinality": "0 - 1"
+        }
+      },
+      {
+        "Name": "creator",
+        "Title": "Creator",
+        "Description": "ORCID URL(s) of the author(s)",
+        "Type": "<<PLACEHOLDER_creator>>",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      }
+    ]
+  }
+}

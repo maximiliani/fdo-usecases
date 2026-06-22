@@ -1,0 +1,62 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "Versionable",
+  "description": "Versioning profile enabling tracking of version chains, release sequences, and relationships between iterations of evolving resources.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Version management for software releases, dataset updates, iterative publications, and any digital objects undergoing sequential development with explicit version relationships.",
+  "References": [
+    "https://semver.org"
+  ],
+  "Aliases": [
+    "Version Control Profile",
+    "Release Chain Profile"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "version",
+        "Title": "Version",
+        "Description": "Semantic version identifier for this release",
+        "Type": "<<PLACEHOLDER_version>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "nextVersion",
+        "Title": "Next Version",
+        "Description": "Handle pointing to a subsequent version",
+        "Type": "<<PLACEHOLDER_nextVersion>>",
+        "Properties": {
+          "Cardinality": "0 - 1"
+        }
+      },
+      {
+        "Name": "previousVersion",
+        "Title": "Previous Version",
+        "Description": "Handle pointing to a prior version",
+        "Type": "<<PLACEHOLDER_previousVersion>>",
+        "Properties": {
+          "Cardinality": "0 - 1"
+        }
+      },
+      {
+        "Name": "latestVersion",
+        "Title": "Latest Version",
+        "Description": "Handle pointing to the most current version",
+        "Type": "<<PLACEHOLDER_latestVersion>>",
+        "Properties": {
+          "Cardinality": "0 - 1"
+        }
+      }
+    ]
+  }
+}

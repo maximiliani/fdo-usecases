@@ -1,0 +1,40 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "initialStress",
+  "description": "Applied mechanical stress value in megapascals (MPa) at the start of a materials testing experiment.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Specification of loading conditions in mechanical testing including creep tests, tensile tests, compression tests, and fatigue experiments where stress control is required.",
+  "References": [
+    "https://dx.doi.org/10.31030/3485273",
+    "https://www.dinmedia.de/en/standard/din-en-iso-204/371676068"
+  ],
+  "Aliases": [
+    "Applied Stress",
+    "Test Stress",
+    "Mechanical Load",
+    "Stress Level"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "initialStress",
+        "Type": "<<PLACEHOLDER_DecimalNumber>>",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

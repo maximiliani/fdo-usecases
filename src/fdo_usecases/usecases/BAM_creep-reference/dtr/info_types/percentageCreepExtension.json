@@ -1,0 +1,40 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "percentageCreepExtension",
+  "description": "Creep strain expressed as a dimensionless ratio (0-1) representing the relative elongation of a material under sustained load.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Quantification of time-dependent plastic deformation in creep tests, tensile elongation measurements, and strain-based material characterization.",
+  "References": [
+    "https://dx.doi.org/10.31030/3485273",
+    "https://www.dinmedia.de/en/standard/din-en-iso-204/371676068"
+  ],
+  "Aliases": [
+    "Creep Strain",
+    "Relative Elongation",
+    "Plastic Strain",
+    "Deformation Ratio"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "percentageCreepExtension",
+        "Type": "<<PLACEHOLDER_Percentage>>",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

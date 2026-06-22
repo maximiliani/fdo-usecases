@@ -1,0 +1,118 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "CreepExperiment",
+  "description": "Profile for creep testing experiments per DIN EN ISO 204:2023-10, capturing test conditions, parameters, and relationships to materials and data.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Comprehensive metadata for high-temperature creep tests on metallic materials, including stress rupture testing and time-dependent deformation measurements under sustained load.",
+  "References": [
+    "https://dx.doi.org/10.31030/3485273",
+    "https://www.dinmedia.de/en/standard/din-en-iso-204/371676068"
+  ],
+  "Aliases": [
+    "Creep Test Profile",
+    "Stress Rupture Test Profile",
+    "High-Temperature Testing Profile"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "applicableStandard",
+        "Title": "Applicable Standard",
+        "Description": "Technical standard governing the test procedure",
+        "Type": "<<PLACEHOLDER_applicableStandard>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "testID",
+        "Title": "Test ID",
+        "Description": "Unique identifier for this experiment instance",
+        "Type": "<<PLACEHOLDER_testID>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "specifiedTemperature",
+        "Title": "Specified Temperature",
+        "Description": "Test temperature in degrees Celsius",
+        "Type": "<<PLACEHOLDER_specifiedTemperature>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "initialStress",
+        "Title": "Initial Stress",
+        "Description": "Applied mechanical stress in megapascals",
+        "Type": "<<PLACEHOLDER_initialStress>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "testDuration",
+        "Title": "Test Duration",
+        "Description": "Duration of the experiment in ISO 8601 format",
+        "Type": "<<PLACEHOLDER_testDuration>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "percentageCreepExtension",
+        "Title": "Percentage Creep Extension",
+        "Description": "Creep strain as a ratio (0-1)",
+        "Type": "<<PLACEHOLDER_percentageCreepExtension>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "SingleCrystalOrientation",
+        "Title": "Single Crystal Orientation",
+        "Description": "Crystallographic orientation angle in degrees",
+        "Type": "<<PLACEHOLDER_SingleCrystalOrientation>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "hasData",
+        "Title": "Has Data",
+        "Description": "Handle(s) to associated data resources",
+        "Type": "<<PLACEHOLDER_hasData>>",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      },
+      {
+        "Name": "hasMetadata",
+        "Title": "Has Metadata",
+        "Description": "Handle(s) to descriptive metadata records",
+        "Type": "<<PLACEHOLDER_hasMetadata>>",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      },
+      {
+        "Name": "usesMaterial",
+        "Title": "Uses Material",
+        "Description": "Handle(s) to material sample(s) tested",
+        "Type": "<<PLACEHOLDER_usesMaterial>>",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "helmholtzResearchArea",
+  "description": "Helmholtz Association research area classification from the predefined set of six strategic research fields.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Classification of research activities, projects, and outputs according to Helmholtz Association's strategic research portfolio structure.",
+  "References": [
+    "https://www.helmholtz.de/en/research/"
+  ],
+  "Aliases": [
+    "Research Field",
+    "Helmholtz Program Area",
+    "Strategic Research Area"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "helmholtzResearchArea",
+        "Type": "21.T11969/3df63b7acb0522da685d",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

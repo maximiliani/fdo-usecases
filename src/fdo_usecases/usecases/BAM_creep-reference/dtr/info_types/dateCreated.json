@@ -1,0 +1,39 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "dateCreated",
+  "description": "ISO 8601 datetime stamp indicating when a resource, dataset, or digital object was originally created.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Recording creation timestamps for version control, provenance tracking, citation requirements, and temporal metadata across all research domains.",
+  "References": [
+    "https://www.iso.org/iso-8601-date-and-time-format.html"
+  ],
+  "Aliases": [
+    "Creation Date",
+    "Date of Creation",
+    "Timestamp Created",
+    "Origin Date"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "dateCreated",
+        "Type": "21.T11969/f1e5baf5ecc358963108",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "identifier": "21.T11969/6291bafa30dfead575e8",
+  "name": "MegaPascal",
+  "description": "Megapascal unit for pressure and stress measurements, equal to one million pascals (1 MPa = 10^6 Pa). Commonly used in materials science for mechanical stress, tensile strength, and compression measurements.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-483"
+      }
+    ],
+    "creationDate": "2026-06-22T15:19:51.957Z",
+    "lastModificationDate": "2026-06-22T15:19:51.965Z"
+  },
+  "ExpectedUse": "Megapascal unit for pressure and stress measurements, equal to one million pascals (1 MPa = 10^6 Pa). Commonly used in materials science for mechanical stress, tensile strength, and compression measurements.",
+  "Aliases": [
+    "MPa"
+  ],
+  "unitDescription": {
+    "Name": "Megapascal",
+    "Symbol": "MPa",
+    "Quantity": "Pressure/Stress",
+    "Dimension Symbol": "p",
+    "TypicalSymbols": [
+      "σ"
+    ],
+    "Context": "Materials testing, mechanical engineering, structural analysis, climate analysis",
+    "Definition": "One megapascal equals one million pascals (1 MPa = 10^6 Pa), where one pascal is one newton per square metre.",
+    "Derivation": "21.T11969/9be4ec7c88f130ac2598 * 10^6",
+    "Usage": "Standard unit for stress measurements in materials testing per DIN EN ISO 204:2023-10 and in many other areas."
+  }
+}

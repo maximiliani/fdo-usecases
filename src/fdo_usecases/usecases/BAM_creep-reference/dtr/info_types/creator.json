@@ -1,0 +1,39 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "creator",
+  "description": "ORCID URL(s) identifying the creator(s) or author(s) of a research output, dataset, or digital object.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Attribution of scholarly works, datasets, software, and other research outputs to individual researchers using persistent identifiers.",
+  "References": [
+    "https://orcid.org"
+  ],
+  "Aliases": [
+    "Author",
+    "Contributor",
+    "Researcher ID",
+    "Principal Investigator"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "creator",
+        "Type": "<<PLACEHOLDER_ORCID_URL>>",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

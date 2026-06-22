@@ -1,0 +1,39 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "dataCitePublicationType",
+  "description": "DataCite ResourceTypeGeneral term indicating the broad category of a registered resource.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Classification of research outputs according to DataCite's controlled vocabulary for resource types, enabling consistent categorization across repositories and DOI registration agencies.",
+  "References": [
+    "https://datacite-metadata-schema.readthedocs.io/en/4.7/properties/resourcetype/#a-resourcetypegeneral"
+  ],
+  "Aliases": [
+    "Resource Type",
+    "Publication Type",
+    "Output Type",
+    "Work Type"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "dataCitePublicationType",
+        "Type": "21.T11969/3df63b7acb0522da685d",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

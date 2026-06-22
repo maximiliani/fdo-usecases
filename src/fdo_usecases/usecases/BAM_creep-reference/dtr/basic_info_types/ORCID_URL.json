@@ -1,0 +1,36 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/BasicInfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "ORCID_URL",
+  "description": "URL format of an ORCID (Open Researcher and Contributor ID) identifier. ORCID provides a persistent digital identifier that distinguishes individual researchers and contributes to open scholarly infrastructure.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Unambiguous identification of researchers, authors, contributors, and other individuals in scholarly communication, research data management, and academic publishing systems.",
+  "References": [
+    "https://orcid.org",
+    "https://info.orcid.org/what-is-orcid/"
+  ],
+  "Aliases": [
+    "Open Researcher and Contributor ID URL",
+    "Researcher ID",
+    "Author Identifier"
+  ],
+  "Schema": {
+    "Type": "String",
+    "PropRelations": "AND",
+    "Properties": [
+      {
+        "Property": "pattern",
+        "Value": "^https://orcid\\.org/[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]$"
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

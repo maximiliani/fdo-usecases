@@ -1,0 +1,61 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "DataResource",
+  "description": "Profile for digital data resources specifying format, location, licensing, and integrity verification information.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Metadata for downloadable data files, bitstreams, and digital objects requiring format specification, access locations, license terms, and integrity verification.",
+  "References": [],
+  "Aliases": [
+    "Digital Object Profile",
+    "Bitstream Metadata Profile",
+    "Data File Profile"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "mimeType",
+        "Title": "Media Type",
+        "Description": "Format identifier for the digital resource",
+        "Type": "<<PLACEHOLDER_mimeType>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "dataObjectLocation",
+        "Title": "Data Object Location",
+        "Description": "URL for accessing or downloading the bitstream",
+        "Type": "<<PLACEHOLDER_dataObjectLocation>>",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      },
+      {
+        "Name": "spdxLicense",
+        "Title": "SPDX License",
+        "Description": "License URL specifying usage rights and conditions",
+        "Type": "<<PLACEHOLDER_spdxLicense>>",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      },
+      {
+        "Name": "checksum",
+        "Title": "Checksum",
+        "Description": "Cryptographic hash for integrity verification",
+        "Type": "<<PLACEHOLDER_checksum>>",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      }
+    ]
+  }
+}

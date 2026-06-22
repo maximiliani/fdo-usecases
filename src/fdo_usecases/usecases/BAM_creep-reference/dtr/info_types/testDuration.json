@@ -1,0 +1,39 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "testDuration",
+  "description": "Duration of an experiment or test procedure expressed in ISO 8601 duration format.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Recording experimental time spans, test run durations, exposure periods, and time-dependent measurement intervals across all experimental domains.",
+  "References": [
+    "https://www.iso.org/iso-8601-date-and-time-format.html"
+  ],
+  "Aliases": [
+    "Experiment Duration",
+    "Test Run Time",
+    "Exposure Time",
+    "Measurement Period"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "testDuration",
+        "Type": "21.T11969/1370004da76fa4f3b7a5",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}

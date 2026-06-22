@@ -1,0 +1,38 @@
+{
+  "$schema": "https://dtr.fair-infrastructure.net/schema/InfoType",
+  "pid": "<<PLACEHOLDER>>",
+  "name": "dataObjectLocation",
+  "description": "URL(s) pointing to the location(s) where the actual digital object bitstream or data file can be accessed or downloaded.",
+  "version": "1.0.0",
+  "contributor": [
+    {
+      "Name": "Maximilian Inckmann",
+      "ORCID": "https://orcid.org/0009-0005-2800-4833"
+    }
+  ],
+  "ExpectedUse": "Direct access to digital object content, enabling retrieval, download, and programmatic access to research data, software, documents, and other digital assets.",
+  "References": [],
+  "Aliases": [
+    "Download URL",
+    "Data Location",
+    "Bitstream Location",
+    "File URL",
+    "Access URL"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "dataObjectLocation",
+        "Type": "21.T11969/e0efc41346cda4ba84ca",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  },
+  "versioning": {
+    "version": "1.0.0"
+  }
+}
