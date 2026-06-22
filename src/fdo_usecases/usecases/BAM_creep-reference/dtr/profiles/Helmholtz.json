@@ -1,22 +1,23 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/4f19ada2a020aaa8a14a",
   "name": "Helmholtz",
   "description": "Helmholtz Association-specific metadata profile for classifying research outputs according to strategic research areas and program-oriented funding structures.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:41:14.348Z",
+    "lastModificationDate": "2026-06-22T16:41:14.348Z"
+  },
   "ExpectedUse": "Metadata enrichment for Helmholtz Association research outputs, enabling portfolio analysis, strategic reporting, and alignment with institutional research classification schemes.",
   "References": [
     "https://www.helmholtz.de/en/research/"
-  ],
-  "Aliases": [
-    "Helmholtz Research Area Profile",
-    "PoF Classification Profile"
   ],
   "Schema": {
     "Type": "Object",
@@ -24,8 +25,8 @@
       {
         "Name": "helmholtzResearchArea",
         "Title": "Helmholtz Research Area",
-        "Description": "Strategic research field classification",
-        "Type": "<<PLACEHOLDER_helmholtzResearchArea>>",
+        "Description": "Helmholtz Association research area classification from the predefined set of six strategic research fields.",
+        "Type": "21.T11969/ed4732b6dc70be0f1b22",
         "Properties": {
           "Cardinality": "1 - n"
         }
@@ -33,8 +34,8 @@
       {
         "Name": "helmholtzPoFStructure",
         "Title": "Program-Oriented Funding Structure",
-        "Description": "Hierarchical PoF program identifier",
-        "Type": "<<PLACEHOLDER_helmholtzPoFStructure>>",
+        "Description": "Helmholtz Program-Oriented Funding (PoF) structure identifier indicating the hierarchical research program classification.",
+        "Type": "21.T11969/e5cb2389246c17ee0503",
         "Properties": {
           "Cardinality": "1 - n"
         }

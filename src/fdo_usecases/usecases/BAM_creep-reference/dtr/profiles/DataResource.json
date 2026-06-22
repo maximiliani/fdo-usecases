@@ -1,19 +1,23 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/0738c2ef35faef0fb552",
   "name": "DataResource",
   "description": "Profile for digital data resources specifying format, location, licensing, and integrity verification information.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:40:34.448Z",
+    "lastModificationDate": "2026-06-22T16:40:34.448Z"
+  },
   "ExpectedUse": "Metadata for downloadable data files, bitstreams, and digital objects requiring format specification, access locations, license terms, and integrity verification.",
   "References": [],
   "Aliases": [
-    "Digital Object Profile",
     "Bitstream Metadata Profile",
     "Data File Profile"
   ],
@@ -23,8 +27,8 @@
       {
         "Name": "mimeType",
         "Title": "Media Type",
-        "Description": "Format identifier for the digital resource",
-        "Type": "<<PLACEHOLDER_mimeType>>",
+        "Description": "Media type (MIME type) identifier specifying the format of a digital resource or bitstream.",
+        "Type": "21.T11969/3313b863118ed5eb0ded",
         "Properties": {
           "Cardinality": "1"
         }
@@ -32,8 +36,8 @@
       {
         "Name": "dataObjectLocation",
         "Title": "Data Object Location",
-        "Description": "URL for accessing or downloading the bitstream",
-        "Type": "<<PLACEHOLDER_dataObjectLocation>>",
+        "Description": "URL(s) pointing to the location(s) where the actual digital object bitstream or data file can be accessed or downloaded.",
+        "Type": "21.T11969/479febb2bbe8400da547",
         "Properties": {
           "Cardinality": "1 - n"
         }
@@ -41,8 +45,8 @@
       {
         "Name": "spdxLicense",
         "Title": "SPDX License",
-        "Description": "License URL specifying usage rights and conditions",
-        "Type": "<<PLACEHOLDER_spdxLicense>>",
+        "Description": "SPDX license URL(s) specifying the license terms under which a resource is distributed.",
+        "Type": "21.T11969/623654b1072ae7b88202",
         "Properties": {
           "Cardinality": "1 - n"
         }
@@ -50,10 +54,10 @@
       {
         "Name": "checksum",
         "Title": "Checksum",
-        "Description": "Cryptographic hash for integrity verification",
-        "Type": "<<PLACEHOLDER_checksum>>",
+        "Description": "Cryptographic checksum value for verifying data integrity and detecting file corruption or tampering.",
+        "Type": "21.T11969/a80ed2ef79e22f1d8af8",
         "Properties": {
-          "Cardinality": "1"
+          "Cardinality": "1 - n"
         }
       }
     ]

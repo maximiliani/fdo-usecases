@@ -1,19 +1,23 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/077fe9c54ed5ed26fa54",
   "name": "Base",
   "description": "Base profile containing fundamental metadata attributes for any FAIR Digital Object. Provides essential provenance, identification, and descriptive information.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:38:31.467Z",
+    "lastModificationDate": "2026-06-22T16:38:31.467Z"
+  },
   "ExpectedUse": "Foundation profile for all FAIR Digital Objects, ensuring consistent core metadata across diverse research outputs including datasets, software, publications, and experimental records.",
   "References": [],
   "Aliases": [
-    "Core Profile",
     "Foundation Profile",
     "Minimal Metadata Profile"
   ],
@@ -21,59 +25,75 @@
     "Type": "Object",
     "Properties": [
       {
-        "Name": "kernelInformationProfile",
-        "Type": "<<PLACEHOLDER_kernelInformationProfile>>",
-        "Properties": {
-          "Cardinality": "1 - n"
-        }
-      },
-      {
-        "Name": "creatorAffiliation",
-        "Type": "<<PLACEHOLDER_creatorAffiliation>>",
+        "Name": "FDO_profile",
+        "Title": "FDO profile",
+        "Description": "Handle identifier(s) pointing to the FDO profiles that defines the record structure for a FAIR Digital Object.",
+        "Type": "21.T11969/01e3f7ccb897f9c724dd",
         "Properties": {
           "Cardinality": "1 - n"
         }
       },
       {
         "Name": "creator",
-        "Type": "<<PLACEHOLDER_creator>>",
+        "Title": "Creator",
+        "Description": "ORCID URL(s) identifying the creator(s) or author(s) of a research output, dataset, or digital object.",
+        "Type": "21.T11969/7c67083a5d218e544063",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      },
+      {
+        "Name": "creatorAffiliation",
+        "Title": "Creator Affiliation",
+        "Description": "ROR (Research Organization Registry) identifier(s) for the institutional affiliation(s) of creators and contributors.",
+        "Type": "21.T11969/ea9f6b3d78c6608fe801",
         "Properties": {
           "Cardinality": "1 - n"
         }
       },
       {
         "Name": "dateCreated",
-        "Type": "<<PLACEHOLDER_dateCreated>>",
+        "Title": "Date Created",
+        "Description": "ISO 8601 datetime stamp indicating when a resource, dataset, or digital object was originally created.",
+        "Type": "21.T11969/29f92bd203dd3eaa5a1f",
         "Properties": {
           "Cardinality": "1"
         }
       },
       {
         "Name": "dateModified",
-        "Type": "<<PLACEHOLDER_dateModified>>",
+        "Title": "Date Modified",
+        "Description": "ISO 8601 datetime stamp indicating when a resource, dataset, or digital object was last modified or updated.",
+        "Type": "21.T11969/397d831aa3a9d18eb52c",
         "Properties": {
           "Cardinality": "0 - 1"
         }
       },
       {
         "Name": "keyword",
-        "Type": "<<PLACEHOLDER_keyword>>",
+        "Title": "Keyword",
+        "Description": "Subject keyword or phrase describing the topical content of a resource for discovery and classification purposes.",
+        "Type": "21.T11969/793ff5c33c3aeb32907a",
+        "Properties": {
+          "Cardinality": "0 - n"
+        }
+      },
+      {
+        "Name": "name",
+        "Title": "Name",
+        "Description": "Human-readable name or title assigned to a resource for identification and display purposes.",
+        "Type": "21.T11969/bd3e9fb9b606d2198c9e",
         "Properties": {
           "Cardinality": "1 - n"
         }
       },
       {
-        "Name": "name",
-        "Type": "<<PLACEHOLDER_name>>",
-        "Properties": {
-          "Cardinality": "1"
-        }
-      },
-      {
         "Name": "description",
-        "Type": "<<PLACEHOLDER_description>>",
+        "Title": "Description",
+        "Description": "Free-text description providing contextual information about a resource's content, purpose, or characteristics.",
+        "Type": "21.T11969/880724416f5857987e70",
         "Properties": {
-          "Cardinality": "1"
+          "Cardinality": "0 - 1"
         }
       }
     ]

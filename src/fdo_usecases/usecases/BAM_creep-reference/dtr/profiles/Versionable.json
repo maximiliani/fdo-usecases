@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/6c663a0695a411803d70",
   "name": "Versionable",
   "description": "Versioning profile enabling tracking of version chains, release sequences, and relationships between iterations of evolving resources.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:44:44.652Z",
+    "lastModificationDate": "2026-06-22T16:44:44.652Z"
+  },
   "ExpectedUse": "Version management for software releases, dataset updates, iterative publications, and any digital objects undergoing sequential development with explicit version relationships.",
   "References": [
     "https://semver.org"
@@ -24,8 +29,8 @@
       {
         "Name": "version",
         "Title": "Version",
-        "Description": "Semantic version identifier for this release",
-        "Type": "<<PLACEHOLDER_version>>",
+        "Description": "Semantic version identifier for a specific iteration or release of a resource.",
+        "Type": "21.T11969/be1ae3492b235faad933",
         "Properties": {
           "Cardinality": "1"
         }
@@ -33,8 +38,8 @@
       {
         "Name": "nextVersion",
         "Title": "Next Version",
-        "Description": "Handle pointing to a subsequent version",
-        "Type": "<<PLACEHOLDER_nextVersion>>",
+        "Description": "Handle identifier pointing to a newer version of the same resource.",
+        "Type": "21.T11969/7f1a6afddcfeefbf195b",
         "Properties": {
           "Cardinality": "0 - 1"
         }
@@ -42,8 +47,8 @@
       {
         "Name": "previousVersion",
         "Title": "Previous Version",
-        "Description": "Handle pointing to a prior version",
-        "Type": "<<PLACEHOLDER_previousVersion>>",
+        "Description": "Handle identifier pointing to an earlier version of the same resource.",
+        "Type": "21.T11969/7c97f00a2a95826c1a8f",
         "Properties": {
           "Cardinality": "0 - 1"
         }
@@ -51,8 +56,8 @@
       {
         "Name": "latestVersion",
         "Title": "Latest Version",
-        "Description": "Handle pointing to the most current version",
-        "Type": "<<PLACEHOLDER_latestVersion>>",
+        "Description": "Handle identifier pointing to the most current published version of a resource.",
+        "Type": "21.T11969/2b4d6ceda80ddd63f7a9",
         "Properties": {
           "Cardinality": "0 - 1"
         }

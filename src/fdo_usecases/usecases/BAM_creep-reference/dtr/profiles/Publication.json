@@ -1,19 +1,21 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/e00441c49bf6cb62a4a5",
   "name": "Publication",
   "description": "Profile for scholarly publications and citable research outputs with persistent identifiers, publication metadata, and attribution information.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:43:59.590Z",
+    "lastModificationDate": "2026-06-22T16:43:59.590Z"
+  },
   "ExpectedUse": "Metadata for journal articles, conference papers, preprints, datasets with DOIs, software publications, and other formally published research outputs requiring citation metadata.",
-  "References": [
-    "https://datacite-metadata-schema.readthedocs.io/en/4.7/properties/resourcetype/#a-resourcetypegeneral"
-  ],
   "Aliases": [
     "Scholarly Publication Profile",
     "Citable Resource Profile",
@@ -25,8 +27,8 @@
       {
         "Name": "doi",
         "Title": "DOI",
-        "Description": "Digital Object Identifier for persistent citation",
-        "Type": "<<PLACEHOLDER_doi>>",
+        "Description": "DOI (Digital Object Identifier) providing a persistent, resolvable identifier for a digital object.",
+        "Type": "21.T11969/48e563f148dc04d8b31c",
         "Properties": {
           "Cardinality": "1"
         }
@@ -34,35 +36,35 @@
       {
         "Name": "dataCitePublicationType",
         "Title": "Publication Type",
-        "Description": "DataCite ResourceTypeGeneral classification",
-        "Type": "<<PLACEHOLDER_dataCitePublicationType>>",
+        "Description": "DataCite ResourceTypeGeneral term indicating the broad category of a registered resource.",
+        "Type": "21.T11969/48dbf6a89f9748ae4ead",
         "Properties": {
-          "Cardinality": "1"
+          "Cardinality": "1 - n"
         }
       },
       {
         "Name": "publisher",
         "Title": "Publisher",
-        "Description": "Organization responsible for making the resource available",
-        "Type": "<<PLACEHOLDER_publisher>>",
+        "Description": "Name of the organization or entity responsible for making a resource available.",
+        "Type": "21.T11969/cdd96207a7dfbcc0db93",
         "Properties": {
           "Cardinality": "1"
         }
       },
       {
         "Name": "datePublished",
-        "Title": "Publication Date",
-        "Description": "Date when the resource was formally published",
-        "Type": "<<PLACEHOLDER_datePublished>>",
+        "Title": "Date Published",
+        "Description": "ISO 8601 datetime stamp indicating when a resource was formally published or made publicly available.",
+        "Type": "21.T11969/0c9b86e828976a85d4f2",
         "Properties": {
-          "Cardinality": "0 - 1"
+          "Cardinality": "1"
         }
       },
       {
         "Name": "creator",
         "Title": "Creator",
-        "Description": "ORCID URL(s) of the author(s)",
-        "Type": "<<PLACEHOLDER_creator>>",
+        "Description": "ORCID URL(s) identifying the creator(s) or author(s) of a research output, dataset, or digital object.",
+        "Type": "21.T11969/7c67083a5d218e544063",
         "Properties": {
           "Cardinality": "1 - n"
         }

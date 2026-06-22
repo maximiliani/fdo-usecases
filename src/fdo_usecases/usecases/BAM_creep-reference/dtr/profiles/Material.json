@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/Profile",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/d8169782b57c7a9e9f01",
   "name": "Material",
   "description": "Profile for material samples documenting identification, visual characterization, composition, and thermal processing history.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T16:42:11.552Z",
+    "lastModificationDate": "2026-06-22T16:42:11.552Z"
+  },
   "ExpectedUse": "Metadata for physical material specimens, alloy batches, and reference materials in materials science workflows, linking samples to characterization data and experimental use.",
   "References": [],
   "Aliases": [
@@ -23,8 +28,8 @@
       {
         "Name": "materialID",
         "Title": "Material ID",
-        "Description": "Unique identifier for this material sample",
-        "Type": "<<PLACEHOLDER_materialID>>",
+        "Description": "Unique identifier assigned to a specific material sample, alloy batch, or substance.",
+        "Type": "21.T11969/716805eef0349802dc9a",
         "Properties": {
           "Cardinality": "1"
         }
@@ -32,8 +37,8 @@
       {
         "Name": "previewImage",
         "Title": "Preview Image",
-        "Description": "URL(s) to representative visual images",
-        "Type": "<<PLACEHOLDER_previewImage>>",
+        "Description": "URL(s) to thumbnail or preview images providing visual representation of a resource's content.",
+        "Type": "21.T11969/925e3f9925a88476ffba",
         "Properties": {
           "Cardinality": "0 - n"
         }
@@ -41,17 +46,17 @@
       {
         "Name": "semImage",
         "Title": "SEM Image",
-        "Description": "Handle to scanning electron microscopy micrograph",
-        "Type": "<<PLACEHOLDER_semImage>>",
+        "Description": "Handle identifier for a scanning electron microscopy (SEM) image associated with a material sample or experiment.",
+        "Type": "21.T11969/19a94f596420bb274408",
         "Properties": {
-          "Cardinality": "0 - 1"
+          "Cardinality": "0 - n"
         }
       },
       {
         "Name": "hasChemicalComposition",
         "Title": "Has Chemical Composition",
-        "Description": "Handle to elemental composition data",
-        "Type": "<<PLACEHOLDER_hasChemicalComposition>>",
+        "Description": "Handle identifier for a resource containing the chemical composition data of a material sample.",
+        "Type": "21.T11969/e32cfb93d7fc61ce3ca5",
         "Properties": {
           "Cardinality": "1"
         }
@@ -59,10 +64,10 @@
       {
         "Name": "hasHeatTreatment",
         "Title": "Has Heat Treatment",
-        "Description": "Handle to thermal processing record",
-        "Type": "<<PLACEHOLDER_hasHeatTreatment>>",
+        "Description": "Handle identifier for a resource documenting the heat treatment process applied to a material sample.",
+        "Type": "21.T11969/766ae14d72b49cfb5273",
         "Properties": {
-          "Cardinality": "0 - 1"
+          "Cardinality": "0 - n"
         }
       }
     ]
