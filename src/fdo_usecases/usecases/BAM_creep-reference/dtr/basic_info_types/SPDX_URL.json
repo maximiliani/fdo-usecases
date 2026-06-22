@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/BasicInfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/c153e86078bc231756ac",
   "name": "SPDX_URL",
   "description": "URL format of an SPDX (Software Package Data Exchange) license identifier. SPDX provides a standard format for communicating the components, licenses, and copyrights associated with a software package or application.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:31:30.938Z",
+    "lastModificationDate": "2026-06-22T15:31:30.938Z"
+  },
   "ExpectedUse": "Specification of software and data licenses in standardized SPDX format, enabling automated license compliance checking and interoperability across software development and data distribution platforms.",
   "References": [
     "https://spdx.github.io/spdx-spec/v3.0.1/",
@@ -29,8 +34,5 @@
         "Value": "^https://spdx\\.org/licenses/[A-Za-z0-9\\-\\.]+$"
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

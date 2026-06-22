@@ -1,15 +1,20 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/BasicInfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/2fe7b9f68268094eb3d2",
   "name": "DecimalAngle",
   "description": "Angular measurement expressed as a decimal value in degrees, ranging from 0 to 360 degrees. Used for orientation, rotation, crystallographic angles, and directional measurements.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:27:18.724Z",
+    "lastModificationDate": "2026-06-22T15:27:18.724Z"
+  },
   "ExpectedUse": "Specification of angular orientations, rotational positions, crystallographic orientations, directional bearings, and geometric angles in materials science, astronomy, navigation, robotics, and computer graphics.",
   "References": [],
   "Aliases": [
@@ -31,8 +36,5 @@
         "Value": 360
       }
     ]
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

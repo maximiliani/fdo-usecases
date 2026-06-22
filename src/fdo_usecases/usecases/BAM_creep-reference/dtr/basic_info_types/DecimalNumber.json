@@ -1,17 +1,22 @@
 {
-  "$schema": "https://dtr.fair-infrastructure.net/schema/BasicInfoType",
-  "pid": "<<PLACEHOLDER>>",
+  "Identifier": "21.T11969/112c248def0a38f01234",
   "name": "DecimalNumber",
   "description": "Decimal number value for scientific measurements and quantitative data. Supports arbitrary precision numeric values for accurate representation of measured quantities.",
-  "version": "1.0.0",
-  "contributor": [
-    {
-      "Name": "Maximilian Inckmann",
-      "ORCID": "https://orcid.org/0009-0005-2800-4833"
-    }
-  ],
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-06-22T15:27:58.618Z",
+    "lastModificationDate": "2026-06-22T15:27:58.618Z"
+  },
   "ExpectedUse": "General-purpose numeric type for scientific measurements, calculated values, statistical data, and quantitative metadata across all research domains including physics, chemistry, biology, engineering, and social sciences.",
-  "References": [ ],
+  "References": [],
   "Aliases": [
     "Numeric Value",
     "Measurement Value",
@@ -23,8 +28,5 @@
     "Type": "Number",
     "PropRelations": "AND",
     "Properties": []
-  },
-  "versioning": {
-    "version": "1.0.0"
   }
 }

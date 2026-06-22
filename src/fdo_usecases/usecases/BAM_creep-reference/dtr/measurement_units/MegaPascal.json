@@ -9,11 +9,11 @@
     "contributors": [
       {
         "Name": "Maximilian Inckmann",
-        "ORCID": "https://orcid.org/0009-0005-2800-483"
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
       }
     ],
     "creationDate": "2026-06-22T15:19:51.957Z",
-    "lastModificationDate": "2026-06-22T15:19:51.965Z"
+    "lastModificationDate": "2026-06-22T15:35:03.986Z"
   },
   "ExpectedUse": "Megapascal unit for pressure and stress measurements, equal to one million pascals (1 MPa = 10^6 Pa). Commonly used in materials science for mechanical stress, tensile strength, and compression measurements.",
   "Aliases": [
