@@ -1,4 +1,5 @@
 # Python code for JSON to PID Record conversion
+extracted from https://github.com/kit-data-manager/fair-do-designer (c) 2025 - 2026 Andreas Pfeil, Christopher Raquet (both: Karlsruhe Institute of Technology) Apache-2.0 licensed
 
 This project contains required utilities to map JSON files to PID records and register them using a [Typed PID Maker](https://github.com/kit-data-manager/pit-service) instance.
 
