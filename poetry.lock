@@ -40,18 +40,6 @@ files = [
 packaging = "*"
 
 [[package]]
-name = "appdirs"
-version = "1.4.4"
-description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-optional = false
-python-versions = "*"
-groups = ["dev"]
-files = [
-    {file = "appdirs-1.4.4-py2.py3-none-any.whl", hash = "sha256:a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128"},
-    {file = "appdirs-1.4.4.tar.gz", hash = "sha256:7d5d0167b2b1ba821647616af46a749d1c653740dd0d2415100fe26e27afdf41"},
-]
-
-[[package]]
 name = "attrs"
 version = "26.1.0"
 description = "Classes Without Boilerplate"
@@ -523,18 +511,19 @@ toml = ["tomli ; python_full_version <= \"3.11.0a6\""]
 
 [[package]]
 name = "depgather"
-version = "0.4.0"
+version = "0.5.0"
 description = "Get a list of deps given a pyproject.toml, uv.lock, requirements.txt etc"
 optional = false
 python-versions = ">=3.12"
 groups = ["dev"]
 files = [
-    {file = "depgather-0.4.0-py3-none-any.whl", hash = "sha256:8bd2a813a4b9cfe385daea7d8addcfc03fd9b12254dc119918d5c65ccd26461f"},
-    {file = "depgather-0.4.0.tar.gz", hash = "sha256:661facd6fffd709ef57086461fcc749cbfcb073eac1518db7db2cd02f60c3bd5"},
+    { file = "depgather-0.5.0-py3-none-any.whl", hash = "sha256:ff92b0e2bde382537d139a2f1819d4d04ef1bf244fd216e0829e35007905e565" },
+    { file = "depgather-0.5.0.tar.gz", hash = "sha256:0a9dd0980c9c8ae01c5acfbe76c97d2b5209a299defa520331a61a0846816f65" },
 ]
 
 [package.dependencies]
 loguru = ">=0.7.3"
+pydantic = ">=2.13.4"
 requirements-parser = ">=0.13.0"
 tomli = ">=2.2.1"
 
@@ -613,14 +602,14 @@ files = [
 
 [[package]]
 name = "hypothesis"
-version = "6.155.3"
+version = "6.155.7"
 description = "The property-based testing library for Python"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "hypothesis-6.155.3-py3-none-any.whl", hash = "sha256:ede5a3d142d9c5c9f70cb3075541905b228d6c3a682bcec3d4fe0722e9eda127"},
-    {file = "hypothesis-6.155.3.tar.gz", hash = "sha256:1e34b17ae9873515384312cb7640abd773eb096c7eef8c0d9c614fa2c306e9bb"},
+    { file = "hypothesis-6.155.7-py3-none-any.whl", hash = "sha256:9f634bdb1f9e9b8ab6ba09431cf2deedb750c96978125a6fb3c5a0f6c6db4131" },
+    { file = "hypothesis-6.155.7.tar.gz", hash = "sha256:d8d6091753d0669db3c90c5e5b346cb37c72f3dd9378c8413acb1fd5da63f7ea" },
 ]
 
 [package.dependencies]
@@ -764,23 +753,23 @@ dev = ["Sphinx (>=5.0.2)", "doc8 (>=0.11.2)", "pytest (>=7.0.1)", "pytest-xdist 
 
 [[package]]
 name = "licensecheck"
-version = "2026.0.5"
+version = "2026.0.8"
 description = "Output the licenses used by dependencies and check if these are compatible with the project license"
 optional = false
 python-versions = ">=3.12"
 groups = ["dev"]
 files = [
-    {file = "licensecheck-2026.0.5-py3-none-any.whl", hash = "sha256:9544c14d773e223b8536e7947547c8280792c18626c5c8dee86b246d2b76e736"},
-    {file = "licensecheck-2026.0.5.tar.gz", hash = "sha256:621250322ec81d02f717e0a55a83618900683dc80b04ef37148982cfe5de664e"},
+    { file = "licensecheck-2026.0.8-py3-none-any.whl", hash = "sha256:a2e16b3c4204bfc3b9d3878930516067adb7657aeb6fb3f523c5a2e93b936467" },
+    { file = "licensecheck-2026.0.8.tar.gz", hash = "sha256:9f5504ac55d8f953de9ee52ea7d3a924cc3306facc538a3e912403c92ddf4612" },
 ]
 
 [package.dependencies]
-appdirs = ">=1.4.4"
 configurator = ">=3.2.0"
-depgather = ">=0.4.0"
+depgather = ">=0.5.0"
 license-expression = ">=30.4.4"
 loguru = ">=0.7.3"
 markdown = ">=3.10.2"
+platformdirs = ">=4.10.0"
 pydantic = ">=2.13.4"
 requests = ">=2.32.5"
 requests-cache = ">=1.3.2"
@@ -1382,14 +1371,14 @@ testing = ["coverage", "pytest", "pytest-benchmark"]
 
 [[package]]
 name = "poethepoet"
-version = "0.46.0"
+version = "0.47.0"
 description = "A task runner that works well with poetry and uv."
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "poethepoet-0.46.0-py3-none-any.whl", hash = "sha256:dc6d770a14792d124abac9066c5a707876027d1878ac9ca26cf57e9b2a96dc89"},
-    {file = "poethepoet-0.46.0.tar.gz", hash = "sha256:daf8469031879ef59ef0b34fdba83574d65e41eb9186e20cd0f7c89ce479b030"},
+    { file = "poethepoet-0.47.0-py3-none-any.whl", hash = "sha256:b443f38c5c8cd6e2415bcd5922a45c03ab120360ff0d515233ef6279f3f285c3" },
+    { file = "poethepoet-0.47.0.tar.gz", hash = "sha256:8902da95e78ecec6bf1ee37b7c4da3bcf53f2ff89eb0d8a4447c01de4c4f2e6e" },
 ]
 
 [package.dependencies]
@@ -1680,14 +1669,14 @@ diagrams = ["jinja2", "railroad-diagrams"]
 
 [[package]]
 name = "pytest"
-version = "9.1.0"
+version = "9.1.1"
 description = "pytest: simple powerful testing with Python"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "pytest-9.1.0-py3-none-any.whl", hash = "sha256:8ebb0e7888bdf2bdfc602ec51f8f62d50200af37356c74e503c79a94f5c81f32"},
-    {file = "pytest-9.1.0.tar.gz", hash = "sha256:41dd9148c08072446394cefd3d79701701335a9f4cae69ba92e39f6c7f5c061c"},
+    { file = "pytest-9.1.1-py3-none-any.whl", hash = "sha256:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c" },
+    { file = "pytest-9.1.1.tar.gz", hash = "sha256:1088fbde8f2b49d95a549a195707afa7a76a3ce9bcadc26b6d71f0ffda5fe313" },
 ]
 
 [package.dependencies]
@@ -2223,14 +2212,14 @@ files = [
 
 [[package]]
 name = "typer"
-version = "0.26.7"
+version = "0.26.8"
 description = "Typer, build great CLIs. Easy to code. Based on Python type hints."
 optional = false
 python-versions = ">=3.10"
 groups = ["main", "dev"]
 files = [
-    {file = "typer-0.26.7-py3-none-any.whl", hash = "sha256:5c87cfbc5d34491c5346ebf49c23e18d56ccb863268d3a8d592b26087c2f5e58"},
-    {file = "typer-0.26.7.tar.gz", hash = "sha256:e314a34c617e419c091b2830dda3ea1f257134ff593061a8f5b9717ab8dddb3a"},
+    { file = "typer-0.26.8-py3-none-any.whl", hash = "sha256:3512ca79ac5c11113414b36e80281b872884477722440691c89d1112e321a49c" },
+    { file = "typer-0.26.8.tar.gz", hash = "sha256:c244a6bd558886fe3f8780efb6bdd28bb9aff005a94eedebaa5cb32926fe2f7e" },
 ]
 
 [package.dependencies]
@@ -2397,4 +2386,4 @@ dev = ["black (>=19.3b0) ; python_version >= \"3.6\"", "pytest (>=4.6.2)"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4.0"
-content-hash = "fe136ffacb2469d3c59a66d00190fde3221061c13245eaeb6cda7dc4bcacf143"
+content-hash = "dcfd230b46333b0d135fcc3b3ca619de67be282de5a5634ac784219f218f9de2"

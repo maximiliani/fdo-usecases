@@ -30,10 +30,10 @@ extra:
   # social links in footer: https://squidfunk.github.io/mkdocs-material/setup/setting-up-the-footer/?h=social#social-links
   social:
     # you can add more various social links, if desired
-    # - icon: 'fontawesome/solid/globe'
-    #   link: 'https://your-organization-homepage.org'
-    # - icon: 'fontawesome/brands/github'
-    #   link: 'https://github.com/your_github_organization'
+  - icon: 'fontawesome/solid/globe'
+    link: 'https://scc.kit.edu'
+  - icon: 'fontawesome/brands/github'
+    link: 'https://github.com/kit-data-manager/fdo-usecases'
     # - icon: 'fontawesome/brands/gitlab'
     #   link: 'https://your.gitlab.instance/your_organization'
 
@@ -120,6 +120,12 @@ markdown_extensions:
 - pymdownx.emoji:
     emoji_index: !!python/name:material.extensions.emoji.twemoji
     emoji_generator: !!python/name:material.extensions.emoji.to_svg
+    # Mermaid diagram support: https://squidfunk.github.io/mkdocs-material/reference/diagrams/
+- pymdownx.superfences:
+    custom_fences:
+    - name: mermaid
+      class: mermaid
+      format: !!python/name:pymdownx.superfences.fence_code_format
 
 plugins:
   # default search box (must be listed if plugins are added)
@@ -145,6 +151,10 @@ plugins:
           members_order: source
           separate_signature: true
           show_signature_annotations: true
+          # Use first line of module docstring as heading
+          heading_level: 1
+          show_root_heading: true
+          show_root_full_path: false
   # https://squidfunk.github.io/mkdocs-material/setup/building-for-offline-usage/#built-in-offline-plugin
   # To allow building for offline usage, e.g. with: OFFLINE=true mkdocs build
 - offline:
