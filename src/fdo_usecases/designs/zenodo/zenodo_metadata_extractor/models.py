@@ -88,18 +88,21 @@ class Creator(BaseModel):
     """Creator/author of a dataset.
 
     Represents a single author or contributor to a dataset. ORCID identifiers
-    are validated against the standard ISO 27729 format.
+    are validated against the standard ISO 27729 format. ROR IDs are validated
+    against the standard ROR identifier format.
 
     Attributes:
         name: Full name in "Family name, Given names" format
         affiliation: Institutional affiliation (optional)
         orcid: ORCID identifier in XXXX-XXXX-XXXX-XXXX format (optional)
+        ror_id: ROR identifier URL for institutional affiliation (optional)
 
     """
 
     name: str
     affiliation: str | None = None
     orcid: str | None = None
+    ror_id: str | None = None
 
     @field_validator("orcid")
     @classmethod
@@ -110,6 +113,17 @@ class Creator(BaseModel):
         orcid_pattern = r"^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$"
         if not re.match(orcid_pattern, v):
             raise ValueError(f"Invalid ORCID format: {v}")
+        return v
+
+    @field_validator("ror_id")
+    @classmethod
+    def validate_ror_id(cls, v: str | None) -> str | None:
+        """Validate ROR ID format."""
+        if v is None:
+            return v
+        ror_pattern = r"^https://ror\.org/0[a-h0-9]{6}[0-9a-z]$"
+        if not re.match(ror_pattern, v):
+            raise ValueError(f"Invalid ROR ID format: {v}")
         return v
 
 

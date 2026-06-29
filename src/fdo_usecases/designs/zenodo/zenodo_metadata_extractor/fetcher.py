@@ -43,7 +43,7 @@ import re
 from datetime import date
 from typing import Any
 
-from .api_client import ZenodoAPIClient
+from .api_client import OrcidApiClient, ZenodoAPIClient, ZenodoExportApiClient
 from .exceptions import DOINotFoundError
 from .models import (
     CommunityInfo,
@@ -107,6 +107,10 @@ class ZenodoDatasetFetcher:
 
         """
         self.api_client = ZenodoAPIClient(cache_enabled=cache_enabled, timeout=timeout)
+        self.export_client = ZenodoExportApiClient(
+            cache_enabled=cache_enabled, timeout=timeout
+        )
+        self.orcid_client = OrcidApiClient(cache_enabled=cache_enabled, timeout=timeout)
 
     async def fetch_by_doi(self, doi: str) -> Dataset:
         """Fetch complete dataset by DOI.
@@ -156,6 +160,9 @@ class ZenodoDatasetFetcher:
             dataset = self._build_dataset_model(
                 record_data, versions_data, concept_recid
             )
+
+            # Step 4: Enrich creators with ROR IDs (priority: Zenodo > ORCID)
+            await self._enrich_creators_with_ror(record_data, dataset)
 
             return dataset
 
@@ -218,6 +225,202 @@ class ZenodoDatasetFetcher:
         except DOINotFoundError:
             # Versions endpoint doesn't exist for this record
             return []
+
+    async def _enrich_creators_with_ror(
+        self, record_data: dict[str, Any], dataset: Dataset
+    ) -> None:
+        """Enrich dataset creators with ROR IDs.
+
+        Priority order:
+        1. Extract ROR IDs from Zenodo export metadata (structured affiliations)
+        2. Match Zenodo free-text affiliation + ORCID resolved ROR
+        3. Skip if no ROR found
+
+        Step 1: Fetch Zenodo export JSON which contains structured creator
+        affiliations with ROR identifiers in the format:
+        creators[i].affiliations[j].identifiers[k].scheme == "ror"
+
+        Step 2: For creators without ROR from Zenodo, attempt ORCID profile
+        lookup if ORCID is available.
+
+        Args:
+            record_data: Original record data from Zenodo API
+            dataset: Dataset object with creators to enrich (modified in-place)
+
+        """
+        export_data: dict[str, Any] | None = None
+        try:
+            recid = record_data["id"]
+            async with self.export_client:
+                export_data = await self.export_client.get_record_export(recid)
+        except Exception:  # noqa: S110
+            pass
+
+        for version in dataset.versions.values():
+            for creator in version.creators:
+                ror_id: str | None = None
+
+                ror_id = self._extract_ror_from_export(export_data, creator)
+
+                if not ror_id and creator.orcid:
+                    try:
+                        employments = await self.orcid_client.get_employments(
+                            creator.orcid
+                        )
+                        educations = await self.orcid_client.get_educations(
+                            creator.orcid
+                        )
+
+                        all_affiliations = employments + educations
+
+                        matched_ror = self._match_affiliation(
+                            creator.affiliation,
+                            all_affiliations,
+                            version.publication_date,
+                        )
+
+                        if matched_ror:
+                            ror_id = matched_ror
+
+                    except Exception:  # noqa: S110
+                        pass
+
+                if ror_id:
+                    creator.ror_id = ror_id
+
+    def _extract_ror_from_export(
+        self, export_data: dict[str, Any] | None, creator: Creator
+    ) -> str | None:
+        """Extract ROR ID from Zenodo export JSON structured affiliations.
+
+        Parses the export JSON format where creators have structured
+        affiliations array with identifiers:
+        {
+          "affiliations": [{
+            "identifiers": [
+              {"identifier": "03x516a66", "scheme": "ror"},
+              ...
+            ]
+          }]
+        }
+
+        Matches creators by name and ORCID between export data and
+        existing creator object.
+
+        Args:
+            export_data: Complete export JSON from Zenodo (or None if fetch failed)
+            creator: Creator object to find ROR for
+
+        Returns:
+            ROR ID URL if found, None otherwise
+
+        """
+        if not export_data:
+            return None
+
+        export_creators = export_data.get("metadata", {}).get("creators", [])
+
+        creator_name = creator.name.strip().lower()
+        creator_orcid = creator.orcid
+
+        for exp_creator in export_creators:
+            person_or_org = exp_creator.get("person_or_org", {})
+            exp_name = person_or_org.get("name", "").strip().lower()
+            exp_identifiers = person_or_org.get("identifiers", [])
+
+            name_match = creator_name == exp_name or creator_name in exp_name
+
+            orcid_match = False
+            if creator_orcid:
+                for ident in exp_identifiers:
+                    if (
+                        ident.get("scheme") == "orcid"
+                        and ident.get("identifier") == creator_orcid
+                    ):
+                        orcid_match = True
+                        break
+
+            if not (name_match or orcid_match):
+                continue
+
+            affiliations = exp_creator.get("affiliations", [])
+            for affil in affiliations:
+                identifiers = affil.get("identifiers", [])
+                for ident in identifiers:
+                    if ident.get("scheme") == "ror":
+                        ror_id_value = ident.get("identifier")
+                        if ror_id_value:
+                            return f"https://ror.org/{ror_id_value}"
+
+        return None
+
+    def _match_affiliation(
+        self,
+        zenodo_affiliation: str | None,
+        orcid_affiliations: list[dict[str, Any]],
+        publication_date: date,
+    ) -> str | None:
+        """Match Zenodo affiliation string to ORCID ROR IDs.
+
+        Compares the affiliation name from Zenodo metadata with organizations
+        listed in the ORCID profile. Uses substring matching and optionally
+        validates the timeframe.
+
+        Args:
+            zenodo_affiliation: Affiliation string from Zenodo metadata
+            orcid_affiliations: List of affiliation records from ORCID
+            publication_date: Dataset publication date for timeframe validation
+
+        Returns:
+            ROR ID URL if match found, None otherwise
+
+        """
+        if not zenodo_affiliation:
+            return None
+
+        zenodo_affil_lower = zenodo_affiliation.lower()
+
+        for affil in orcid_affiliations:
+            org_data = affil.get("organization", {})
+            org_name = org_data.get("name", "")
+            org_name_lower = org_name.lower()
+
+            if not org_name:
+                continue
+
+            if (
+                zenodo_affil_lower in org_name_lower
+                or org_name_lower in zenodo_affil_lower
+            ):
+                ror_id = org_data.get("disambiguated_organization", {}).get(
+                    "disambiguated_organization_identifier"
+                )
+
+                if not ror_id:
+                    continue
+
+                start_date_str = affil.get("start_date", {}).get("value")
+                end_date_str = affil.get("end_date", {}).get("value")
+
+                if start_date_str:
+                    try:
+                        start_year = int(start_date_str[:4])
+                        if start_year > publication_date.year + 1:
+                            continue
+                    except ValueError:
+                        pass
+
+                if end_date_str:
+                    try:
+                        end_year = int(end_date_str[:4])
+                        if end_year < publication_date.year - 1:
+                            continue
+                    except ValueError:
+                        pass
+
+                return f"https://ror.org/{ror_id}"
+
+        return None
 
     def _build_dataset_model(
         self,
