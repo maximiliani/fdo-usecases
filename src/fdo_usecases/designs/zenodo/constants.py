@@ -89,7 +89,7 @@ INFOTYPES = {
     #: Publication references relationship
     "references": "21.T11969/f4c9a69f715c3c60aa2f",
     #: Publication isReferencedBy relationship
-    "isReferencedBy": "21.T11969/e5945ef3ff07f314a14",
+    "isReferencedBy": "21.T11969/e5945ef3ff07f314a146",
     #: Landing page URL location
     "landingPageLocation": "21.T11969/0c9b86e828976a85d4f3",
     #: Preview image URL for dataset landing page
