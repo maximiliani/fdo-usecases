@@ -62,17 +62,19 @@ class ZenodoFDODesign(RecordDesign):
 
     """
 
-    def __init__(self, doi: str):
-        """Initialize orchestrator with DOI.
+    def __init__(self, dois: list[str] | str, max_concurrent: int = 10):
+        """Initialize orchestrator with DOI(s).
 
         Args:
-            doi: Digital Object Identifier of the dataset
+            dois: Single DOI string or list of DOI strings to process
+            max_concurrent: Maximum number of concurrent API requests (default: 10)
 
         """
         super().__init__()
-        self.doi = doi
+        self.dois = [dois] if isinstance(dois, str) else dois
+        self._max_concurrent = max_concurrent
+        self._semaphore: asyncio.Semaphore | None = None
         self._processed_datasets: set[str] = set()
-        self._dataset: Dataset | None = None
         self._record_graph: dict[str, PidRecord] = {}
 
         # Composed designs (pass self as orchestrator for graph access)
@@ -83,24 +85,40 @@ class ZenodoFDODesign(RecordDesign):
         # Reference processing service
         self.reference_processor = ReferenceProcessor(self)
 
-        logger.info(f"ZenodoFDODesign initialized for DOI: {doi}")
+        logger.info(
+            f"ZenodoFDODesign initialized for {len(self.dois)} DOI(s), "
+            f"max_concurrent={max_concurrent}"
+        )
 
-    async def _fetch_metadata(self) -> Dataset:
-        """Fetch and cache Zenodo metadata.
+    async def _get_semaphore(self) -> asyncio.Semaphore:
+        """Get or create semaphore for concurrency limiting.
+
+        Returns:
+            Semaphore instance for limiting concurrent requests
+
+        """
+        if self._semaphore is None:
+            self._semaphore = asyncio.Semaphore(self._max_concurrent)
+        return self._semaphore
+
+    async def _fetch_metadata(self, doi: str) -> Dataset:
+        """Fetch Zenodo metadata for a specific DOI.
+
+        Args:
+            doi: DOI to fetch metadata for
 
         Returns:
             Complete Dataset object with all versions and files
 
         """
-        if self._dataset is None:
-            logger.info(f"Fetching metadata for DOI: {self.doi}")
-            fetcher = ZenodoDatasetFetcher(cache_enabled=True)
-            self._dataset = await fetcher.fetch_by_doi(self.doi)
-            logger.info(
-                f"Fetched {len(self._dataset.versions)} versions "
-                f"with {len(self._dataset.all_files)} unique files"
-            )
-        return self._dataset
+        logger.info(f"Fetching metadata for DOI: {doi}")
+        fetcher = ZenodoDatasetFetcher(cache_enabled=True)
+        dataset = await fetcher.fetch_by_doi(doi)
+        logger.info(
+            f"Fetched {len(dataset.versions)} versions "
+            f"with {len(dataset.all_files)} unique files"
+        )
+        return dataset
 
     def _transform_to_exchange_models(
         self, dataset: Dataset
@@ -188,58 +206,100 @@ class ZenodoFDODesign(RecordDesign):
 
         """
         logger.info(f"Processing nested Zenodo reference: {doi}")
-        nested_design = ZenodoFDODesign(doi)
+        nested_design = ZenodoFDODesign(dois=doi, max_concurrent=self._max_concurrent)
         nested_design._processed_datasets = self._processed_datasets
+        nested_design._record_graph = self._record_graph
         await nested_design.execute_async()
 
-    def execute(self) -> None:
+    def execute(
+        self,
+    ) -> tuple[list[str], list[tuple[str, BaseException]]]:
         """Execute FDO creation synchronously.
 
-        Main entry point that wraps async execution. Fetches metadata,
-        transforms to exchange models, and creates all FDOs.
+        Returns:
+            Tuple of (successful_dois, [(failed_doi, exception), ...])
 
         """
-        asyncio.run(self.execute_async())
+        return asyncio.run(self.execute_async())
 
-    async def execute_async(self) -> None:
-        """Async execution entry point.
+    async def execute_async(
+        self,
+    ) -> tuple[list[str], list[tuple[str, BaseException]]]:
+        """Process all DOIs concurrently with error aggregation.
 
-        Main workflow:
+        Main workflow for each DOI:
         1. Check deduplication
         2. Fetch metadata
         3. Transform to exchange models
-        4. Create Dataset FDOs
-        5. Create File FDOs
+        4. Create Dataset FDOs (parallel)
+        5. Create File FDOs (parallel)
         6. Process references
 
+        Returns:
+            Tuple of (successful_dois, [(failed_doi, exception), ...])
+
         """
-        if self.doi in self._processed_datasets:
-            logger.warning(f"Skipping already processed dataset: {self.doi}")
+        semaphore = await self._get_semaphore()
+
+        async def process_single_doi(doi: str) -> str:
+            async with semaphore:
+                await self._process_doi(doi)
+                return doi
+
+        results = await asyncio.gather(
+            *[process_single_doi(doi) for doi in self.dois],
+            return_exceptions=True,
+        )
+
+        successful: list[str] = []
+        failed: list[tuple[str, BaseException]] = []
+        for i, result in enumerate(results):
+            if isinstance(result, BaseException):
+                logger.error(
+                    f"Failed to process {self.dois[i]}: {result}", exc_info=result
+                )
+                failed.append((self.dois[i], result))
+            else:
+                successful.append(result)
+
+        if failed:
+            print(f"\n❌ Failed DOIs ({len(failed)}):")
+            for doi, exc in failed:
+                print(f"  - {doi}: {type(exc).__name__}: {exc}")
+
+        return successful, failed
+
+    async def _process_doi(self, doi: str) -> None:
+        """Process a single DOI.
+
+        Args:
+            doi: Digital Object Identifier to process
+
+        """
+        if doi in self._processed_datasets:
+            logger.warning(f"Skipping already processed dataset: {doi}")
             return
 
-        self._processed_datasets.add(self.doi)
-        logger.info(f"Starting FDO creation for DOI: {self.doi}")
+        self._processed_datasets.add(doi)
+        logger.info(f"Starting FDO creation for DOI: {doi}")
 
-        # Fetch metadata
-        dataset = await self._fetch_metadata()
+        dataset = await self._fetch_metadata(doi)
 
-        # Transform to exchange models
         dataset_datas, file_datas = self._transform_to_exchange_models(dataset)
 
-        # Create Dataset FDOs
         logger.info(f"Creating {len(dataset_datas)} Dataset FDOs")
-        for data in dataset_datas:
-            await self.dataset_design.create_fdo(data)
+        await asyncio.gather(
+            *[self.dataset_design.create_fdo(data) for data in dataset_datas]
+        )
 
-        # Create File FDOs
         logger.info(f"Creating {len(file_datas)} File FDOs")
-        for data in file_datas:
-            await self.file_design.create_fdo(data)
+        await asyncio.gather(
+            *[self.file_design.create_fdo(data) for data in file_datas]
+        )
 
-        # Process references via service
         await self.reference_processor.process_all(dataset.related_identifiers)
 
-        logger.info(f"Completed FDO creation for DOI: {self.doi}")
+        logger.info(f"Completed FDO creation for DOI: {doi}")
 
 
 __all__ = ["ZenodoFDODesign"]
