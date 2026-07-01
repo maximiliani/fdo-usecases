@@ -509,6 +509,13 @@
             </div>
 
             <div class="control-section">
+                <h4>Filter by Relationship</h4>
+                <div id="relationship-filters">
+                    <!-- Dynamically populated based on edge data -->
+                </div>
+            </div>
+
+            <div class="control-section">
                 <h4>Legend</h4>
                 <div class="legend-item">
                     <div class="legend-node zenodo"></div>
@@ -575,10 +582,161 @@
         let currentDisplayMode = 'name';
         let visibleTypes = new Set(['zenodo', 'md5', 'handle', 'other']);
         let focusedNodeId = null;
+        let visibleRelationships = new Set();
 
         // Lookup helper for attribute metadata
         function getAttrMeta(key) {
             return ATTR_DEFS[key] || { name: key, description: '' };
+        }
+
+        // Calculate in-degree for each node (number of incoming edges)
+        function calculateNodePopularity() {
+            const popularity = {};
+            GRAPH_DATA.elements.forEach(elem => {
+                if (!elem.data.source) {  // node
+                    popularity[elem.data.id] = 0;
+                }
+            });
+            GRAPH_DATA.elements.forEach(elem => {
+                if (elem.data.source) {  // edge
+                    const target = elem.data.target;
+                    popularity[target] = (popularity[target] || 0) + 1;
+                }
+            });
+            return popularity;
+        }
+
+        // Detect communities using Louvain-like algorithm (modularity optimization)
+        function detectCommunities() {
+            const nodes = [];
+            const edges = [];
+            const nodeMap = {};
+
+            GRAPH_DATA.elements.forEach((elem, idx) => {
+                if (!elem.data.source) {
+                    nodes.push(idx);
+                    nodeMap[elem.data.id] = idx;
+                } else {
+                    edges.push([nodeMap[elem.data.source], nodeMap[elem.data.target]]);
+                }
+            });
+
+            const n = nodes.length;
+            let community = new Array(n).fill(0).map((_, i) => i);
+
+            // Simple greedy modularity optimization
+            const adjacency = Array.from({length: n}, () => []);
+            edges.forEach(([a, b]) => {
+                adjacency[a].push(b);
+                adjacency[b].push(a);
+            });
+
+            // Iterate to optimize community assignments
+            for (let iter = 0; iter < 10; iter++) {
+                for (let i = 0; i < n; i++) {
+                    const neighborCommunities = {};
+                    adjacency[i].forEach(neighbor => {
+                        const comm = community[neighbor];
+                        neighborCommunities[comm] = (neighborCommunities[comm] || 0) + 1;
+                    });
+
+                    if (Object.keys(neighborCommunities).length > 0) {
+                        const bestComm = Object.entries(neighborCommunities)
+                            .sort((a, b) => b[1] - a[1])[0][0];
+                        community[i] = parseInt(bestComm);
+                    }
+                }
+            }
+
+            // Renumber communities sequentially
+            const uniqueComms = [...new Set(community)].sort((a, b) => a - b);
+            const renumberMap = {};
+            uniqueComms.forEach((c, i) => { renumberMap[c] = i; });
+
+            return community.map(c => renumberMap[c]);
+        }
+
+        // Initialize relationship filters from edge data
+        function initRelationshipFilters() {
+            const relationships = new Map();
+
+            GRAPH_DATA.elements.forEach(elem => {
+                if (elem.data.source && elem.data.k) {
+                    const meta = getAttrMeta(elem.data.k);
+                    if (!relationships.has(elem.data.k)) {
+                        relationships.set(elem.data.k, {
+                            pid: elem.data.k,
+                            name: meta.name || elem.data.k,
+                            count: 0
+                        });
+                    }
+                    relationships.get(elem.data.k).count++;
+                }
+            });
+
+            const container = document.getElementById('relationship-filters');
+            visibleRelationships.clear();
+
+            relationships.forEach((rel, pid) => {
+                visibleRelationships.add(pid);
+                const div = document.createElement('div');
+                div.className = 'filter-checkbox';
+                div.innerHTML = `
+                    <label>
+                        <input type="checkbox" class="relationship-filter" data-pid="${escapeHtml(pid)}" checked>
+                        <span>${escapeHtml(rel.name)} (${rel.count})</span>
+                    </label>
+                `;
+                container.appendChild(div);
+            });
+
+            document.querySelectorAll('.relationship-filter').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const pid = this.dataset.pid;
+                    if (this.checked) {
+                        visibleRelationships.add(pid);
+                    } else {
+                        visibleRelationships.delete(pid);
+                    }
+                    filterByRelationship();
+                });
+            });
+        }
+
+        // Filter edges by relationship type
+        function filterByRelationship() {
+            // Don't apply when in focus mode
+            if (focusedNodeId) return;
+
+            cy.edges().forEach(edge => {
+                const relPid = edge.data('k');
+                if (visibleRelationships.has(relPid)) {
+                    edge.removeClass('hidden-relationship');
+                } else {
+                    edge.addClass('hidden-relationship');
+                }
+            });
+
+            // Hide nodes that become isolated
+            cy.nodes().forEach(node => {
+                const hasVisibleEdge = node.connectedEdges().some(e => {
+                    return !e.hasClass('hidden-relationship') &&
+                           !e.hasClass('hidden') &&
+                           !e.hasClass('hidden-profile');
+                });
+
+                // Also check if node passes type/profile filters
+                const passesTypeFilter = visibleTypes.has(node.data('type'));
+                const profiles = node.data('profiles') || [];
+                const passesProfileFilter = profiles.some(p => visibleProfiles.has(p));
+
+                if (!hasVisibleEdge && passesTypeFilter && passesProfileFilter) {
+                    // Node is isolated due to relationship filtering
+                    node.addClass('hidden-isolated');
+                } else {
+                    node.removeClass('hidden-isolated');
+                }
+            });
         }
 
         // Focus on a single node (show only it and its direct connections)
@@ -632,9 +790,10 @@
             if (focusBtn) focusBtn.style.display = 'inline-block';
             if (clearBtn) clearBtn.style.display = 'none';
 
-            // Re-apply type and profile filters
+            // Re-apply all filters
             filterByType();
             filterByProfile();
+            filterByRelationship();
         }
 
         // Initialize Cytoscape
@@ -726,6 +885,24 @@
                         style: {
                             'display': 'none'
                         }
+                    },
+                    {
+                        selector: 'node.hidden-relationship',
+                        style: {
+                            'display': 'none'
+                        }
+                    },
+                    {
+                        selector: 'edge.hidden-relationship',
+                        style: {
+                            'display': 'none'
+                        }
+                    },
+                    {
+                        selector: 'node.hidden-isolated',
+                        style: {
+                            'display': 'none'
+                        }
                     }
                 ],
                 layout: {
@@ -751,8 +928,9 @@
             // Update statistics
             updateStatistics();
 
-            // Initialize profile filters
+            // Initialize filters
             initProfileFilters();
+            initRelationshipFilters();
 
             // Node click handler
             cy.on('tap', 'node', function(evt) {
@@ -910,11 +1088,55 @@
         // Layout change handler
         document.getElementById('layout-select').addEventListener('change', function() {
             const layout = this.value;
-            cy.layout({
-                name: layout,
-                animate: true,
-                animationDuration: 500
-            }).run();
+            console.log('Layout changed to:', layout);
+
+            if (layout === 'popularity') {
+                console.log('Applying popularity-based hierarchical layout...');
+                console.log('Available layouts:', Object.keys(cy.layouts()));
+
+                try {
+                    // Hierarchical layout by popularity (most referenced at top)
+                    const popularity = calculateNodePopularity();
+
+                    // Log top nodes for debugging
+                    const sorted = Object.entries(popularity).sort((a, b) => b[1] - a[1]);
+                    console.log('Top 5 most referenced nodes:', sorted.slice(0, 5));
+
+                    // Assign rank based on in-degree (higher = more referenced = top)
+                    const ranks = {};
+                    Object.entries(popularity).forEach(([pid, refs]) => {
+                        if (refs >= 10) ranks[pid] = 0;      // Top tier
+                        else if (refs >= 3) ranks[pid] = 1;  // Middle tier
+                        else ranks[pid] = 2;                  // Bottom tier
+                    });
+
+                    console.log('Running dagre layout with custom ranking...');
+                    cy.layout({
+                        name: 'dagre',
+                        animate: true,
+                        animationDuration: 800,
+                        rankDir: 'TB',
+                        rankSep: 200,
+                        nodeSep: 50,
+                        ranker: 'tight-tree',
+                        assignRank: function(node) {
+                            const rank = ranks[node.id()] !== undefined ? ranks[node.id()] : 2;
+                            console.log(`Node ${node.id().substr(0, 20)}... assigned rank ${rank}`);
+                            return rank;
+                        }
+                    }).run();
+                    console.log('Dagre layout completed successfully');
+                } catch (e) {
+                    console.error('Error applying dagre layout:', e);
+                }
+            } else {
+                console.log(`Applying ${layout} layout...`);
+                cy.layout({
+                    name: layout,
+                    animate: true,
+                    animationDuration: 500
+                }).run();
+            }
         });
 
         // Display mode handlers
@@ -1113,17 +1335,43 @@
             }
         });
 
-        // Load Cytoscape and extensions
+        // Load Cytoscape and extensions sequentially (dagre must load before cytoscape-dagre)
         function loadScripts() {
             console.log('Loading Cytoscape scripts...');
             const scripts = [
                 'https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js',
-                'https://cdn.jsdelivr.net/npm/cytoscape-cose-bilkent@4.1.0/cytoscape-cose-bilkent.min.js'
+                'https://cdn.jsdelivr.net/npm/cytoscape-cose-bilkent@4.1.0/cytoscape-cose-bilkent.min.js',
+                'https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js',
+                'https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js'
             ];
 
-            let loaded = 0;
+            let currentIdx = 0;
 
-            scripts.forEach((src, idx) => {
+            function loadNext() {
+                if (currentIdx >= scripts.length) {
+                    // All scripts loaded
+                    console.log('All scripts loaded, initializing Cytoscape...');
+                    try {
+                        // Register dagre extension with cytoscape
+                        if (window.cytoscapeDagre) {
+                            cytoscape.use(window.cytoscapeDagre);
+                            console.log('dagre extension registered');
+                        } else {
+                            console.error('cytoscapeDagre not found on window!');
+                        }
+                        initCytoscape();
+                    } catch (e) {
+                        console.error('Error initializing Cytoscape:', e);
+                        document.getElementById('loading-overlay').innerHTML =
+                            'Error: ' + e.message;
+                    }
+                    return;
+                }
+
+                const src = scripts[currentIdx];
+                const idx = currentIdx;
+                currentIdx++;
+
                 const script = document.createElement('script');
                 script.src = src;
                 script.onerror = (err) => {
@@ -1132,21 +1380,19 @@
                         'Error loading: ' + src.split('/').pop();
                 };
                 script.onload = () => {
-                    loaded++;
                     console.log(`Loaded ${idx + 1}/${scripts.length}: ${src.split('/').pop()}`);
-                    if (loaded === scripts.length) {
-                        console.log('All scripts loaded, initializing Cytoscape...');
-                        try {
-                            initCytoscape();
-                        } catch (e) {
-                            console.error('Error initializing Cytoscape:', e);
-                            document.getElementById('loading-overlay').innerHTML =
-                                'Error: ' + e.message;
-                        }
+
+                    // Verify dagre is available before loading cytoscape-dagre
+                    if (idx === 2) {  // dagre just loaded
+                        console.log('dagre loaded, checking window.dagre:', typeof window.dagre);
                     }
+
+                    loadNext();
                 };
                 document.head.appendChild(script);
-            });
+            }
+
+            loadNext();
         }
 
         // Start loading
