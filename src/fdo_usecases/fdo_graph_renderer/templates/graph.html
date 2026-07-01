@@ -457,12 +457,8 @@
             width: 10px;
             height: 10px;
             border-radius: 50%;
+            /* Colors now set dynamically via inline style in JavaScript */
         }
-
-        .type-indicator.zenodo { background: #3498db; }
-        .type-indicator.md5 { background: #2ecc71; }
-        .type-indicator.handle { background: #e67e22; }
-        .type-indicator.other { background: #9b59b6; }
     </style>
 </head>
 <body>
@@ -526,29 +522,8 @@
 
             <div class="control-section">
                 <h4>Filter by Type</h4>
-                <div class="filter-checkbox">
-                    <label>
-                        <input type="checkbox" class="type-filter" data-type="zenodo" checked>
-                        <span class="type-indicator zenodo"></span> Zenodo
-                    </label>
-                </div>
-                <div class="filter-checkbox">
-                    <label>
-                        <input type="checkbox" class="type-filter" data-type="md5" checked>
-                        <span class="type-indicator md5"></span> MD5 Files
-                    </label>
-                </div>
-                <div class="filter-checkbox">
-                    <label>
-                        <input type="checkbox" class="type-filter" data-type="handle" checked>
-                        <span class="type-indicator handle"></span> Handle
-                    </label>
-                </div>
-                <div class="filter-checkbox">
-                    <label>
-                        <input type="checkbox" class="type-filter" data-type="other" checked>
-                        <span class="type-indicator other"></span> Other
-                    </label>
+                <div id="type-filters">
+                    <!-- Dynamically populated based on graph data -->
                 </div>
             </div>
 
@@ -762,18 +737,82 @@
             }
 
             try {
-                const { PID } = await import('https://unpkg.com/@kit-data-manager/pid-component/dist/esm/index.js');
+                const { PID, PIDDataType } = await import('https://unpkg.com/@kit-data-manager/pid-component/dist/esm/index.js');
+
                 const pid = PID.getPIDFromString(attrKeyPid);
+
+                // Check if resolvable
+                if (!pid.isResolvable()) {
+                    console.debug(`PID ${attrKeyPid} marked as unresolvable`);
+                    const fallback = { name: truncatePid(attrKeyPid, 25), description: '' };
+                    attrMetaCache.set(attrKeyPid, fallback);
+                    failedResolutions.add(attrKeyPid);
+                    return fallback;
+                }
+
+                // Resolve the PID
                 const record = await pid.resolve();
 
-                if (record && record.values) {
-                    let name = '';
-                    let description = '';
+                if (!record || !record.values) {
+                    console.debug(`PID ${attrKeyPid} could not be resolved via API`);
+                    const fallback = { name: truncatePid(attrKeyPid, 25), description: '' };
+                    attrMetaCache.set(attrKeyPid, fallback);
+                    failedResolutions.add(attrKeyPid);
+                    return fallback;
+                }
 
-                    for (const val of record.values) {
-                        const typeStr = val.type?.toString() || '';
+                // Try to resolve as PIDDataType first
+                const dataType = await PIDDataType.resolveDataType(pid);
+                if (dataType) {
+                    const meta = {
+                        name: dataType.name || truncatePid(attrKeyPid, 25),
+                        description: dataType.description || ''
+                    };
+                    attrMetaCache.set(attrKeyPid, meta);
+                    return meta;
+                }
+
+                // Fallback: Look for 10320/loc reference and parse XML
+                let name = '';
+                let description = '';
+
+                for (const val of record.values) {
+                    const typeStr = val.type?.toString() || '';
+
+                    // Check for location type reference (10320/loc)
+                    if (typeStr === '10320/loc' || typeStr.includes('10320/loc')) {
+                        try {
+                            const xmlValue = val.data?.value || '';
+                            const parser = new DOMParser();
+                            const xmlDoc = parser.parseFromString(xmlValue, 'text/xml');
+
+                            // Get all locations from XML
+                            const xmlLocations = xmlDoc.getElementsByTagName('location');
+                            for (let j = 0; j < xmlLocations.length; j++) {
+                                const href = xmlLocations[j].getAttribute('href');
+                                const view = xmlLocations[j].getAttribute('view');
+
+                                // If view is json, fetch and extract name/description
+                                if (view === 'json' && href) {
+                                    try {
+                                        const response = await fetch(href);
+                                        const epicJson = await response.json();
+                                        name = epicJson['name'] || '';
+                                        description = epicJson['description'] || '';
+                                        break;
+                                    } catch (e) {
+                                        console.warn(`Failed to fetch ePIC JSON from ${href}:`, e);
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.warn(`Failed to parse location XML for ${attrKeyPid}:`, e);
+                        }
+                    }
+
+                    // Also check common name/title fields as backup
+                    if (!name) {
                         const dataValue = val.data?.value || '';
-
                         if (typeStr.includes('bd3e9fb9b606d2198c9e') ||
                             typeStr.includes('name') ||
                             typeStr.includes('title')) {
@@ -786,15 +825,15 @@
                             description = dataValue;
                         }
                     }
-
-                    if (!name) {
-                        name = truncatePid(attrKeyPid, 25);
-                    }
-
-                    const meta = { name, description };
-                    attrMetaCache.set(attrKeyPid, meta);
-                    return meta;
                 }
+
+                if (!name) {
+                    name = truncatePid(attrKeyPid, 25);
+                }
+
+                const meta = { name, description };
+                attrMetaCache.set(attrKeyPid, meta);
+                return meta;
             } catch (error) {
                 console.warn(`Failed to resolve ${attrKeyPid}:`, error);
             }
@@ -806,13 +845,23 @@
         }
 
         async function preloadAttributeMetadata(cytoscapeElements) {
-            const uniqueAttrKeys = new Set();
-
+            // Collect unique attribute keys from edges
+            const edgeAttrKeys = new Set();
             cytoscapeElements.elements.forEach(elem => {
                 if (elem.data.k) {
-                    uniqueAttrKeys.add(elem.data.k);
+                    edgeAttrKeys.add(elem.data.k);
                 }
             });
+
+            // ALSO collect profile PIDs for resolution
+            const profilePids = new Set();
+            Object.values(RAW_GRAPH_DATA).forEach(recordData => {
+                const profiles = extractProfilePids(recordData.record || []);
+                profiles.forEach(p => profilePids.add(p));
+            });
+
+            // Combine all PIDs to resolve
+            const uniqueAttrKeys = new Set([...edgeAttrKeys, ...profilePids]);
 
             const totalToResolve = uniqueAttrKeys.size;
             let resolvedCount = 0;
@@ -821,7 +870,7 @@
                 return;
             }
 
-            console.log(`Resolving ${totalToResolve} unique attribute PIDs...`);
+            console.log(`Resolving ${totalToResolve} unique PIDs (${edgeAttrKeys.size} attributes + ${profilePids.size} profiles)...`);
             updateLoading(3, 0);
 
             const batchSize = 10;
@@ -1097,8 +1146,6 @@
             });
 
             updateStatistics();
-            initProfileFilters();
-            initRelationshipFilters();
 
             cy.on('tap', 'node', function(evt) {
                 showNodeDetails(evt.target);
@@ -1164,10 +1211,10 @@
                                 <span style="color: #95a5a6; font-weight: normal;">(${attr.c || 1} ${hasMultiple ? 'values' : 'value'})</span>
                             </div>
                             ${!hasMultiple
-                                ? `<div class="attribute-value">${escapeHtml(values[0])}</div>`
+                                ? `<div class="attribute-value">${values[0]}</div>`
                                 : `<div class="attribute-values">
                                     <ul>
-                                        ${values.map(v => `<li><span class="attribute-value">${escapeHtml(v)}</span></li>`).join('')}
+                                        ${values.map(v => `<li><span class="attribute-value">${v}</span></li>`).join('')}
                                     </ul>
                                    </div>`
                             }
@@ -1202,8 +1249,14 @@
             `;
 
             if (window.pidDetectionController) {
+                // First rescan after short delay
                 setTimeout(() => {
                     window.pidDetectionController.rescan();
+
+                    // Second rescan after components start rendering
+                    setTimeout(() => {
+                        window.pidDetectionController.rescan();
+                    }, 500);
                 }, 100);
             }
 
@@ -1225,6 +1278,57 @@
             return div.innerHTML;
         }
 
+        function initTypeFilters() {
+            const container = document.getElementById('type-filters');
+            container.innerHTML = '';
+
+            // Count actual types in graph data
+            const typeCounts = new Map();
+            Object.entries(RAW_GRAPH_DATA).forEach(([pid, recordData]) => {
+                const type = classifyNodeType(pid);
+                typeCounts.set(type, (typeCounts.get(type) || 0) + 1);
+            });
+
+            // Color mapping - MUST match graph node colors exactly
+            const typeColors = {
+                zenodo: '#3498db',
+                md5: '#2ecc71',
+                handle: '#e67e22',
+                other: '#9b59b6'
+            };
+
+            // Create checkboxes only for types that exist
+            typeCounts.forEach((count, type) => {
+                visibleTypes.add(type);
+                const div = document.createElement('div');
+                div.className = 'filter-checkbox';
+                div.innerHTML = `
+                    <label>
+                        <input type="checkbox" class="type-filter"
+                               data-type="${type}" checked>
+                        <span class="type-indicator"
+                              style="display: inline-block; width: 10px; height: 10px;
+                                     border-radius: 50%; background: ${typeColors[type]};"></span>
+                        ${type.charAt(0).toUpperCase() + type.slice(1)} (${count})
+                    </label>
+                `;
+                container.appendChild(div);
+            });
+
+            // Attach event listeners
+            document.querySelectorAll('.type-filter').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const type = this.dataset.type;
+                    if (this.checked) {
+                        visibleTypes.add(type);
+                    } else {
+                        visibleTypes.delete(type);
+                    }
+                    filterByType();
+                });
+            });
+        }
+
         function initProfileFilters() {
             const profiles = new Set();
             Object.values(RAW_GRAPH_DATA).forEach(recordData => {
@@ -1235,14 +1339,23 @@
             const container = document.getElementById('profile-filters');
             visibleProfiles.clear();
 
-            profiles.forEach(profile => {
-                visibleProfiles.add(profile);
+            profiles.forEach(profilePid => {
+                visibleProfiles.add(profilePid);
+
+                // Lookup resolved name from cache
+                const meta = attrMetaCache.get(profilePid);
+                const displayName = meta?.name || truncatePid(profilePid, 25);
+                const isFailed = !meta || meta.name === truncatePid(profilePid, 25);
+
                 const div = document.createElement('div');
                 div.className = 'filter-checkbox';
                 div.innerHTML = `
                     <label>
-                        <input type="checkbox" class="profile-filter" data-profile="${escapeHtml(profile)}" checked>
-                        <span>${escapeHtml(profile)}</span>
+                        <input type="checkbox" class="profile-filter"
+                               data-profile="${escapeHtml(profilePid)}" checked>
+                        <span style="${isFailed ? 'color: #f39c12;' : ''}">
+                            ${escapeHtml(displayName)}${isFailed ? ' ⚠️' : ''}
+                        </span>
                     </label>
                 `;
                 container.appendChild(div);
@@ -1587,9 +1700,16 @@
 
                     await preloadAttributeMetadata(elements);
 
-                    updateLoading(4, 0);
+                    updateLoading(3, 0);
                     console.log('Initializing Cytoscape...');
                     initCytoscapeWithElements(elements);
+
+                    // Initialize filters AFTER metadata resolution
+                    updateLoading(4, 0);
+                    console.log('Initializing filters with resolved metadata...');
+                    initTypeFilters();
+                    initProfileFilters();
+                    initRelationshipFilters();
                     updateLoading(4, 100);
                 }, 100);
             }, 100);
@@ -1602,10 +1722,17 @@
                 window.pidDetectionController = initPidDetection({
                     root: document.getElementById('details-panel'),
                     darkMode: 'light',
+                    renderers: ['HandleType', 'DOIType', 'ORCIDType', 'RORType', 'URLType'],
                     observe: true,
-                    levelOfSubcomponents: 2,
+                    levelOfSubcomponents: 3,
                     emphasizeComponent: true,
-                    showTopLevelCopy: true
+                    showTopLevelCopy: true,
+                    fallbackToAll: true,
+                    exclude: 'script, style, pre, code, .no-pid-detect, pid-component',
+                    settings: JSON.stringify([{
+                        type: 'HandleType',
+                        values: [{name: 'ttl', value: 86400000}]
+                    }])
                 });
 
                 await initializeGraph();
