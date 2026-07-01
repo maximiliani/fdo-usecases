@@ -22,8 +22,7 @@ repos:
       hooks:
           - id: mypy
             args: [--no-strict-optional, --ignore-missing-imports]
-            # NOTE: you might need to add some deps here:
-            additional_dependencies: []
+            additional_dependencies: [types-requests]
 
     # License Metadata
     - repo: https://github.com/citation-file-format/cff-converter-python

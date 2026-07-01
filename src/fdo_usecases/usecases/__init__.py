@@ -13,7 +13,7 @@ from fdo_usecases.designs.zenodo import ZenodoFDODesign
 
 EXECUTOR: Executor = Executor()
 
-EXECUTOR.addDesign(ZenodoFDODesign(doi="10.5281/zenodo.20132712"))
+EXECUTOR.addDesign(ZenodoFDODesign(dois=["10.5281/zenodo.20132712"]))
 EXECUTOR.addDesign(CreepDesign())
 
 EXECUTOR.execute()

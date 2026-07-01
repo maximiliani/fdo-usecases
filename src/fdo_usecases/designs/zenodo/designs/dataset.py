@@ -129,6 +129,11 @@ class ZenodoDatasetDesign(RecordDesign):
         if data.latest_version_doi and data.latest_version_doi != data.doi:
             record.addAttribute(INFOTYPES["latestVersion"], data.latest_version_doi)
 
+        # Forward links: hasData - link this dataset version to its files
+        if data.files:
+            for checksum in data.files:
+                record.addAttribute(INFOTYPES["hasData"], checksum)
+
         # Backlinks for inference
         self.addBacklink(*BACKLINK_DATASET_FILE)
         self.addBacklink(*BACKLINK_VERSION_CHAIN)

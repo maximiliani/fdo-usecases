@@ -112,6 +112,11 @@ class PublicationDesign(RecordDesign):
         if data.creator_orcids:
             record.addAttribute(INFOTYPES["creator"], data.creator_orcids)  # type: ignore[arg-type]
 
+        # Forward links: isReferencedBy - link this publication to datasets that reference it
+        if data.referenced_by_datasets:
+            for dataset_doi in data.referenced_by_datasets:
+                record.addAttribute(INFOTYPES["isReferencedBy"], dataset_doi)
+
         # Backlinks for inference
         self.addBacklink(*BACKLINK_PUBLICATION_CITATION)
         self.addBacklink(*BACKLINK_PUBLICATION_REFERENCE)

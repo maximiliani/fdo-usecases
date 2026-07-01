@@ -7,6 +7,7 @@
 import logging
 from typing import TYPE_CHECKING
 
+from fdo_usecases.designs.zenodo.constants import INFOTYPES
 from fdo_usecases.designs.zenodo.designs import PublicationDesign
 from fdo_usecases.designs.zenodo.models import RelatedIdentifier
 from fdo_usecases.designs.zenodo.models.exchange import PublicationFDOData
@@ -24,6 +25,10 @@ class PublicationReferenceHandler:
     (DOIs, Handles, etc.). Only minimal metadata is available from the
     related_identifier field, so many fields will be None.
 
+    Attributes:
+        orchestrator: Reference to parent ZenodoFDODesign for graph access
+        publication_design: PublicationDesign instance for creating FDOs
+
     """
 
     def __init__(self, orchestrator: "ZenodoFDODesign"):
@@ -33,6 +38,7 @@ class PublicationReferenceHandler:
             orchestrator: Parent ZenodoFDODesign instance
 
         """
+        self.orchestrator = orchestrator
         self.publication_design = PublicationDesign(orchestrator)
         logger.debug("PublicationReferenceHandler initialized")
 
@@ -54,36 +60,54 @@ class PublicationReferenceHandler:
         # Also handle other identifier schemes as publications
         return "zenodo" not in identifier.identifier.lower()
 
-    async def process(self, identifier: RelatedIdentifier) -> None:
+    async def process(
+        self, identifier: RelatedIdentifier, referencing_dataset_doi: str
+    ) -> None:
         """Create Publication FDO with available metadata.
 
         Creates a minimal PublicationFDOData with only the information
-        available from the related_identifier field.
+        available from the related_identifier field. Also creates forward
+        link from dataset to publication (cites/references).
 
         Args:
             identifier: Related identifier to process
+            referencing_dataset_doi: DOI of dataset that references this publication
 
         """
         try:
             pub_data = PublicationFDOData(
                 identifier=identifier.identifier,
                 resource_type=identifier.resource_type,
-                publisher=None,  # Not available from related_identifier
-                publication_date=None,  # Not available
-                title=None,  # Not available
-                description=None,  # Not available
-                creator_orcids=[],  # Not available
+                publisher=None,
+                publication_date=None,
+                title=None,
+                description=None,
+                creator_orcids=[],
+                referenced_by_datasets=[referencing_dataset_doi],
             )
 
             record_id = await self.publication_design.create_fdo(pub_data)
             logger.info(f"Created publication FDO for {record_id}")
+
+            # Add forward link from dataset to publication
+            if identifier.relation in ["cites", "references"]:
+                record = self.orchestrator._record_graph.get(referencing_dataset_doi)
+                if record:
+                    if identifier.relation == "cites":
+                        record.addAttribute(INFOTYPES["cites"], identifier.identifier)
+                    else:
+                        record.addAttribute(
+                            INFOTYPES["references"], identifier.identifier
+                        )
+                    logger.debug(
+                        f"Added {identifier.relation} link from {referencing_dataset_doi} to {identifier.identifier}"
+                    )
 
         except Exception as e:
             logger.error(
                 f"Failed to create publication FDO for {identifier.identifier}: {e}",
                 exc_info=True,
             )
-            # Continue processing other references (Option A)
 
 
 __all__ = ["PublicationReferenceHandler"]

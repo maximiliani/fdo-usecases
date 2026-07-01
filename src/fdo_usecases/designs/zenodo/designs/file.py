@@ -110,6 +110,11 @@ class ZenodoFileDesign(RecordDesign):
         if data.next_version_checksum:
             record.addAttribute(INFOTYPES["nextVersion"], data.next_version_checksum)
 
+        # Forward links: isPartOf - link this file to all dataset versions it belongs to
+        if data.dataset_versions:
+            for dataset_doi in data.dataset_versions:
+                record.addAttribute(INFOTYPES["isPartOf"], dataset_doi)
+
         # Backlinks for inference
         self.addBacklink(*BACKLINK_DATASET_FILE)
         self.addBacklink(*BACKLINK_FILE_VERSION_CHAIN)

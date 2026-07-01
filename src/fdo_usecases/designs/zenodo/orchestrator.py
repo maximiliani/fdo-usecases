@@ -164,6 +164,7 @@ class ZenodoFDODesign(RecordDesign):
                     if dataset.latest_version_doi != version.doi
                     else None
                 ),
+                files=list(version.files.keys()),
             )
             dataset_datas.append(dataset_data)
 
@@ -186,6 +187,7 @@ class ZenodoFDODesign(RecordDesign):
                 license_url=license_url,
                 previous_version_checksum=file_obj.previous_version_checksum,
                 next_version_checksum=file_obj.next_version_checksum,
+                dataset_versions=file_obj.present_in_versions.copy(),
             )
             file_datas.append(file_data)
 
@@ -297,7 +299,8 @@ class ZenodoFDODesign(RecordDesign):
             *[self.file_design.create_fdo(data) for data in file_datas]
         )
 
-        await self.reference_processor.process_all(dataset.related_identifiers)
+        # Process references with context of which dataset is referencing them
+        await self.reference_processor.process_all(dataset.related_identifiers, doi)
 
         logger.info(f"Completed FDO creation for DOI: {doi}")
 

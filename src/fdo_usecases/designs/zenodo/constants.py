@@ -77,6 +77,18 @@ INFOTYPES = {
     "publisher": "21.T11969/cdd96207a7dfbcc0db93",
     #: Publication date (ISO 8601)
     "datePublished": "21.T11969/0c9b86e828976a85d4f2",
+    #: Dataset hasData relationship (linking to files)
+    "hasData": "21.T11969/hasData_pid",
+    #: File isPartOf relationship (linking to datasets)
+    "isPartOf": "21.T11969/isPartOf_pid",
+    #: Publication cites relationship
+    "cites": "21.T11969/cites_pid",
+    #: Publication isCitedBy relationship
+    "isCitedBy": "21.T11969/isCitedBy_pid",
+    #: Publication references relationship
+    "references": "21.T11969/references_pid",
+    #: Publication isReferencedBy relationship
+    "isReferencedBy": "21.T11969/isReferencedBy_pid",
 }
 
 

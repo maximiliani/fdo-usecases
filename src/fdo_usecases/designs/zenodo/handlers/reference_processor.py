@@ -35,7 +35,7 @@ logger = logging.getLogger(__name__)
 class ReferenceHandler(Protocol):
     """Interface for reference handlers using Python Protocol (structural typing).
 
-    This Protocol defines the required interface that all handler implementations
+    This Protocol defined the required interface that all handler implementations
     must provide. It's not meant to be instantiated directly - instead, any class
     that implements these two methods will automatically be considered a ReferenceHandler.
 
@@ -45,7 +45,7 @@ class ReferenceHandler(Protocol):
             async def can_handle(self, identifier: RelatedIdentifier) -> bool:
                 return identifier.scheme == "custom"
 
-            async def process(self, identifier: RelatedIdentifier) -> None:
+            async def process(self, identifier: RelatedIdentifier, referencing_dataset_doi: str) -> None:
                 # Process custom identifier
                 pass
         ```
@@ -68,11 +68,14 @@ class ReferenceHandler(Protocol):
         """
         ...  # Protocol placeholder - implement in concrete classes
 
-    async def process(self, identifier: RelatedIdentifier) -> None:
+    async def process(
+        self, identifier: RelatedIdentifier, referencing_dataset_doi: str
+    ) -> None:
         """Process the reference and create appropriate FDOs.
 
         Args:
             identifier: Related identifier to process
+            referencing_dataset_doi: DOI of the dataset that references this identifier
 
         Raises:
             Exception: Any error during processing (logged by caller)
@@ -120,7 +123,9 @@ class ReferenceProcessor:
             f"ReferenceProcessor initialized with {len(self.handlers)} handlers"
         )
 
-    async def process_all(self, identifiers: list[RelatedIdentifier]) -> None:
+    async def process_all(
+        self, identifiers: list[RelatedIdentifier], referencing_dataset_doi: str
+    ) -> None:
         """Process all related identifiers using appropriate handlers.
 
         For each identifier, finds the first matching handler and delegates
@@ -128,6 +133,7 @@ class ReferenceProcessor:
 
         Args:
             identifiers: List of related identifiers to process
+            referencing_dataset_doi: DOI of the dataset that references these identifiers
 
         """
         logger.info(f"Processing {len(identifiers)} related identifiers")
@@ -139,7 +145,7 @@ class ReferenceProcessor:
                         f"Handler {handler.__class__.__name__} processing {identifier.identifier}"
                     )
                     try:
-                        await handler.process(identifier)
+                        await handler.process(identifier, referencing_dataset_doi)
                     except Exception as e:
                         logger.error(
                             f"Handler {handler.__class__.__name__} failed for "

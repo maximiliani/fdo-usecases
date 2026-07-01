@@ -4,9 +4,9 @@
 
 """CLI of fdo-usecases."""
 
-import typer
+from pathlib import Path
 
-from fdo_usecases.lib import CalcOperation, calculate
+import typer
 
 # create subcommand app
 say = typer.Typer()
@@ -15,29 +15,37 @@ say = typer.Typer()
 app = typer.Typer()
 app.add_typer(say, name="say")
 
-# ----
 
+@app.command("render-graph")
+def render_graph(
+    input_path: Path = typer.Argument(..., help="Path to FDO graph JSON file"),
+    output_dir: Path = typer.Option(
+        "./fdo-graph", "-o", "--output-dir", help="Output directory"
+    ),
+    layout: str = typer.Option(
+        "cose",
+        "-l",
+        "--layout",
+        help="Layout algorithm: cose, grid, circle, dagre",
+    ),
+    offline: bool = typer.Option(
+        False, "--offline", help="Skip network PID resolution"
+    ),
+    dtr_path: Path | None = typer.Option(
+        None, "--dtr-path", help="Path to DTR JSON files"
+    ),
+) -> None:
+    """Render an FDO graph as an interactive HTML visualization."""
+    from fdo_usecases.fdo_graph_renderer import generate_graph
 
-@app.command()
-def calc(op: CalcOperation, x: int, y: int):
-    """Compute the result of applying an operation on x and y."""
-    result: int = calculate(op, x, y)
-    typer.echo(f"Result: {result}")
-
-
-# ----
-
-
-@say.command()
-def hello(name: str):
-    """Greet a person."""
-    print(f"Hello {name}")
-
-
-@say.command()
-def goodbye(name: str, formal: bool = False):
-    """Say goodbye to a person."""
-    if formal:
-        print(f"Goodbye {name}. Have a good day.")
-    else:
-        print(f"Bye {name}!")
+    html_path = generate_graph(
+        input_path=input_path,
+        output_dir=output_dir,
+        layout=layout,
+        export_svg=True,
+        offline=offline,
+        dtr_path=dtr_path,
+        auto_detect_dtr=True,
+    )
+    print(f"✓ Generated: {html_path}")
+    print("  Open this file in a browser to view the interactive graph")

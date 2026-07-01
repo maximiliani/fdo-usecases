@@ -54,6 +54,7 @@ class DatasetFDOData(BaseModel):
         previous_version_doi: Previous version DOI or None if first version
         next_version_doi: Next version DOI or None if latest version
         latest_version_doi: Latest version DOI (for non-latest versions)
+        files: List of file checksums in this dataset version
 
     """
 
@@ -67,6 +68,7 @@ class DatasetFDOData(BaseModel):
     previous_version_doi: str | None = None
     next_version_doi: str | None = None
     latest_version_doi: str | None = None
+    files: list[str] = Field(default_factory=list)
 
 
 class FileFDOData(BaseModel):
@@ -84,6 +86,7 @@ class FileFDOData(BaseModel):
         license_url: SPDX license URL from parent dataset (optional)
         previous_version_checksum: Checksum of previous file version (optional)
         next_version_checksum: Checksum of next file version (optional)
+        dataset_versions: List of dataset version DOIs containing this file
 
     """
 
@@ -94,6 +97,7 @@ class FileFDOData(BaseModel):
     license_url: str | None = None
     previous_version_checksum: str | None = None
     next_version_checksum: str | None = None
+    dataset_versions: list[str] = Field(default_factory=list)
 
 
 class PublicationFDOData(BaseModel):
@@ -111,6 +115,7 @@ class PublicationFDOData(BaseModel):
         title: Publication title (optional)
         description: Publication description (optional)
         creator_orcids: List of creator ORCID identifiers (optional)
+        referenced_by_datasets: List of dataset DOIs that reference this publication
 
     """
 
@@ -121,6 +126,7 @@ class PublicationFDOData(BaseModel):
     title: str | None = None
     description: str | None = None
     creator_orcids: list[str] = Field(default_factory=list)
+    referenced_by_datasets: list[str] = Field(default_factory=list)
 
 
 __all__ = [

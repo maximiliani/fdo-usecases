@@ -46,7 +46,9 @@ class ZenodoReferenceHandler:
         """
         return "zenodo" in identifier.identifier.lower()
 
-    async def process(self, identifier: RelatedIdentifier) -> None:
+    async def process(
+        self, identifier: RelatedIdentifier, referencing_dataset_doi: str
+    ) -> None:
         """Recursively process nested Zenodo dataset.
 
         Creates a new ZenodoFDODesign instance and executes it. The orchestrator's
@@ -54,6 +56,7 @@ class ZenodoReferenceHandler:
 
         Args:
             identifier: Related identifier pointing to Zenodo dataset
+            referencing_dataset_doi: DOI of dataset that references this Zenodo dataset
 
         """
         doi = identifier.identifier
