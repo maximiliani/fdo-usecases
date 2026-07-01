@@ -142,6 +142,7 @@ class ZenodoFDODesign(RecordDesign):
 
         # Transform each version
         for version in dataset.versions.values():
+            landing_page_url = f"https://doi.org/{version.doi}"
             dataset_data = DatasetFDOData(
                 doi=version.doi,
                 title=version.title,
@@ -165,6 +166,7 @@ class ZenodoFDODesign(RecordDesign):
                     else None
                 ),
                 files=list(version.files.keys()),
+                landing_page_url=landing_page_url,
             )
             dataset_datas.append(dataset_data)
 
@@ -179,6 +181,9 @@ class ZenodoFDODesign(RecordDesign):
                         license_url = str(ver.license.url)
                         break
 
+            # Landing page points to the first dataset version where this file appeared
+            landing_page_url = f"https://doi.org/{file_obj.first_dataset_version}"
+
             file_data = FileFDOData(
                 checksum=checksum,
                 filename=file_obj.filename,
@@ -188,6 +193,7 @@ class ZenodoFDODesign(RecordDesign):
                 previous_version_checksum=file_obj.previous_version_checksum,
                 next_version_checksum=file_obj.next_version_checksum,
                 dataset_versions=file_obj.present_in_versions.copy(),
+                landing_page_url=landing_page_url,
             )
             file_datas.append(file_data)
 

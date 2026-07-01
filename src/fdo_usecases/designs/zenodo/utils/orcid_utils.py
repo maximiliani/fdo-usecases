@@ -41,7 +41,9 @@ def normalize_orcid(orcid: str | None) -> str | None:
         return None
 
     # Add dashes in standard positions
-    return f"{digits[0:4]}-{digits[4:8]}-{digits[8:12]}-{digits[12:16]}"
+    return (
+        f"https://orcid.org/{digits[0:4]}-{digits[4:8]}-{digits[8:12]}-{digits[12:16]}"
+    )
 
 
 __all__ = ["normalize_orcid"]

@@ -75,6 +75,9 @@ class PublicationReferenceHandler:
 
         """
         try:
+            # Build landing page URL from DOI
+            landing_page_url = f"https://doi.org/{identifier.identifier}"
+
             pub_data = PublicationFDOData(
                 identifier=identifier.identifier,
                 resource_type=identifier.resource_type,
@@ -84,6 +87,7 @@ class PublicationReferenceHandler:
                 description=None,
                 creator_orcids=[],
                 referenced_by_datasets=[referencing_dataset_doi],
+                landing_page_url=landing_page_url,
             )
 
             record_id = await self.publication_design.create_fdo(pub_data)

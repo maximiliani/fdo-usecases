@@ -115,6 +115,10 @@ class ZenodoFileDesign(RecordDesign):
             for dataset_doi in data.dataset_versions:
                 record.addAttribute(INFOTYPES["isPartOf"], dataset_doi)
 
+        # Landing page location
+        if data.landing_page_url:
+            record.addAttribute(INFOTYPES["landingPageLocation"], data.landing_page_url)
+
         # Backlinks for inference
         self.addBacklink(*BACKLINK_DATASET_FILE)
         self.addBacklink(*BACKLINK_FILE_VERSION_CHAIN)

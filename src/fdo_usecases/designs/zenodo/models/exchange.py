@@ -55,6 +55,7 @@ class DatasetFDOData(BaseModel):
         next_version_doi: Next version DOI or None if latest version
         latest_version_doi: Latest version DOI (for non-latest versions)
         files: List of file checksums in this dataset version
+        landing_page_url: URL to the Zenodo landing page for this version
 
     """
 
@@ -69,6 +70,7 @@ class DatasetFDOData(BaseModel):
     next_version_doi: str | None = None
     latest_version_doi: str | None = None
     files: list[str] = Field(default_factory=list)
+    landing_page_url: str | None = None
 
 
 class FileFDOData(BaseModel):
@@ -87,6 +89,7 @@ class FileFDOData(BaseModel):
         previous_version_checksum: Checksum of previous file version (optional)
         next_version_checksum: Checksum of next file version (optional)
         dataset_versions: List of dataset version DOIs containing this file
+        landing_page_url: URL to the Zenodo landing page for the file's dataset
 
     """
 
@@ -98,6 +101,7 @@ class FileFDOData(BaseModel):
     previous_version_checksum: str | None = None
     next_version_checksum: str | None = None
     dataset_versions: list[str] = Field(default_factory=list)
+    landing_page_url: str | None = None
 
 
 class PublicationFDOData(BaseModel):
@@ -116,6 +120,7 @@ class PublicationFDOData(BaseModel):
         description: Publication description (optional)
         creator_orcids: List of creator ORCID identifiers (optional)
         referenced_by_datasets: List of dataset DOIs that reference this publication
+        landing_page_url: URL to the publication landing page (DOI URL)
 
     """
 
@@ -127,6 +132,7 @@ class PublicationFDOData(BaseModel):
     description: str | None = None
     creator_orcids: list[str] = Field(default_factory=list)
     referenced_by_datasets: list[str] = Field(default_factory=list)
+    landing_page_url: str | None = None
 
 
 __all__ = [

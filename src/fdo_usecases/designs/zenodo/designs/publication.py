@@ -117,6 +117,10 @@ class PublicationDesign(RecordDesign):
             for dataset_doi in data.referenced_by_datasets:
                 record.addAttribute(INFOTYPES["isReferencedBy"], dataset_doi)
 
+        # Landing page location
+        if data.landing_page_url:
+            record.addAttribute(INFOTYPES["landingPageLocation"], data.landing_page_url)
+
         # Backlinks for inference
         self.addBacklink(*BACKLINK_PUBLICATION_CITATION)
         self.addBacklink(*BACKLINK_PUBLICATION_REFERENCE)

@@ -134,6 +134,10 @@ class ZenodoDatasetDesign(RecordDesign):
             for checksum in data.files:
                 record.addAttribute(INFOTYPES["hasPart"], checksum)
 
+        # Landing page location
+        if data.landing_page_url:
+            record.addAttribute(INFOTYPES["landingPageLocation"], data.landing_page_url)
+
         # Backlinks for inference
         self.addBacklink(*BACKLINK_DATASET_FILE)
         self.addBacklink(*BACKLINK_VERSION_CHAIN)
