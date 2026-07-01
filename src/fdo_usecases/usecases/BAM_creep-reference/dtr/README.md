@@ -3,7 +3,7 @@
 This document lists all BasicInfoTypes, InfoTypes, and Profiles with their Type Registry PIDs, local JSON file
 references, and DTR entry links.
 
-**Last Updated**: 2026-06-22
+**Last Updated**: 2026-07-01
 **Contributor**: Maximilian Inckmann, ORCID: https://orcid.org/0009-0005-2800-4833
 **Standard Reference**: DIN EN ISO 204:
 2023-10 — [DOI](https://dx.doi.org/10.31030/3485273) | [DIN Media](https://www.dinmedia.de/en/standard/din-en-iso-204/371676068)
@@ -82,6 +82,7 @@ Cardinality is defined at the Profile level.
 | SingleCrystalOrientation | `21.T11969/4597cf0db467d7e365a9` | [`SingleCrystalOrientation.json`](info_types/SingleCrystalOrientation.json) | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/4597cf0db467d7e365a9) | DecimalAngle              |
 | applicableStandard       | `21.T11969/dda596702b20205cba36` | [`applicableStandard.json`](info_types/applicableStandard.json)             | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/dda596702b20205cba36) | String                    |
 | checksum                 | `21.T11969/a80ed2ef79e22f1d8af8` | [`checksum.json`](info_types/checksum.json)                                 | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/a80ed2ef79e22f1d8af8) | String                    |
+| cites                    | `21.T11969/813e06c1441327b72e68` | [`cites.json`](info_types/cites.json)                                       | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/813e06c1441327b72e68) | handle_identifier         |
 | creator                  | `21.T11969/7c67083a5d218e544063` | [`creator.json`](info_types/creator.json)                                   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/7c67083a5d218e544063) | ORCID_URL                 |
 | creatorAffiliation       | `21.T11969/ea9f6b3d78c6608fe801` | [`creatorAffiliation.json`](info_types/creatorAffiliation.json)             | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/ea9f6b3d78c6608fe801) | ror                       |
 | dataCitePublicationType  | `21.T11969/48dbf6a89f9748ae4ead` | [`dataCitePublicationType.json`](info_types/dataCitePublicationType.json)   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/48dbf6a89f9748ae4ead) | String                    |
@@ -95,10 +96,14 @@ Cardinality is defined at the Profile level.
 | hasChemicalComposition   | `21.T11969/e32cfb93d7fc61ce3ca5` | [`hasChemicalComposition.json`](info_types/hasChemicalComposition.json)     | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/e32cfb93d7fc61ce3ca5) | handle_identifier         |
 | hasData                  | `21.T11969/cc230f978e8add2e2520` | [`hasData.json`](info_types/hasData.json)                                   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/cc230f978e8add2e2520) | handle_identifier         |
 | hasHeatTreatment         | `21.T11969/766ae14d72b49cfb5273` | [`hasHeatTreatment.json`](info_types/hasHeatTreatment.json)                 | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/766ae14d72b49cfb5273) | handle_identifier         |
+| hasPart                  | `21.T11969/39c056d0cc63e2d0ff17` | [`hasPart.json`](info_types/hasPart.json)                                   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/39c056d0cc63e2d0ff17) | handle_identifier         |
 | hasMetadata              | `21.T11969/d0773859091aeb451528` | [`hasMetadata.json`](info_types/hasMetadata.json)                           | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/d0773859091aeb451528) | handle_identifier         |
 | helmholtzPoFStructure    | `21.T11969/e5cb2389246c17ee0503` | [`helmholtzPoFStructure.json`](info_types/helmholtzPoFStructure.json)       | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/e5cb2389246c17ee0503) | String                    |
 | helmholtzResearchArea    | `21.T11969/ed4732b6dc70be0f1b22` | [`helmholtzResearchArea.json`](info_types/helmholtzResearchArea.json)       | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/ed4732b6dc70be0f1b22) | HelmholtzResearchAreaEnum |
+| isPartOf                 | `21.T11969/30f4a1f8aacab81faf38` | [`isPartOf.json`](info_types/isPartOf.json)                                 | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/30f4a1f8aacab81faf38) | handle_identifier         |
 | initialStress            | `21.T11969/8bd53487030550ee2e94` | [`initialStress.json`](info_types/initialStress.json)                       | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/8bd53487030550ee2e94) | DecimalNumber             |
+| isCitedBy                | `21.T11969/520bb71b795d8573f533` | [`isCitedBy.json`](info_types/isCitedBy.json)                               | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/520bb71b795d8573f533) | handle_identifier         |
+| isReferencedBy           | `21.T11969/e5945ef3ff07f314a146` | [`isReferencedBy.json`](info_types/isReferencedBy.json)                     | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/e5945ef3ff07f314a146) | handle_identifier         |
 | keyword                  | `21.T11969/793ff5c33c3aeb32907a` | [`keyword.json`](info_types/keyword.json)                                   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/793ff5c33c3aeb32907a) | String                    |
 | latestVersion            | `21.T11969/2b4d6ceda80ddd63f7a9` | [`latestVersion.json`](info_types/latestVersion.json)                       | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/2b4d6ceda80ddd63f7a9) | handle_identifier         |
 | materialID               | `21.T11969/716805eef0349802dc9a` | [`materialID.json`](info_types/materialID.json)                             | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/716805eef0349802dc9a) | String                    |
@@ -110,6 +115,7 @@ Cardinality is defined at the Profile level.
 | previewImage             | `21.T11969/925e3f9925a88476ffba` | [`previewImage.json`](info_types/previewImage.json)                         | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/925e3f9925a88476ffba) | URL                       |
 | previousVersion          | `21.T11969/7c97f00a2a95826c1a8f` | [`previousVersion.json`](info_types/previousVersion.json)                   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/7c97f00a2a95826c1a8f) | handle_identifier         |
 | publisher                | `21.T11969/cdd96207a7dfbcc0db93` | [`publisher.json`](info_types/publisher.json)                               | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/cdd96207a7dfbcc0db93) | String                    |
+| references               | `21.T11969/f4c9a69f715c3c60aa2f` | [`references.json`](info_types/references.json)                             | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/f4c9a69f715c3c60aa2f) | handle_identifier         |
 | semImage                 | `21.T11969/19a94f596420bb274408` | [`semImage.json`](info_types/semImage.json)                                 | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/19a94f596420bb274408) | handle_identifier         |
 | spdxLicense              | `21.T11969/623654b1072ae7b88202` | [`spdxLicense.json`](info_types/spdxLicense.json)                           | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/623654b1072ae7b88202) | SPDX_URL                  |
 | specifiedTemperature     | `21.T11969/ac4a911ffb09772718e3` | [`specifiedTemperature.json`](info_types/specifiedTemperature.json)         | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/ac4a911ffb09772718e3) | DecimalNumber             |
@@ -244,9 +250,9 @@ Profiles combine InfoTypes with specific cardinalities. Property names match Inf
 |------------------|--------|------------|---------|
 | MeasurementUnits | 1      | 1          | 0       |
 | BasicInfoTypes   | 7      | 7          | 0       |
-| InfoTypes        | 39     | 39         | 0       |
+| InfoTypes        | 45     | 45         | 0       |
 | Profiles         | 8      | 8          | 0       |
-| **Total**        | **55** | **55**     | **0**   |
+| **Total**        | **61** | **61**     | **0**   |
 
 ---
 
