@@ -78,7 +78,7 @@ INFOTYPES = {
     #: Publication date (ISO 8601)
     "datePublished": "21.T11969/0c9b86e828976a85d4f2",
     #: Dataset hasData relationship (linking to files)
-    "hasData": "21.T11969/hasData_pid",
+    "hasData": "21.T11969/cc230f978e8add2e2520",
     #: File isPartOf relationship (linking to datasets)
     "isPartOf": "21.T11969/isPartOf_pid",
     #: Publication cites relationship

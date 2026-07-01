@@ -146,6 +146,12 @@
             transition: background 0.2s;
         }
 
+        .btn-inline {
+            width: auto;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
         .btn-primary {
             background: #3498db;
             color: white;
@@ -568,10 +574,67 @@
         let cy;
         let currentDisplayMode = 'name';
         let visibleTypes = new Set(['zenodo', 'md5', 'handle', 'other']);
+        let focusedNodeId = null;
 
         // Lookup helper for attribute metadata
         function getAttrMeta(key) {
             return ATTR_DEFS[key] || { name: key, description: '' };
+        }
+
+        // Focus on a single node (show only it and its direct connections)
+        function focusOnNode(node) {
+            focusedNodeId = node.id();
+            const connectedEdges = node.connectedEdges();
+            const connectedNodes = connectedEdges.connectedNodes();
+
+            // Hide all nodes except the focused one and its neighbors
+            cy.nodes().forEach(n => {
+                if (n.id() === focusedNodeId || connectedNodes.has(n)) {
+                    n.removeClass('hidden-focus');
+                } else {
+                    n.addClass('hidden-focus');
+                }
+            });
+
+            // Hide all edges except those connected to the focused node
+            cy.edges().forEach(e => {
+                if (connectedEdges.has(e)) {
+                    e.removeClass('hidden-focus');
+                } else {
+                    e.addClass('hidden-focus');
+                }
+            });
+
+            // Update UI buttons
+            const focusBtn = document.getElementById('focus-node-btn');
+            const clearBtn = document.getElementById('clear-focus-btn');
+            if (focusBtn) focusBtn.style.display = 'none';
+            if (clearBtn) clearBtn.style.display = 'inline-block';
+
+            // Fit view to focused node and neighbors
+            cy.animate({
+                fit: {
+                    eles: node.union(connectedNodes),
+                    padding: 50
+                },
+                duration: 500
+            });
+        }
+
+        // Clear focus and show all nodes
+        function clearFocus() {
+            focusedNodeId = null;
+            cy.elements().removeClass('hidden-focus');
+
+            // Update UI buttons
+            const focusBtn = document.getElementById('focus-node-btn');
+            const clearBtn = document.getElementById('clear-focus-btn');
+            if (focusBtn) focusBtn.style.display = 'inline-block';
+            if (clearBtn) clearBtn.style.display = 'none';
+
+            // Re-apply type and profile filters
+            filterByType();
+            filterByProfile();
         }
 
         // Initialize Cytoscape
@@ -648,6 +711,18 @@
                     },
                     {
                         selector: 'edge.hidden-profile',
+                        style: {
+                            'display': 'none'
+                        }
+                    },
+                    {
+                        selector: 'node.hidden-focus',
+                        style: {
+                            'display': 'none'
+                        }
+                    },
+                    {
+                        selector: 'edge.hidden-focus',
                         style: {
                             'display': 'none'
                         }
@@ -807,7 +882,16 @@
                     <div class="detail-label">Attributes (${uniqueAttrCount} unique, ${totalCount} total)</div>
                     ${attributesHtml}
                 </div>
+                <div class="detail-row">
+                    <button class="btn btn-primary btn-inline" id="focus-node-btn">Focus on this Node</button>
+                    <button class="btn btn-secondary btn-inline" id="clear-focus-btn" style="display: none;">Clear Focus</button>
+                </div>
             `;
+
+            // Add focus functionality
+            document.getElementById('focus-node-btn').addEventListener('click', function() {
+                focusOnNode(node);
+            });
 
             document.getElementById('details-panel').classList.add('open');
         }
@@ -905,6 +989,9 @@
         });
 
         function filterByType() {
+            // Don't apply type filters when in focus mode
+            if (focusedNodeId) return;
+
             cy.nodes().forEach(node => {
                 const type = node.data('type');
                 if (visibleTypes.has(type)) {
@@ -926,6 +1013,9 @@
         }
 
         function filterByProfile() {
+            // Don't apply profile filters when in focus mode
+            if (focusedNodeId) return;
+
             cy.nodes().forEach(node => {
                 const profiles = node.data('profiles') || [];
                 const hasVisibleProfile = profiles.some(p => visibleProfiles.has(p));
@@ -1015,6 +1105,13 @@
 
         // Close details button
         document.getElementById('close-details').addEventListener('click', closeDetailsPanel);
+
+        // Clear focus button handler (delegated since button is created dynamically)
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'clear-focus-btn') {
+                clearFocus();
+            }
+        });
 
         // Load Cytoscape and extensions
         function loadScripts() {
