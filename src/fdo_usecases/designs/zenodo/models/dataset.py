@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Karlsruhe Institute of Technology
 #
-# SPDX-License-Identifier: Apache2.0
+# SPDX-License-Identifier: Apache-2.0
 
 """Dataset container models for Zenodo records.
 
@@ -82,7 +82,7 @@ class Dataset(BaseModel):
         return v
 
     @model_validator(mode="after")
-    def validate_versions_not_empty(self) -> Dataset:
+    def validate_versions_not_empty(self) -> "Dataset":
         """Ensure dataset has at least one version."""
         if not self.versions:
             raise ValueError("Dataset must have at least one version")

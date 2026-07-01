@@ -1,9 +1,10 @@
 # SPDX-FileCopyrightText: 2026 Karlsruhe Institute of Technology
 #
-# SPDX-License-Identifier: Apache2.0
+# SPDX-License-Identifier: Apache-2.0
 
 """ROR ID enrichment service."""
 
+import logging
 from datetime import date
 from typing import Any
 
@@ -15,6 +16,8 @@ from fdo_usecases.designs.zenodo.enrichment.affiliation_matcher import (
     AffiliationMatcher,
 )
 from fdo_usecases.designs.zenodo.models import Creator, Dataset
+
+logger = logging.getLogger(__name__)
 
 
 class ROREnricher:
@@ -110,8 +113,8 @@ class ROREnricher:
                 if matched_ror:
                     ror_id = matched_ror
 
-            except Exception:
-                pass
+            except Exception as e:  # noqa: S110
+                logger.debug("Failed to enrich ROR ID for %s: %s", creator.name, e)
 
         return ror_id
 

@@ -15,28 +15,28 @@ Transforms Zenodo dataset metadata into FAIR Digital Objects (FDOs) with full ve
 ```mermaid
 graph TD
     User["User Code"] --> Orchestrator["ZenodoFDODesign<br/>(orchestrator.py)"]
-    
+
     Orchestrator --> Fetcher["ZenodoDatasetFetcher"]
     Orchestrator --> DatasetDesign["ZenodoDatasetDesign"]
     Orchestrator --> FileDesign["ZenodoFileDesign"]
     Orchestrator --> PubDesign["PublicationDesign"]
     Orchestrator --> RefProcessor["ReferenceProcessor"]
-    
+
     Fetcher --> DOIResolver["DOIResolver"]
     Fetcher --> VersionFetcher["VersionFetcher"]
     Fetcher --> ModelBuilder["ModelBuilder"]
     Fetcher --> ROREnricher["ROREnricher"]
-    
+
     DOIResolver --> ZenodoAPI["ZenodoAPIClient"]
     ROREnricher --> ORCIDAPI["OrcidApiClient"]
     ROREnricher --> AffiliationMatcher["AffiliationMatcher"]
-    
+
     RefProcessor --> ZenodoHandler["ZenodoReferenceHandler"]
     RefProcessor --> PubHandler["PublicationReferenceHandler"]
-    
+
     ZenodoHandler -.->|"recursive"| Orchestrator
     PubHandler --> PubDesign
-    
+
     style Orchestrator stroke:#f9f,stroke-width:2px
     style DatasetDesign stroke:#bbf
     style FileDesign stroke:#bbf
@@ -54,21 +54,21 @@ sequenceDiagram
     participant L as FileDesign
     participant P as PublicationDesign
     participant R as ReferenceProcessor
-    
+
     U->>O: execute(doi="10.5281/zenodo.X")
     O->>F: fetch_metadata()
     F-->>O: Dataset model (all versions)
-    
+
     loop Each dataset version
         O->>D: create_fdo(DatasetFDOData)
         D-->>O: Record added to graph
     end
-    
+
     loop Each unique file
         O->>L: create_fdo(FileFDOData)
         L-->>O: Record added to graph
     end
-    
+
     O->>R: process_references()
     alt Zenodo dataset ref
         R->>O: recursive execute()

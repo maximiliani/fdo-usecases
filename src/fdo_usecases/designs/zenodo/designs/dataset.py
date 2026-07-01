@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Karlsruhe Institute of Technology
 #
-# SPDX-License-Identifier: Apache2.0
+# SPDX-License-Identifier: Apache-2.0
 
 """Dataset FDO design for Zenodo records.
 
@@ -90,7 +90,7 @@ class ZenodoDatasetDesign(RecordDesign):
 
         # Profiles - Base + Versionable
         profiles = [BASE_PROFILE, VERSIONABLE_PROFILE]
-        record.addAttribute(PROFILE_KEY, profiles)
+        record.addAttribute(PROFILE_KEY, profiles)  # type: ignore[arg-type]
 
         # Base profile attributes
         record.addAttribute(INFOTYPES["name"], data.title)
@@ -105,17 +105,17 @@ class ZenodoDatasetDesign(RecordDesign):
         creator_orcids = [c.orcid for c in data.creators if c.orcid]
         if creator_orcids:
             logger.debug(f"Adding {len(creator_orcids)} creator ORCIDs")
-            record.addAttribute(INFOTYPES["creator"], creator_orcids)
+            record.addAttribute(INFOTYPES["creator"], creator_orcids)  # type: ignore[arg-type]
 
         # Creator affiliations (ROR IDs)
         creator_ror_ids = [c.ror_id for c in data.creators if c.ror_id]
         if creator_ror_ids:
             logger.debug(f"Adding {len(creator_ror_ids)} ROR IDs")
-            record.addAttribute(INFOTYPES["creatorAffiliation"], creator_ror_ids)
+            record.addAttribute(INFOTYPES["creatorAffiliation"], creator_ror_ids)  # type: ignore[arg-type]
 
         # Keywords
         if data.keywords:
-            record.addAttribute(INFOTYPES["keyword"], data.keywords)
+            record.addAttribute(INFOTYPES["keyword"], data.keywords)  # type: ignore[arg-type]
 
         # Versionable profile attributes
         record.addAttribute(INFOTYPES["version"], data.version_label)

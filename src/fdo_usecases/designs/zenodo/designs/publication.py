@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Karlsruhe Institute of Technology
 #
-# SPDX-License-Identifier: Apache2.0
+# SPDX-License-Identifier: Apache-2.0
 
 """Publication FDO design for Zenodo records.
 
@@ -110,7 +110,7 @@ class PublicationDesign(RecordDesign):
             record.addAttribute(INFOTYPES["description"], desc)
 
         if data.creator_orcids:
-            record.addAttribute(INFOTYPES["creator"], data.creator_orcids)
+            record.addAttribute(INFOTYPES["creator"], data.creator_orcids)  # type: ignore[arg-type]
 
         # Backlinks for inference
         self.addBacklink(*BACKLINK_PUBLICATION_CITATION)

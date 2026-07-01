@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: 2026 Karlsruhe Institute of Technology
 #
-# SPDX-License-Identifier: Apache2.0
+# SPDX-License-Identifier: Apache-2.0
 
 """MatWerk Creep Reference Dataset-specific FDO designs."""
 
