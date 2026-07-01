@@ -496,6 +496,13 @@
             </div>
 
             <div class="control-section">
+                <h4>Filter by Profile</h4>
+                <div id="profile-filters">
+                    <!-- Dynamically populated based on graph data -->
+                </div>
+            </div>
+
+            <div class="control-section">
                 <h4>Legend</h4>
                 <div class="legend-item">
                     <div class="legend-node zenodo"></div>
@@ -579,16 +586,16 @@
                             'background-color': getNodeColor,
                             'shape': getNodeShape,
                             'label': 'data(label)',
-                            'font-size': '12px',
+                            'font-size': '11px',
                             'color': '#2c3e50',
                             'text-valign': 'bottom',
                             'text-halign': 'center',
-                            'width': 60,
-                            'height': 60,
+                            'width': 80,
+                            'height': 80,
                             'border-width': 2,
                             'border-color': '#2c3e50',
                             'text-wrap': 'wrap',
-                            'text-max-width': '80px'
+                            'text-max-width': '100px'
                         }
                     },
                     {
@@ -632,23 +639,45 @@
                         style: {
                             'display': 'none'
                         }
+                    },
+                    {
+                        selector: 'node.hidden-profile',
+                        style: {
+                            'display': 'none'
+                        }
+                    },
+                    {
+                        selector: 'edge.hidden-profile',
+                        style: {
+                            'display': 'none'
+                        }
                     }
                 ],
                 layout: {
                     name: DEFAULT_LAYOUT,
                     animate: true,
                     animationDuration: 500,
+                    // CoSE layout parameters for better node spacing
+                    nodeRepulsion: 10500,
+                    idealEdgeLength: 250,
+                    edgeElasticity: 100,
+                    nestingFactor: 0.3,
+                    padding: 15,
+                    numIter: 25000,
                     ready: function() {
                         document.getElementById('loading-overlay').classList.add('hidden');
                     }
                 },
                 wheelSensitivity: 0.3,
-                minZoom: 0.1,
-                maxZoom: 3
+                minZoom: 0.005,
+                maxZoom: 10
             });
 
             // Update statistics
             updateStatistics();
+
+            // Initialize profile filters
+            initProfileFilters();
 
             // Node click handler
             cy.on('tap', 'node', function(evt) {
@@ -822,6 +851,46 @@
             }
         });
 
+        let visibleProfiles = new Set();
+
+        // Initialize profile filters dynamically from graph data
+        function initProfileFilters() {
+            const profiles = new Set();
+            GRAPH_DATA.elements.forEach(elem => {
+                if (!elem.data.source && elem.data.profiles) {
+                    elem.data.profiles.forEach(p => profiles.add(p));
+                }
+            });
+
+            const container = document.getElementById('profile-filters');
+            visibleProfiles.clear();
+
+            profiles.forEach(profile => {
+                visibleProfiles.add(profile);
+                const div = document.createElement('div');
+                div.className = 'filter-checkbox';
+                div.innerHTML = `
+                    <label>
+                        <input type="checkbox" class="profile-filter" data-profile="${escapeHtml(profile)}" checked>
+                        <span>${escapeHtml(profile)}</span>
+                    </label>
+                `;
+                container.appendChild(div);
+            });
+
+            document.querySelectorAll('.profile-filter').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const profile = this.dataset.profile;
+                    if (this.checked) {
+                        visibleProfiles.add(profile);
+                    } else {
+                        visibleProfiles.delete(profile);
+                    }
+                    filterByProfile();
+                });
+            });
+        }
+
         // Type filters
         document.querySelectorAll('.type-filter').forEach(checkbox => {
             checkbox.addEventListener('change', function() {
@@ -852,6 +921,28 @@
                     edge.removeClass('hidden');
                 } else {
                     edge.addClass('hidden');
+                }
+            });
+        }
+
+        function filterByProfile() {
+            cy.nodes().forEach(node => {
+                const profiles = node.data('profiles') || [];
+                const hasVisibleProfile = profiles.some(p => visibleProfiles.has(p));
+                if (hasVisibleProfile) {
+                    node.removeClass('hidden-profile');
+                } else {
+                    node.addClass('hidden-profile');
+                }
+            });
+
+            cy.edges().forEach(edge => {
+                const sourceVisible = !edge.source().hasClass('hidden-profile');
+                const targetVisible = !edge.target().hasClass('hidden-profile');
+                if (sourceVisible && targetVisible) {
+                    edge.removeClass('hidden-profile');
+                } else {
+                    edge.addClass('hidden-profile');
                 }
             });
         }
