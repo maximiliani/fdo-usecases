@@ -1,0 +1,40 @@
+{
+  "Identifier": "21.T11969/30f4a1f8aacab81faf38",
+  "name": "isPartOf",
+  "description": "Handle identifier pointing to a parent or container FDO of which this resource is a part.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-07-01T17:20:19.499Z",
+    "lastModificationDate": "2026-07-01T17:20:19.499Z"
+  },
+  "ExpectedUse": "Establishing hierarchical relationships between FDOs, linking child resources to their parent collections, datasets to projects, or components to assemblies.",
+  "References": [],
+  "Aliases": [
+    "Parent Resource",
+    "Container Reference",
+    "Member Of"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "isPartOf",
+        "Title": "Is Part Of",
+        "Description": "Handle identifier pointing to a parent or container FDO of which this resource is a part.",
+        "Type": "21.T11969/3bbedeeb04fa80daf501",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "Identifier": "21.T11969/520bb71b795d8573f533",
+  "name": "isCitedBy",
+  "description": "Handle identifier pointing to an FDO that cites or references this resource.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-07-01T17:18:48.024Z",
+    "lastModificationDate": "2026-07-01T17:18:48.024Z"
+  },
+  "ExpectedUse": "Tracking incoming citations to a resource, measuring impact through citation counts, discovering derivative works, and building citation networks.",
+  "References": [],
+  "Aliases": [
+    "Cited By",
+    "Incoming Citation",
+    "Citing Work"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "isCitedBy",
+        "Title": "Is Cited By",
+        "Description": "Handle identifier pointing to an FDO that cites or references this resource.",
+        "Type": "21.T11969/3bbedeeb04fa80daf501",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "Identifier": "21.T11969/39c056d0cc63e2d0ff17",
+  "name": "hasPart",
+  "description": "Handle identifier pointing to a child or component FDO that is part of this resource.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-07-01T17:18:25.135Z",
+    "lastModificationDate": "2026-07-01T17:18:25.135Z"
+  },
+  "ExpectedUse": "Establishing hierarchical relationships from parent to child FDOs, linking collections to their members, projects to datasets, or assemblies to their components.",
+  "References": [],
+  "Aliases": [
+    "Child Resource",
+    "Component Reference",
+    "Contains"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "hasPart",
+        "Title": "Has Part",
+        "Description": "Handle identifier pointing to a child or component FDO that is part of this resource.",
+        "Type": "21.T11969/3bbedeeb04fa80daf501",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  }
+}
