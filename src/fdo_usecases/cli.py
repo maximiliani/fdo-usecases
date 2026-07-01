@@ -28,14 +28,12 @@ def render_graph(
         "--layout",
         help="Layout algorithm: cose, grid, circle, dagre",
     ),
-    offline: bool = typer.Option(
-        False, "--offline", help="Skip network PID resolution"
-    ),
-    dtr_path: Path | None = typer.Option(
-        None, "--dtr-path", help="Path to DTR JSON files"
-    ),
 ) -> None:
-    """Render an FDO graph as an interactive HTML visualization."""
+    """Render an FDO graph as an interactive HTML visualization.
+
+    PID resolution happens in the browser via handle.net API.
+    Internet connection required when opening the HTML file.
+    """
     from fdo_usecases.fdo_graph_renderer import generate_graph
 
     html_path = generate_graph(
@@ -43,9 +41,7 @@ def render_graph(
         output_dir=output_dir,
         layout=layout,
         export_svg=True,
-        offline=offline,
-        dtr_path=dtr_path,
-        auto_detect_dtr=True,
     )
     print(f"✓ Generated: {html_path}")
     print("  Open this file in a browser to view the interactive graph")
+    print("  (Internet connection required for PID resolution)")

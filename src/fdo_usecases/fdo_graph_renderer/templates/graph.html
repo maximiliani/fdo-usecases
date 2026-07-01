@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FDO Graph Visualization</title>
+    <!-- Load Cytoscape.js and extensions -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-cose-bilkent@4.1.0/cytoscape-cose-bilkent.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -384,17 +389,56 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(44, 62, 80, 0.9);
+            background: rgba(44, 62, 80, 0.95);
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             color: white;
-            font-size: 18px;
         }
 
         #loading-overlay.hidden {
             display: none;
+        }
+
+        .loading-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .progress-container {
+            width: 400px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .progress-percentage {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #bdc3c7;
+        }
+
+        .retry-indicator {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #f39c12;
+            display: none;
+        }
+
+        .retry-indicator.active {
+            display: block;
         }
 
         .filter-checkbox {
@@ -422,7 +466,14 @@
     </style>
 </head>
 <body>
-    <div id="loading-overlay">Loading graph...</div>
+    <div id="loading-overlay">
+        <div class="loading-text">Loading graph...</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="progress-percentage" id="progress-percentage">0%</div>
+        <div class="retry-indicator" id="retry-indicator">⚠️ Retrying failed resolutions...</div>
+    </div>
 
     <div id="container">
         <div id="control-panel">
@@ -572,9 +623,8 @@
     </div>
 
     <script>
-        // Graph data injected from Python
-        const GRAPH_DATA = $graph_json;
-        const ATTR_DEFS = $attr_defs_json;  // Separate attribute definitions
+        // Raw JSON injected from Python
+        const RAW_GRAPH_DATA = $raw_json;
         const DEFAULT_LAYOUT = '$layout_algorithm';
         const ENABLE_SVG_EXPORT = '$export_svg' === 'true';
 
@@ -583,224 +633,347 @@
         let visibleTypes = new Set(['zenodo', 'md5', 'handle', 'other']);
         let focusedNodeId = null;
         let visibleRelationships = new Set();
+        let visibleProfiles = new Set();
 
-        // Lookup helper for attribute metadata
-        function getAttrMeta(key) {
-            return ATTR_DEFS[key] || { name: key, description: '' };
+        // Cache for resolved attribute metadata
+        const attrMetaCache = new Map();
+
+        // Track failed resolutions for retry
+        const failedResolutions = new Set();
+        window.remainingFailures = [];
+
+        // Loading steps configuration
+        const LOADING_STEPS = [
+            { text: 'Parsing raw JSON...', weight: 5 },
+            { text: 'Building node structures...', weight: 10 },
+            { text: 'Detecting relationships...', weight: 15 },
+            { text: 'Resolving attribute PIDs...', weight: 60 },
+            { text: 'Initializing visualization...', weight: 10 }
+        ];
+
+        function updateLoading(stepIndex, progressInStep) {
+            const step = LOADING_STEPS[stepIndex];
+            const baseProgress = LOADING_STEPS.slice(0, stepIndex)
+                .reduce((sum, s) => sum + s.weight, 0);
+
+            const totalProgress = baseProgress + (progressInStep * step.weight / 100);
+
+            document.getElementById('progress-bar').style.width = `${totalProgress}%`;
+            document.getElementById('progress-percentage').textContent =
+                `${Math.round(totalProgress)}% - ${step.text}`;
         }
 
-        // Calculate in-degree for each node (number of incoming edges)
-        function calculateNodePopularity() {
-            const popularity = {};
-            GRAPH_DATA.elements.forEach(elem => {
-                if (!elem.data.source) {  // node
-                    popularity[elem.data.id] = 0;
-                }
-            });
-            GRAPH_DATA.elements.forEach(elem => {
-                if (elem.data.source) {  // edge
-                    const target = elem.data.target;
-                    popularity[target] = (popularity[target] || 0) + 1;
-                }
-            });
-            return popularity;
+        function showRetryIndicator() {
+            document.getElementById('retry-indicator').classList.add('active');
         }
 
-        // Detect communities using Louvain-like algorithm (modularity optimization)
-        function detectCommunities() {
-            const nodes = [];
-            const edges = [];
-            const nodeMap = {};
+        function hideLoadingOverlay() {
+            setTimeout(() => {
+                document.getElementById('loading-overlay').classList.add('hidden');
+            }, 500);
+        }
 
-            GRAPH_DATA.elements.forEach((elem, idx) => {
-                if (!elem.data.source) {
-                    nodes.push(idx);
-                    nodeMap[elem.data.id] = idx;
-                } else {
-                    edges.push([nodeMap[elem.data.source], nodeMap[elem.data.target]]);
+        function classifyNodeType(pid) {
+            if (pid.startsWith('10.5281/zenodo')) return 'zenodo';
+            if (pid.startsWith('md5:')) return 'md5';
+            if (pid.startsWith('21.T')) return 'handle';
+            return 'other';
+        }
+
+        function truncatePid(pid, maxLength = 30) {
+            if (!pid) return '';
+            if (pid.length <= maxLength) return pid;
+            return `${pid.substring(0, Math.floor(maxLength / 2))}...${pid.substring(pid.length - Math.ceil(maxLength / 2))}`;
+        }
+
+        function extractProfilePids(recordArray) {
+            const PROFILE_KEY = '21.T11148/076759916209e5d62bd5';
+            return recordArray
+                .filter(attr => attr.key === PROFILE_KEY)
+                .map(attr => attr.value);
+        }
+
+        function groupAttributesByKey(recordArray) {
+            const grouped = {};
+            recordArray.forEach(attr => {
+                if (!grouped[attr.key]) {
+                    grouped[attr.key] = [];
                 }
+                grouped[attr.key].push(attr.value);
+            });
+            return Object.entries(grouped).map(([key, values]) => ({
+                k: key,
+                v: values.length > 1 ? values : values[0],
+                c: values.length
+            }));
+        }
+
+        function buildCytoscapeElements() {
+            const elements = [];
+            const allPids = Object.keys(RAW_GRAPH_DATA);
+
+            // Create nodes
+            Object.entries(RAW_GRAPH_DATA).forEach(([pid, recordData]) => {
+                const recordArray = recordData.record || [];
+                const profilePids = extractProfilePids(recordArray);
+                const groupedAttrs = groupAttributesByKey(recordArray);
+
+                const node = {
+                    data: {
+                        id: pid,
+                        label: truncatePid(pid),
+                        full_pid: pid,
+                        type: classifyNodeType(pid),
+                        profiles: profilePids,
+                        attrs: groupedAttrs
+                    },
+                    classes: classifyNodeType(pid)
+                };
+                elements.push(node);
             });
 
-            const n = nodes.length;
-            let community = new Array(n).fill(0).map((_, i) => i);
+            // Create edges: AUTOMATIC RELATIONSHIP DETECTION
+            // Rule: If attribute.value == another FDO's PID → relationship exists
+            Object.entries(RAW_GRAPH_DATA).forEach(([sourcePid, recordData]) => {
+                const recordArray = recordData.record || [];
 
-            // Simple greedy modularity optimization
-            const adjacency = Array.from({length: n}, () => []);
-            edges.forEach(([a, b]) => {
-                adjacency[a].push(b);
-                adjacency[b].push(a);
-            });
+                recordArray.forEach(attr => {
+                    const isRelationship = allPids.includes(attr.value);
 
-            // Iterate to optimize community assignments
-            for (let iter = 0; iter < 10; iter++) {
-                for (let i = 0; i < n; i++) {
-                    const neighborCommunities = {};
-                    adjacency[i].forEach(neighbor => {
-                        const comm = community[neighbor];
-                        neighborCommunities[comm] = (neighborCommunities[comm] || 0) + 1;
-                    });
-
-                    if (Object.keys(neighborCommunities).length > 0) {
-                        const bestComm = Object.entries(neighborCommunities)
-                            .sort((a, b) => b[1] - a[1])[0][0];
-                        community[i] = parseInt(bestComm);
+                    if (isRelationship) {
+                        const edge = {
+                            data: {
+                                source: sourcePid,
+                                target: attr.value,
+                                k: attr.key
+                            }
+                        };
+                        elements.push(edge);
                     }
+                });
+            });
+
+            return { elements };
+        }
+
+        async function resolveAttributeName(attrKeyPid) {
+            if (attrMetaCache.has(attrKeyPid)) {
+                return attrMetaCache.get(attrKeyPid);
+            }
+
+            try {
+                const { PID } = await import('https://unpkg.com/@kit-data-manager/pid-component/dist/esm/index.js');
+                const pid = PID.getPIDFromString(attrKeyPid);
+                const record = await pid.resolve();
+
+                if (record && record.values) {
+                    let name = '';
+                    let description = '';
+
+                    for (const val of record.values) {
+                        const typeStr = val.type?.toString() || '';
+                        const dataValue = val.data?.value || '';
+
+                        if (typeStr.includes('bd3e9fb9b606d2198c9e') ||
+                            typeStr.includes('name') ||
+                            typeStr.includes('title')) {
+                            name = dataValue;
+                        }
+
+                        if (typeStr.includes('880724416f5857987e70') ||
+                            typeStr.includes('description') ||
+                            typeStr.includes('abstract')) {
+                            description = dataValue;
+                        }
+                    }
+
+                    if (!name) {
+                        name = truncatePid(attrKeyPid, 25);
+                    }
+
+                    const meta = { name, description };
+                    attrMetaCache.set(attrKeyPid, meta);
+                    return meta;
+                }
+            } catch (error) {
+                console.warn(`Failed to resolve ${attrKeyPid}:`, error);
+            }
+
+            const fallback = { name: truncatePid(attrKeyPid, 25), description: '' };
+            attrMetaCache.set(attrKeyPid, fallback);
+            failedResolutions.add(attrKeyPid);
+            return fallback;
+        }
+
+        async function preloadAttributeMetadata(cytoscapeElements) {
+            const uniqueAttrKeys = new Set();
+
+            cytoscapeElements.elements.forEach(elem => {
+                if (elem.data.k) {
+                    uniqueAttrKeys.add(elem.data.k);
+                }
+            });
+
+            const totalToResolve = uniqueAttrKeys.size;
+            let resolvedCount = 0;
+
+            if (totalToResolve === 0) {
+                return;
+            }
+
+            console.log(`Resolving ${totalToResolve} unique attribute PIDs...`);
+            updateLoading(3, 0);
+
+            const batchSize = 10;
+            const keysArray = Array.from(uniqueAttrKeys);
+
+            async function resolveBatch(batch) {
+                const results = await Promise.allSettled(
+                    batch.map(key => resolveAttributeName(key))
+                );
+
+                results.forEach((result, idx) => {
+                    if (result.status === 'fulfilled') {
+                        resolvedCount++;
+                    }
+                });
+
+                updateLoading(3, (resolvedCount / totalToResolve) * 100);
+            }
+
+            for (let i = 0; i < keysArray.length; i += batchSize) {
+                const batch = keysArray.slice(i, i + batchSize);
+                await resolveBatch(batch);
+            }
+
+            if (failedResolutions.size > 0) {
+                console.log(`Retrying ${failedResolutions.size} failed resolutions...`);
+                showRetryIndicator();
+
+                const failedArray = Array.from(failedResolutions);
+                const initialFailedCount = failedResolutions.size;
+
+                for (let i = 0; i < failedArray.length; i += batchSize) {
+                    const batch = failedArray.slice(i, i + batchSize);
+                    await resolveBatch(batch);
+                }
+
+                const stillFailed = failedResolutions.size;
+                const recovered = initialFailedCount - stillFailed;
+
+                console.log(`Retry recovered ${recovered} of ${initialFailedCount} failed resolutions`);
+
+                window.remainingFailures = Array.from(failedResolutions);
+
+                if (window.remainingFailures.length > 0) {
+                    setTimeout(() => startBackgroundRetries(), 1000);
                 }
             }
 
-            // Renumber communities sequentially
-            const uniqueComms = [...new Set(community)].sort((a, b) => a - b);
-            const renumberMap = {};
-            uniqueComms.forEach((c, i) => { renumberMap[c] = i; });
-
-            return community.map(c => renumberMap[c]);
+            hideLoadingOverlay();
         }
 
-        // Initialize relationship filters from edge data
-        function initRelationshipFilters() {
-            const relationships = new Map();
+        function startBackgroundRetries() {
+            if (!window.remainingFailures || window.remainingFailures.length === 0) {
+                return;
+            }
 
-            GRAPH_DATA.elements.forEach(elem => {
-                if (elem.data.source && elem.data.k) {
-                    const meta = getAttrMeta(elem.data.k);
-                    if (!relationships.has(elem.data.k)) {
-                        relationships.set(elem.data.k, {
-                            pid: elem.data.k,
-                            name: meta.name || elem.data.k,
-                            count: 0
-                        });
+            console.log(`Background retry: ${window.remainingFailures.length} PIDs remaining`);
+
+            const interval = setInterval(() => {
+                if (window.remainingFailures.length === 0) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                const batch = window.remainingFailures.splice(0, 5);
+                batch.forEach(async key => {
+                    try {
+                        const { PID } = await import('https://unpkg.com/@kit-data-manager/pid-component/dist/esm/index.js');
+                        const pid = PID.getPIDFromString(key);
+                        const record = await pid.resolve();
+
+                        if (record) {
+                            let name = '';
+                            let description = '';
+
+                            for (const val of record.values) {
+                                const typeStr = val.type?.toString() || '';
+                                const dataValue = val.data?.value || '';
+
+                                if (typeStr.includes('bd3e9fb9b606d2198c9e') ||
+                                    typeStr.includes('name') ||
+                                    typeStr.includes('title')) {
+                                    name = dataValue;
+                                }
+
+                                if (typeStr.includes('880724416f5857987e70') ||
+                                    typeStr.includes('description')) {
+                                    description = dataValue;
+                                }
+                            }
+
+                            if (!name) {
+                                name = truncatePid(key, 25);
+                            }
+
+                            attrMetaCache.set(key, { name, description });
+                        } else {
+                            window.remainingFailures.push(key);
+                        }
+                    } catch (error) {
+                        window.remainingFailures.push(key);
                     }
-                    relationships.get(elem.data.k).count++;
-                }
-            });
-
-            const container = document.getElementById('relationship-filters');
-            visibleRelationships.clear();
-
-            relationships.forEach((rel, pid) => {
-                visibleRelationships.add(pid);
-                const div = document.createElement('div');
-                div.className = 'filter-checkbox';
-                div.innerHTML = `
-                    <label>
-                        <input type="checkbox" class="relationship-filter" data-pid="${escapeHtml(pid)}" checked>
-                        <span>${escapeHtml(rel.name)} (${rel.count})</span>
-                    </label>
-                `;
-                container.appendChild(div);
-            });
-
-            document.querySelectorAll('.relationship-filter').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const pid = this.dataset.pid;
-                    if (this.checked) {
-                        visibleRelationships.add(pid);
-                    } else {
-                        visibleRelationships.delete(pid);
-                    }
-                    filterByRelationship();
                 });
-            });
+            }, 2000);
         }
 
-        // Filter edges by relationship type
-        function filterByRelationship() {
-            // Don't apply when in focus mode
-            if (focusedNodeId) return;
+        function getEdgeColor(edge) {
+            const key = edge.data('k');
+            const meta = attrMetaCache.get(key);
+            const name = (meta?.name || '').toLowerCase();
 
-            cy.edges().forEach(edge => {
-                const relPid = edge.data('k');
-                if (visibleRelationships.has(relPid)) {
-                    edge.removeClass('hidden-relationship');
-                } else {
-                    edge.addClass('hidden-relationship');
-                }
-            });
-
-            // Hide nodes that become isolated
-            cy.nodes().forEach(node => {
-                const hasVisibleEdge = node.connectedEdges().some(e => {
-                    return !e.hasClass('hidden-relationship') &&
-                           !e.hasClass('hidden') &&
-                           !e.hasClass('hidden-profile');
-                });
-
-                // Also check if node passes type/profile filters
-                const passesTypeFilter = visibleTypes.has(node.data('type'));
-                const profiles = node.data('profiles') || [];
-                const passesProfileFilter = profiles.some(p => visibleProfiles.has(p));
-
-                if (!hasVisibleEdge && passesTypeFilter && passesProfileFilter) {
-                    // Node is isolated due to relationship filtering
-                    node.addClass('hidden-isolated');
-                } else {
-                    node.removeClass('hidden-isolated');
-                }
-            });
+            if (name.includes('version')) return '#e74c3c';
+            if (name.includes('file') || name.includes('data')) return '#27ae60';
+            if (name.includes('cite') || name.includes('doi')) return '#2980b9';
+            return '#95a5a6';
         }
 
-        // Focus on a single node (show only it and its direct connections)
-        function focusOnNode(node) {
-            focusedNodeId = node.id();
-            const connectedEdges = node.connectedEdges();
-            const connectedNodes = connectedEdges.connectedNodes();
+        function getEdgeLabel(edge) {
+            const mode = currentDisplayMode;
+            const key = edge.data('k') || '';
+            const meta = attrMetaCache.get(key) || { name: truncatePid(key, 20), description: '' };
+            const isFailed = failedResolutions.has(key);
 
-            // Hide all nodes except the focused one and its neighbors
-            cy.nodes().forEach(n => {
-                if (n.id() === focusedNodeId || connectedNodes.has(n)) {
-                    n.removeClass('hidden-focus');
-                } else {
-                    n.addClass('hidden-focus');
-                }
-            });
+            let labelText;
 
-            // Hide all edges except those connected to the focused node
-            cy.edges().forEach(e => {
-                if (connectedEdges.has(e)) {
-                    e.removeClass('hidden-focus');
-                } else {
-                    e.addClass('hidden-focus');
-                }
-            });
+            if (mode === 'pid') {
+                labelText = truncate(key, 20);
+            } else if (mode === 'name') {
+                labelText = truncate(meta.name || key, 20);
+            } else {
+                labelText = meta.name && meta.name !== truncatePid(key, 25)
+                    ? meta.name
+                    : truncate(key, 20);
+            }
 
-            // Update UI buttons
-            const focusBtn = document.getElementById('focus-node-btn');
-            const clearBtn = document.getElementById('clear-focus-btn');
-            if (focusBtn) focusBtn.style.display = 'none';
-            if (clearBtn) clearBtn.style.display = 'inline-block';
+            if (isFailed && mode !== 'pid') {
+                labelText += ' ⚠️';
+            }
 
-            // Fit view to focused node and neighbors
-            cy.animate({
-                fit: {
-                    eles: node.union(connectedNodes),
-                    padding: 50
-                },
-                duration: 500
-            });
+            return labelText;
         }
 
-        // Clear focus and show all nodes
-        function clearFocus() {
-            focusedNodeId = null;
-            cy.elements().removeClass('hidden-focus');
-
-            // Update UI buttons
-            const focusBtn = document.getElementById('focus-node-btn');
-            const clearBtn = document.getElementById('clear-focus-btn');
-            if (focusBtn) focusBtn.style.display = 'inline-block';
-            if (clearBtn) clearBtn.style.display = 'none';
-
-            // Re-apply all filters
-            filterByType();
-            filterByProfile();
-            filterByRelationship();
+        function truncate(str, len) {
+            if (!str) return '';
+            if (str.length <= len) return str;
+            return str.substring(0, len - 3) + '...';
         }
 
-        // Initialize Cytoscape
-        function initCytoscape() {
+        function initCytoscapeWithElements(elements) {
             cy = cytoscape({
                 container: document.getElementById('cy'),
-                elements: GRAPH_DATA.elements,
+                elements: elements.elements,
                 style: [
                     {
                         selector: 'node',
@@ -909,7 +1082,6 @@
                     name: DEFAULT_LAYOUT,
                     animate: true,
                     animationDuration: 500,
-                    // CoSE layout parameters for better node spacing
                     nodeRepulsion: 10500,
                     idealEdgeLength: 250,
                     edgeElasticity: 100,
@@ -917,7 +1089,6 @@
                     padding: 15,
                     numIter: 25000,
                     ready: function() {
-                        document.getElementById('loading-overlay').classList.add('hidden');
                     }
                 },
                 wheelSensitivity: 0.3,
@@ -925,19 +1096,14 @@
                 maxZoom: 10
             });
 
-            // Update statistics
             updateStatistics();
-
-            // Initialize filters
             initProfileFilters();
             initRelationshipFilters();
 
-            // Node click handler
             cy.on('tap', 'node', function(evt) {
                 showNodeDetails(evt.target);
             });
 
-            // Close details panel when clicking on background
             cy.on('tap', function(evt) {
                 if (evt.target === cy) {
                     closeDetailsPanel();
@@ -967,38 +1133,6 @@
             return shapes[type] || 'ellipse';
         }
 
-        function getEdgeColor(edge) {
-            const type = edge.data('relationship_type');
-            const colors = {
-                version: '#e74c3c',
-                file: '#27ae60',
-                citation: '#2980b9',
-                other: '#95a5a6'
-            };
-            return colors[type] || '#95a5a6';
-        }
-
-        function getEdgeLabel(edge) {
-            const mode = currentDisplayMode;
-            const key = edge.data('k') || '';
-            const meta = getAttrMeta(key);
-            const name = meta.name || '';
-
-            if (mode === 'pid') {
-                return truncate(key, 20);
-            } else if (mode === 'name') {
-                return truncate(name, 20);
-            } else {
-                return name ? `${name}` : truncate(key, 20);
-            }
-        }
-
-        function truncate(str, len) {
-            if (!str) return '';
-            if (str.length <= len) return str;
-            return str.substring(0, len - 3) + '...';
-        }
-
         function updateStatistics() {
             const nodes = cy.nodes().length;
             const edges = cy.edges().length;
@@ -1014,17 +1148,21 @@
                 ? data.profiles.map(p => `<span class="profile-badge">${escapeHtml(p)}</span>`).join('')
                 : '<span style="color: #95a5a6;">None</span>';
 
-            // Use separate attribute definitions lookup
-            const attrs = data.attrs || [];
-            const attributesHtml = attrs.length > 0
+            const attributesHtml = data.attrs && data.attrs.length > 0
                 ? `<ul class="attribute-list">
-                    ${attrs.map(attr => {
-                        const meta = getAttrMeta(attr.k);
+                    ${data.attrs.map(attr => {
+                        const meta = attrMetaCache.get(attr.k) || { name: attr.k, description: '' };
                         const hasMultiple = attr.c && attr.c > 1;
                         const values = Array.isArray(attr.v) ? attr.v : [attr.v];
+                        const isFailed = failedResolutions.has(attr.k);
+
                         return `
-                        <li class="attribute-item">
-                            <div class="attribute-key">${escapeHtml(meta.name)} <span style="color: #95a5a6; font-weight: normal;">(${attr.c || 1} ${hasMultiple ? 'values' : 'value'})</span></div>
+                        <li class="attribute-item" style="${isFailed ? 'border-left-color: #f39c12;' : ''}">
+                            <div class="attribute-key">
+                                ${escapeHtml(meta.name)}
+                                ${isFailed ? '<span style="color: #f39c12; font-size: 10px;" title="Could not resolve PID">⚠️</span>' : ''}
+                                <span style="color: #95a5a6; font-weight: normal;">(${attr.c || 1} ${hasMultiple ? 'values' : 'value'})</span>
+                            </div>
                             ${!hasMultiple
                                 ? `<div class="attribute-value">${escapeHtml(values[0])}</div>`
                                 : `<div class="attribute-values">
@@ -1040,9 +1178,6 @@
                    </ul>`
                 : '<p style="color: #95a5a6;">No attributes</p>';
 
-            const uniqueAttrCount = attrs.length;
-            const totalCount = attrs.reduce((sum, a) => sum + (a.c || 1), 0);
-
             content.innerHTML = `
                 <div class="detail-row">
                     <div class="detail-label">PID</div>
@@ -1057,17 +1192,22 @@
                     <div class="detail-value">${profilesHtml}</div>
                 </div>
                 <div class="detail-row">
-                    <div class="detail-label">Attributes (${uniqueAttrCount} unique, ${totalCount} total)</div>
+                    <div class="detail-label">Attributes (${data.attrs?.length || 0})</div>
                     ${attributesHtml}
                 </div>
                 <div class="detail-row">
-                    <button class="btn btn-primary btn-inline" id="focus-node-btn">Focus on this Node</button>
+                    <button class="btn btn-primary btn-inline" id="focus-node-btn">Focus on This Node</button>
                     <button class="btn btn-secondary btn-inline" id="clear-focus-btn" style="display: none;">Clear Focus</button>
                 </div>
             `;
 
-            // Add focus functionality
-            document.getElementById('focus-node-btn').addEventListener('click', function() {
+            if (window.pidDetectionController) {
+                setTimeout(() => {
+                    window.pidDetectionController.rescan();
+                }, 100);
+            }
+
+            document.getElementById('focus-node-btn')?.addEventListener('click', function() {
                 focusOnNode(node);
             });
 
@@ -1085,87 +1225,11 @@
             return div.innerHTML;
         }
 
-        // Layout change handler
-        document.getElementById('layout-select').addEventListener('change', function() {
-            const layout = this.value;
-            console.log('Layout changed to:', layout);
-
-            if (layout === 'popularity') {
-                console.log('Applying popularity-based hierarchical layout...');
-                console.log('Available layouts:', Object.keys(cy.layouts()));
-
-                try {
-                    // Hierarchical layout by popularity (most referenced at top)
-                    const popularity = calculateNodePopularity();
-
-                    // Log top nodes for debugging
-                    const sorted = Object.entries(popularity).sort((a, b) => b[1] - a[1]);
-                    console.log('Top 5 most referenced nodes:', sorted.slice(0, 5));
-
-                    // Assign rank based on in-degree (higher = more referenced = top)
-                    const ranks = {};
-                    Object.entries(popularity).forEach(([pid, refs]) => {
-                        if (refs >= 10) ranks[pid] = 0;      // Top tier
-                        else if (refs >= 3) ranks[pid] = 1;  // Middle tier
-                        else ranks[pid] = 2;                  // Bottom tier
-                    });
-
-                    console.log('Running dagre layout with custom ranking...');
-                    cy.layout({
-                        name: 'dagre',
-                        animate: true,
-                        animationDuration: 800,
-                        rankDir: 'TB',
-                        rankSep: 200,
-                        nodeSep: 50,
-                        ranker: 'tight-tree',
-                        assignRank: function(node) {
-                            const rank = ranks[node.id()] !== undefined ? ranks[node.id()] : 2;
-                            console.log(`Node ${node.id().substr(0, 20)}... assigned rank ${rank}`);
-                            return rank;
-                        }
-                    }).run();
-                    console.log('Dagre layout completed successfully');
-                } catch (e) {
-                    console.error('Error applying dagre layout:', e);
-                }
-            } else {
-                console.log(`Applying ${layout} layout...`);
-                cy.layout({
-                    name: layout,
-                    animate: true,
-                    animationDuration: 500
-                }).run();
-            }
-        });
-
-        // Display mode handlers
-        document.querySelectorAll('[data-display]').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('[data-display]').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                currentDisplayMode = this.dataset.display;
-                cy.style().update();
-            });
-        });
-
-        // Description toggle
-        document.getElementById('show-descriptions').addEventListener('change', function() {
-            const node = cy.$(':selected').first();
-            if (node.length > 0) {
-                showNodeDetails(node);
-            }
-        });
-
-        let visibleProfiles = new Set();
-
-        // Initialize profile filters dynamically from graph data
         function initProfileFilters() {
             const profiles = new Set();
-            GRAPH_DATA.elements.forEach(elem => {
-                if (!elem.data.source && elem.data.profiles) {
-                    elem.data.profiles.forEach(p => profiles.add(p));
-                }
+            Object.values(RAW_GRAPH_DATA).forEach(recordData => {
+                const profilePids = extractProfilePids(recordData.record || []);
+                profilePids.forEach(p => profiles.add(p));
             });
 
             const container = document.getElementById('profile-filters');
@@ -1197,21 +1261,160 @@
             });
         }
 
-        // Type filters
-        document.querySelectorAll('.type-filter').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const type = this.dataset.type;
+        function initRelationshipFilters() {
+            const container = document.getElementById('relationship-filters');
+            container.innerHTML = '';
+
+            const toggleDiv = document.createElement('div');
+            toggleDiv.className = 'control-group';
+            toggleDiv.innerHTML = `
+                <label>
+                    <input type="checkbox" id="show-all-edges" checked>
+                    Show all edges
+                </label>
+            `;
+            container.appendChild(toggleDiv);
+
+            document.getElementById('show-all-edges').addEventListener('change', function() {
                 if (this.checked) {
-                    visibleTypes.add(type);
+                    cy.edges().removeClass('hidden');
                 } else {
-                    visibleTypes.delete(type);
+                    cy.edges().addClass('hidden');
                 }
-                filterByType();
             });
-        });
+
+            const relationshipTypes = new Map();
+
+            cy.edges().forEach(edge => {
+                const key = edge.data('k');
+                const meta = attrMetaCache.get(key) || { name: truncatePid(key) };
+
+                if (!relationshipTypes.has(key)) {
+                    relationshipTypes.set(key, {
+                        pid: key,
+                        name: meta.name,
+                        count: 0,
+                        failed: !meta.name || meta.name === truncatePid(key)
+                    });
+                }
+                relationshipTypes.get(key).count++;
+            });
+
+            const hr = document.createElement('hr');
+            hr.style.border = 'none';
+            hr.style.borderTop = '1px solid #34495e';
+            hr.style.margin = '10px 0';
+            container.appendChild(hr);
+
+            relationshipTypes.forEach((rel, pid) => {
+                visibleRelationships.add(pid);
+                const div = document.createElement('div');
+                div.className = 'filter-checkbox';
+                div.style.marginBottom = '5px';
+                div.innerHTML = `
+                    <label style="${rel.failed ? 'color: #f39c12;' : ''}">
+                        <input type="checkbox" class="relationship-filter"
+                               data-pid="${escapeHtml(pid)}" checked>
+                        <span>${escapeHtml(rel.name)} (${rel.count})${rel.failed ? ' ⚠️' : ''}</span>
+                    </label>
+                `;
+                container.appendChild(div);
+            });
+
+            document.querySelectorAll('.relationship-filter').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const pid = this.dataset.pid;
+                    if (this.checked) {
+                        visibleRelationships.add(pid);
+                    } else {
+                        visibleRelationships.delete(pid);
+                    }
+                    filterByRelationship();
+                });
+            });
+        }
+
+        function filterByRelationship() {
+            if (focusedNodeId) return;
+
+            cy.edges().forEach(edge => {
+                const relPid = edge.data('k');
+                if (visibleRelationships.has(relPid)) {
+                    edge.removeClass('hidden-relationship');
+                } else {
+                    edge.addClass('hidden-relationship');
+                }
+            });
+
+            cy.nodes().forEach(node => {
+                const hasVisibleEdge = node.connectedEdges().some(e => {
+                    return !e.hasClass('hidden-relationship') &&
+                           !e.hasClass('hidden') &&
+                           !e.hasClass('hidden-profile');
+                });
+
+                const passesTypeFilter = visibleTypes.has(node.data('type'));
+                const profiles = node.data('profiles') || [];
+                const passesProfileFilter = profiles.some(p => visibleProfiles.has(p));
+
+                if (!hasVisibleEdge && passesTypeFilter && passesProfileFilter) {
+                    node.addClass('hidden-isolated');
+                } else {
+                    node.removeClass('hidden-isolated');
+                }
+            });
+        }
+
+        function focusOnNode(node) {
+            focusedNodeId = node.id();
+            const connectedEdges = node.connectedEdges();
+            const connectedNodes = connectedEdges.connectedNodes();
+
+            cy.nodes().forEach(n => {
+                if (n.id() === focusedNodeId || connectedNodes.has(n)) {
+                    n.removeClass('hidden-focus');
+                } else {
+                    n.addClass('hidden-focus');
+                }
+            });
+
+            cy.edges().forEach(e => {
+                if (connectedEdges.has(e)) {
+                    e.removeClass('hidden-focus');
+                } else {
+                    e.addClass('hidden-focus');
+                }
+            });
+
+            const focusBtn = document.getElementById('focus-node-btn');
+            const clearBtn = document.getElementById('clear-focus-btn');
+            if (focusBtn) focusBtn.style.display = 'none';
+            if (clearBtn) clearBtn.style.display = 'inline-block';
+
+            cy.animate({
+                fit: {
+                    eles: node.union(connectedNodes),
+                    padding: 50
+                },
+                duration: 500
+            });
+        }
+
+        function clearFocus() {
+            focusedNodeId = null;
+            cy.elements().removeClass('hidden-focus');
+
+            const focusBtn = document.getElementById('focus-node-btn');
+            const clearBtn = document.getElementById('clear-focus-btn');
+            if (focusBtn) focusBtn.style.display = 'inline-block';
+            if (clearBtn) clearBtn.style.display = 'none';
+
+            filterByType();
+            filterByProfile();
+            filterByRelationship();
+        }
 
         function filterByType() {
-            // Don't apply type filters when in focus mode
             if (focusedNodeId) return;
 
             cy.nodes().forEach(node => {
@@ -1235,7 +1438,6 @@
         }
 
         function filterByProfile() {
-            // Don't apply profile filters when in focus mode
             if (focusedNodeId) return;
 
             cy.nodes().forEach(node => {
@@ -1259,7 +1461,6 @@
             });
         }
 
-        // Search functionality
         let searchTimeout;
         document.getElementById('search-input').addEventListener('input', function() {
             clearTimeout(searchTimeout);
@@ -1306,7 +1507,45 @@
             }
         }
 
-        // Export functions
+        document.getElementById('layout-select').addEventListener('change', function() {
+            const layout = this.value;
+            console.log('Layout changed to:', layout);
+
+            cy.layout({
+                name: layout,
+                animate: true,
+                animationDuration: 500
+            }).run();
+        });
+
+        document.querySelectorAll('[data-display]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-display]').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentDisplayMode = this.dataset.display;
+                cy.style().update();
+            });
+        });
+
+        document.getElementById('show-descriptions').addEventListener('change', function() {
+            const node = cy.$(':selected').first();
+            if (node.length > 0) {
+                showNodeDetails(node);
+            }
+        });
+
+        document.querySelectorAll('.type-filter').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const type = this.dataset.type;
+                if (this.checked) {
+                    visibleTypes.add(type);
+                } else {
+                    visibleTypes.delete(type);
+                }
+                filterByType();
+            });
+        });
+
         document.getElementById('export-svg').addEventListener('click', function() {
             const svgBlob = cy.svg({ scale: 1, full: true });
             const url = URL.createObjectURL(svgBlob);
@@ -1325,78 +1564,62 @@
             link.click();
         });
 
-        // Close details button
         document.getElementById('close-details').addEventListener('click', closeDetailsPanel);
 
-        // Clear focus button handler (delegated since button is created dynamically)
         document.addEventListener('click', function(e) {
             if (e.target && e.target.id === 'clear-focus-btn') {
                 clearFocus();
             }
         });
 
-        // Load Cytoscape and extensions sequentially (dagre must load before cytoscape-dagre)
-        function loadScripts() {
-            console.log('Loading Cytoscape scripts...');
-            const scripts = [
-                'https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js',
-                'https://cdn.jsdelivr.net/npm/cytoscape-cose-bilkent@4.1.0/cytoscape-cose-bilkent.min.js',
-                'https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js',
-                'https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js'
-            ];
+        async function initializeGraph() {
+            console.log('Building Cytoscape elements from raw JSON...');
+            updateLoading(0, 100);
 
-            let currentIdx = 0;
+            setTimeout(() => {
+                updateLoading(1, 0);
+                const elements = buildCytoscapeElements();
+                updateLoading(1, 100);
 
-            function loadNext() {
-                if (currentIdx >= scripts.length) {
-                    // All scripts loaded
-                    console.log('All scripts loaded, initializing Cytoscape...');
-                    try {
-                        // Register dagre extension with cytoscape
-                        if (window.cytoscapeDagre) {
-                            cytoscape.use(window.cytoscapeDagre);
-                            console.log('dagre extension registered');
-                        } else {
-                            console.error('cytoscapeDagre not found on window!');
-                        }
-                        initCytoscape();
-                    } catch (e) {
-                        console.error('Error initializing Cytoscape:', e);
-                        document.getElementById('loading-overlay').innerHTML =
-                            'Error: ' + e.message;
-                    }
-                    return;
-                }
+                setTimeout(async () => {
+                    updateLoading(2, 0);
+                    console.log('Preloading attribute metadata...');
 
-                const src = scripts[currentIdx];
-                const idx = currentIdx;
-                currentIdx++;
+                    await preloadAttributeMetadata(elements);
 
-                const script = document.createElement('script');
-                script.src = src;
-                script.onerror = (err) => {
-                    console.error('Failed to load script:', src, err);
-                    document.getElementById('loading-overlay').innerHTML =
-                        'Error loading: ' + src.split('/').pop();
-                };
-                script.onload = () => {
-                    console.log(`Loaded ${idx + 1}/${scripts.length}: ${src.split('/').pop()}`);
-
-                    // Verify dagre is available before loading cytoscape-dagre
-                    if (idx === 2) {  // dagre just loaded
-                        console.log('dagre loaded, checking window.dagre:', typeof window.dagre);
-                    }
-
-                    loadNext();
-                };
-                document.head.appendChild(script);
-            }
-
-            loadNext();
+                    updateLoading(4, 0);
+                    console.log('Initializing Cytoscape...');
+                    initCytoscapeWithElements(elements);
+                    updateLoading(4, 100);
+                }, 100);
+            }, 100);
         }
 
-        // Start loading
-        loadScripts();
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const { initPidDetection } = await import('https://unpkg.com/@kit-data-manager/pid-component/dist/esm/index.js');
+
+                window.pidDetectionController = initPidDetection({
+                    root: document.getElementById('details-panel'),
+                    darkMode: 'light',
+                    observe: true,
+                    levelOfSubcomponents: 2,
+                    emphasizeComponent: true,
+                    showTopLevelCopy: true
+                });
+
+                await initializeGraph();
+            } catch (error) {
+                console.error('Failed to load pid-component:', error);
+                document.getElementById('loading-overlay').innerHTML = `
+                    <div style="color: #e74c3c; text-align: center;">
+                        <h2>Error Loading pid-component</h2>
+                        <p>Failed to load from CDN. Please check your internet connection.</p>
+                        <p style="font-size: 12px; margin-top: 10px;">${error.message}</p>
+                    </div>
+                `;
+            }
+        });
     </script>
 </body>
 </html>
