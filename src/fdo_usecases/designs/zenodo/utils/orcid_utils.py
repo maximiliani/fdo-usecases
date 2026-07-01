@@ -8,23 +8,24 @@ import re
 
 
 def normalize_orcid(orcid: str | None) -> str | None:
-    """Normalize ORCID to standard format with dashes.
+    """Normalize ORCID to full URL format.
 
-    Converts ORCID from various formats to standard XXXX-XXXX-XXXX-XXXX format.
+    Converts ORCID from various formats to standard URL format.
+    Output is ALWAYS: https://orcid.org/XXXX-XXXX-XXXX-XXXX
 
     Args:
         orcid: ORCID string in any format (with/without dashes, with/without URL prefix)
 
     Returns:
-        Normalized ORCID in XXXX-XXXX-XXXX-XXXX format, or None if input is None/invalid
+        Normalized ORCID as FULL URL, or None if input is None/invalid
 
     Example:
         >>> normalize_orcid("0000-0003-0012-2414")
-        '0000-0003-0012-2414'
+        'https://orcid.org/0000-0003-0012-2414'
         >>> normalize_orcid("0000000300122414")
-        '0000-0003-0012-2414'
+        'https://orcid.org/0000-0003-0012-2414'
         >>> normalize_orcid("https://orcid.org/0000-0003-0012-2414")
-        '0000-0003-0012-2414'
+        'https://orcid.org/0000-0003-0012-2414'
 
     """
     if not orcid:

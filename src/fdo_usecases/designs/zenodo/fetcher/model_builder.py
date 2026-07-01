@@ -17,6 +17,7 @@ from fdo_usecases.designs.zenodo.models import (
     RelatedIdentifier,
     ZenodoFile,
 )
+from fdo_usecases.designs.zenodo.utils import normalize_orcid
 
 
 class ModelBuilder:
@@ -168,7 +169,9 @@ class ModelBuilder:
             Creator(
                 name=c.get("name", ""),
                 affiliation=c.get("affiliation"),
-                orcid=c.get("orcid"),
+                orcid=normalize_orcid(
+                    c.get("orcid")
+                ),  # Apply normalization to URL format
             )
             for c in metadata.get("creators", [])
         ]

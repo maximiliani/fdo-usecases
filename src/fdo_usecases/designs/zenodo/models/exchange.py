@@ -17,7 +17,9 @@ Models:
 
 from datetime import date
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from fdo_usecases.designs.zenodo.constants import VALID_RESOURCE_TYPES
 
 
 class CreatorData(BaseModel):
@@ -27,7 +29,7 @@ class CreatorData(BaseModel):
     Full creator information with names and affiliations is in the metadata models.
 
     Attributes:
-        orcid: ORCID identifier in XXXX-XXXX-XXXX-XXXX format (optional)
+        orcid: ORCID identifier as FULL URL (https://orcid.org/XXXX-XXXX-XXXX-XXXX)
         ror_id: ROR identifier URL for institutional affiliation (optional)
 
     """
@@ -49,13 +51,14 @@ class DatasetFDOData(BaseModel):
         description: Abstract/description (HTML stripped, truncated to 500 words)
         publication_date: Publication date in ISO 8601 format
         version_label: Human-readable version string (e.g., "2.1")
-        creators: List of creator data (ORCIDs and ROR IDs)
+        creators: List of creator data (ORCID URLs and ROR IDs)
         keywords: List of subject keywords/tags
         previous_version_doi: Previous version DOI or None if first version
         next_version_doi: Next version DOI or None if latest version
         latest_version_doi: Latest version DOI (for non-latest versions)
         files: List of file checksums in this dataset version
         landing_page_url: URL to the Zenodo landing page for this version
+        preview_images: List of up to 10 preview image download URLs (PNG, JPEG, GIF, WebP)
 
     """
 
@@ -71,6 +74,7 @@ class DatasetFDOData(BaseModel):
     latest_version_doi: str | None = None
     files: list[str] = Field(default_factory=list)
     landing_page_url: str | None = None
+    preview_images: list[str] = Field(default_factory=list)
 
 
 class FileFDOData(BaseModel):
@@ -113,19 +117,22 @@ class PublicationFDOData(BaseModel):
 
     Attributes:
         identifier: Persistent identifier (DOI or other)
-        resource_type: DataCite publication type (optional)
+        resource_type: DataCite resourceTypeGeneral (controlled vocabulary)
         publisher: Publisher name (optional)
         publication_date: Publication date in ISO 8601 format (optional)
         title: Publication title (optional)
         description: Publication description (optional)
-        creator_orcids: List of creator ORCID identifiers (optional)
+        creator_orcids: List of creator ORCID URLs (optional)
         referenced_by_datasets: List of dataset DOIs that reference this publication
         landing_page_url: URL to the publication landing page (DOI URL)
 
     """
 
     identifier: str
-    resource_type: str | None = None
+    resource_type: str | None = Field(
+        default=None,
+        description="DataCite resourceTypeGeneral from controlled vocabulary",
+    )
     publisher: str | None = None
     publication_date: str | None = None
     title: str | None = None
@@ -133,6 +140,18 @@ class PublicationFDOData(BaseModel):
     creator_orcids: list[str] = Field(default_factory=list)
     referenced_by_datasets: list[str] = Field(default_factory=list)
     landing_page_url: str | None = None
+
+    @field_validator("resource_type")
+    @classmethod
+    def validate_resource_type(cls, v: str | None) -> str | None:
+        """Validate resource_type is in DataCite controlled vocabulary."""
+        if v is None:
+            return v
+        if v not in VALID_RESOURCE_TYPES:
+            raise ValueError(
+                f"Invalid resource_type '{v}'. Must be one of: {sorted(VALID_RESOURCE_TYPES)}"
+            )
+        return v
 
 
 __all__ = [

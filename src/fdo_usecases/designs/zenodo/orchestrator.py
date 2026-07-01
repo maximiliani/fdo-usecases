@@ -28,7 +28,7 @@ from fdo_usecases.designs.zenodo.designs import (
 )
 from fdo_usecases.designs.zenodo.fetcher import ZenodoDatasetFetcher
 from fdo_usecases.designs.zenodo.handlers import ReferenceProcessor
-from fdo_usecases.designs.zenodo.models import Dataset
+from fdo_usecases.designs.zenodo.models import Dataset, DatasetVersion
 from fdo_usecases.designs.zenodo.models.exchange import (
     CreatorData,
     DatasetFDOData,
@@ -39,6 +39,65 @@ logger = logging.getLogger(__name__)
 
 
 class ZenodoFDODesign(RecordDesign):
+    """Orchestrate creation of all FDO types from Zenodo metadata."""
+
+    #: Supported preview image MIME types (browser-compatible)
+    IMAGE_MIME_TYPES = frozenset(
+        [
+            "image/png",
+            "image/jpeg",
+            "image/gif",
+            "image/webp",
+        ]
+    )
+
+    #: Supported preview image filename extensions
+    IMAGE_EXTENSIONS = frozenset([".png", ".jpg", ".jpeg", ".gif", ".webp"])
+
+    #: Maximum number of preview images per dataset version
+    MAX_PREVIEW_IMAGES = 10
+
+    def _extract_preview_images(
+        self,
+        version: DatasetVersion,
+    ) -> list[str]:
+        """Extract preview image URLs from dataset version.
+
+        Filters files by MIME type or filename extension, prioritizing
+        browser-compatible formats (PNG, JPEG, GIF, WebP). Excludes TIFF
+        due to poor browser support.
+
+        Args:
+            version: Dataset version to extract images from
+
+        Returns:
+            List of up to MAX_PREVIEW_IMAGES download URLs
+
+        """
+        preview_urls = []
+
+        for file_obj in version.files.values():
+            is_image = False
+
+            # Primary check: MIME type
+            if file_obj.mimetype and file_obj.mimetype in self.IMAGE_MIME_TYPES:
+                is_image = True
+
+            # Fallback: filename extension
+            if not is_image:
+                filename_lower = file_obj.filename.lower()
+                if any(filename_lower.endswith(ext) for ext in self.IMAGE_EXTENSIONS):
+                    is_image = True
+
+            if is_image:
+                preview_urls.append(str(file_obj.download_url))
+
+                # Stop at limit
+                if len(preview_urls) >= self.MAX_PREVIEW_IMAGES:
+                    break
+
+        return preview_urls
+
     """Orchestrate creation of all FDO types from Zenodo metadata.
 
     This is the main entry point for Zenodo FDO generation. It:
@@ -62,20 +121,28 @@ class ZenodoFDODesign(RecordDesign):
 
     """
 
-    def __init__(self, dois: list[str] | str, max_concurrent: int = 10):
+    def __init__(
+        self,
+        dois: list[str] | str,
+        max_concurrent: int = 10,
+        reference_recursion_depth: int = 3,
+    ):
         """Initialize orchestrator with DOI(s).
 
         Args:
             dois: Single DOI string or list of DOI strings to process
             max_concurrent: Maximum number of concurrent API requests (default: 10)
+            reference_recursion_depth: Maximum depth for recursive reference fetching (default: 3)
 
         """
         super().__init__()
         self.dois = [dois] if isinstance(dois, str) else dois
         self._max_concurrent = max_concurrent
+        self._reference_recursion_depth = reference_recursion_depth
         self._semaphore: asyncio.Semaphore | None = None
         self._processed_datasets: set[str] = set()
         self._record_graph: dict[str, PidRecord] = {}
+        self._cross_reference_registry: dict[str, set[str]] = {}
 
         # Composed designs (pass self as orchestrator for graph access)
         self.dataset_design = ZenodoDatasetDesign(self)
@@ -143,6 +210,10 @@ class ZenodoFDODesign(RecordDesign):
         # Transform each version
         for version in dataset.versions.values():
             landing_page_url = f"https://doi.org/{version.doi}"
+
+            # Extract preview images for this version
+            preview_images = self._extract_preview_images(version)
+
             dataset_data = DatasetFDOData(
                 doi=version.doi,
                 title=version.title,
@@ -167,6 +238,7 @@ class ZenodoFDODesign(RecordDesign):
                 ),
                 files=list(version.files.keys()),
                 landing_page_url=landing_page_url,
+                preview_images=preview_images,
             )
             dataset_datas.append(dataset_data)
 
@@ -251,7 +323,7 @@ class ZenodoFDODesign(RecordDesign):
 
         async def process_single_doi(doi: str) -> str:
             async with semaphore:
-                await self._process_doi(doi)
+                await self._process_doi(doi, depth=0)
                 return doi
 
         results = await asyncio.gather(
@@ -277,11 +349,12 @@ class ZenodoFDODesign(RecordDesign):
 
         return successful, failed
 
-    async def _process_doi(self, doi: str) -> None:
+    async def _process_doi(self, doi: str, depth: int = 0) -> None:
         """Process a single DOI.
 
         Args:
             doi: Digital Object Identifier to process
+            depth: Current recursion depth (for reference processing)
 
         """
         if doi in self._processed_datasets:
@@ -306,7 +379,13 @@ class ZenodoFDODesign(RecordDesign):
         )
 
         # Process references with context of which dataset is referencing them
-        await self.reference_processor.process_all(dataset.related_identifiers, doi)
+        # Pass concept DOI to detect cross-dataset references
+        await self.reference_processor.process_all(
+            dataset.related_identifiers,
+            doi,
+            dataset.concept_doi,
+            depth,
+        )
 
         logger.info(f"Completed FDO creation for DOI: {doi}")
 

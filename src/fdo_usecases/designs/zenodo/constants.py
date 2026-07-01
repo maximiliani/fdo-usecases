@@ -92,7 +92,147 @@ INFOTYPES = {
     "isReferencedBy": "21.T11969/e5945ef3ff07f314a14",
     #: Landing page URL location
     "landingPageLocation": "21.T11969/0c9b86e828976a85d4f3",
+    #: Preview image URL for dataset landing page
+    "previewImage": "21.T11969/925e3f9925a88476ffba",
 }
+
+
+# =============================================================================
+# DataCite Resource Type General Mapping
+# =============================================================================
+
+#: Map Zenodo resource types to DataCite resourceTypeGeneral controlled vocabulary
+#: See: https://datacite-metadata-schema.readthedocs.io/en/4.7/properties/resourcetype/
+RESOURCE_TYPE_MAPPING = {
+    # Publications - Journal
+    "publication-article": "JournalArticle",
+    "publication-preprint": "Preprint",
+    "publication-review": "PeerReview",
+    "publication-editorial": "JournalArticle",
+    "publication-journal": "Journal",
+    # Publications - Books
+    "publication-book": "Book",
+    "publication-book-chapter": "BookChapter",
+    # Publications - Conference
+    "publication-conferencepaper": "ConferencePaper",
+    "publication-conferenceposter": "Poster",
+    "presentation-poster": "Poster",
+    # Publications - Theses
+    "publication-thesis": "Dissertation",
+    "mastersthesis": "Dissertation",
+    "bachelorthesis": "Dissertation",
+    # Publications - Reports
+    "publication-report": "Report",
+    "report-workingpaper": "Report",
+    "report-deliverable": "Report",
+    "report-other": "Report",
+    # Research outputs
+    "dataset": "Dataset",
+    "software": "Software",
+    "code": "Software",
+    # Presentations & Teaching
+    "presentation": "Presentation",
+    "lecture": "Presentation",
+    "lesson": "Presentation",
+    "teachingmaterial": "Presentation",
+    # Visual outputs
+    "image-figure": "Image",
+    "image-photo": "Image",
+    "image-plot": "Image",
+    "image-diagram": "Image",
+    "image-drawing": "Image",
+    "image-other": "Image",
+    "figure": "Image",
+    "photo": "Image",
+    "plot": "Image",
+    "diagram": "Image",
+    "drawing": "Image",
+    # Media
+    "video": "Audiovisual",
+    "audio": "Sound",
+    "recording": "Sound",
+    # Other research objects
+    "outputmanagementplan": "OutputManagementPlan",
+    "plan": "OutputManagementPlan",
+    "instrument": "Instrument",
+    "equipment": "Instrument",
+    "physicalobject": "PhysicalObject",
+    "sample": "PhysicalObject",
+    # Events & Projects
+    "event": "Event",
+    "workshop": "Event",
+    "project": "Project",
+    "collection": "Collection",
+    # Computational
+    "computationalnotebook": "ComputationalNotebook",
+    "notebook": "ComputationalNotebook",
+    "workflow": "Workflow",
+    "model": "Model",
+    # Publishing
+    "journal": "Journal",
+    "conferenceproceeding": "ConferenceProceeding",
+    "datapaper": "DataPaper",
+    # Quality assurance
+    "peerreview": "PeerReview",
+    # Standards
+    "standard": "Standard",
+    "protocol": "Standard",
+    # Services
+    "service": "Service",
+    # Interactive
+    "interactiveresource": "InteractiveResource",
+    # Awards
+    "award": "Award",
+    "prize": "Award",
+    # Registration
+    "studyregistration": "StudyRegistration",
+    # Text (generic)
+    "text": "Text",
+    "manuscript": "Text",
+    "annotation": "Text",
+    # Catch-all
+    "other": "Other",
+}
+
+#: Valid DataCite resourceTypeGeneral values (36 controlled vocabulary terms)
+VALID_RESOURCE_TYPES = frozenset(
+    [
+        "Audiovisual",
+        "Award",
+        "Book",
+        "BookChapter",
+        "Collection",
+        "ComputationalNotebook",
+        "ConferencePaper",
+        "ConferenceProceeding",
+        "DataPaper",
+        "Dataset",
+        "Dissertation",
+        "Event",
+        "Image",
+        "InteractiveResource",
+        "Instrument",
+        "Journal",
+        "JournalArticle",
+        "Model",
+        "OutputManagementPlan",
+        "PeerReview",
+        "PhysicalObject",
+        "Poster",
+        "Preprint",
+        "Presentation",
+        "Project",
+        "Report",
+        "Service",
+        "Software",
+        "Sound",
+        "Standard",
+        "StudyRegistration",
+        "Text",
+        "Workflow",
+        "Other",
+    ]
+)
 
 
 # =============================================================================
@@ -124,6 +264,9 @@ __all__ = [
     "PUBLICATION_PROFILE",
     # InfoTypes
     "INFOTYPES",
+    # DataCite resource type mapping
+    "RESOURCE_TYPE_MAPPING",
+    "VALID_RESOURCE_TYPES",
     # Backlink types
     "BACKLINK_DATASET_FILE",
     "BACKLINK_VERSION_CHAIN",

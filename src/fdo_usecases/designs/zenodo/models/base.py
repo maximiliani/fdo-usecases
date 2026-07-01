@@ -40,13 +40,34 @@ class Creator(BaseModel):
     @field_validator("orcid")
     @classmethod
     def validate_orcid(cls, v: str | None) -> str | None:
-        """Validate ORCID format (16 digits with dashes)."""
+        """Validate ORCID format and return full URL.
+
+        Accepts ORCID in any format (with/without dashes, with/without URL prefix)
+        and always returns the full URL format: https://orcid.org/XXXX-XXXX-XXXX-XXXX
+
+        Args:
+            v: ORCID string in any format
+
+        Returns:
+            Full ORCID URL (https://orcid.org/XXXX-XXXX-XXXX-XXXX) or None if input is None
+
+        Raises:
+            ValueError: If ORCID format is invalid (not 16 digits)
+
+        """
         if v is None:
             return v
-        orcid_pattern = r"^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$"
-        if not re.match(orcid_pattern, v):
+
+        # Extract digits from any format (URL, with/without dashes)
+        orcid_clean = re.sub(r"^https?://orcid\.org/", "", v)
+        digits = re.sub(r"[^0-9X]", "", orcid_clean)
+
+        if len(digits) != 16:
             raise ValueError(f"Invalid ORCID format: {v}")
-        return v
+
+        # Return FULL URL format - NO other format accepted
+        dashed = f"{digits[0:4]}-{digits[4:8]}-{digits[8:12]}-{digits[12:16]}"
+        return f"https://orcid.org/{dashed}"
 
     @field_validator("ror_id")
     @classmethod

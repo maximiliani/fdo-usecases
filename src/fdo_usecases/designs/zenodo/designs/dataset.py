@@ -138,6 +138,12 @@ class ZenodoDatasetDesign(RecordDesign):
         if data.landing_page_url:
             record.addAttribute(INFOTYPES["landingPageLocation"], data.landing_page_url)
 
+        # Preview images
+        if data.preview_images:
+            for img_url in data.preview_images:
+                record.addAttribute(INFOTYPES["previewImage"], img_url)
+            logger.debug(f"Added {len(data.preview_images)} preview images")
+
         # Backlinks for inference
         self.addBacklink(*BACKLINK_DATASET_FILE)
         self.addBacklink(*BACKLINK_VERSION_CHAIN)

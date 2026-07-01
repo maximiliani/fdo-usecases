@@ -7,7 +7,11 @@
 import logging
 from typing import TYPE_CHECKING
 
-from fdo_usecases.designs.zenodo.constants import INFOTYPES
+from fdo_usecases.designs.zenodo.constants import (
+    INFOTYPES,
+    RESOURCE_TYPE_MAPPING,
+    VALID_RESOURCE_TYPES,
+)
 from fdo_usecases.designs.zenodo.designs import PublicationDesign
 from fdo_usecases.designs.zenodo.models import RelatedIdentifier
 from fdo_usecases.designs.zenodo.models.exchange import PublicationFDOData
@@ -16,6 +20,36 @@ if TYPE_CHECKING:
     from fdo_usecases.designs.zenodo.orchestrator import ZenodoFDODesign
 
 logger = logging.getLogger(__name__)
+
+
+def map_to_datacite_resource_type(zenodo_type: str | None) -> str | None:
+    """Map Zenodo resource type to DataCite resourceTypeGeneral.
+
+    Maps Zenodo-specific resource types to the 36 controlled vocabulary terms
+    from the DataCite schema.
+
+    Args:
+        zenodo_type: Resource type from Zenodo API
+
+    Returns:
+        DataCite resourceTypeGeneral value, or None if unmappable
+
+    """
+    if not zenodo_type:
+        return None
+
+    # Direct mapping
+    mapped = RESOURCE_TYPE_MAPPING.get(zenodo_type.lower())
+    if mapped:
+        return mapped
+
+    # Fallback: check if already a valid DataCite type
+    if zenodo_type in VALID_RESOURCE_TYPES:
+        return zenodo_type
+
+    # Default fallback
+    logger.warning(f"Unknown resource type '{zenodo_type}', defaulting to 'Other'")
+    return "Other"
 
 
 class PublicationReferenceHandler:
@@ -78,9 +112,12 @@ class PublicationReferenceHandler:
             # Build landing page URL from DOI
             landing_page_url = f"https://doi.org/{identifier.identifier}"
 
+            # Map Zenodo resource type to DataCite resourceTypeGeneral
+            resource_type = map_to_datacite_resource_type(identifier.resource_type)
+
             pub_data = PublicationFDOData(
                 identifier=identifier.identifier,
-                resource_type=identifier.resource_type,
+                resource_type=resource_type,
                 publisher=None,
                 publication_date=None,
                 title=None,
