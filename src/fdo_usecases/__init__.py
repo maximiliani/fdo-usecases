@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Karlsruhe Institute of Technology
+#
+# SPDX-License-Identifier: Apache2.0
+
 """Top level module of the project."""
 
 from importlib.metadata import version

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Karlsruhe Institute of Technology
+#
+# SPDX-License-Identifier: Apache2.0
+
 """Conditional utilities for FDO use cases.
 
 This module provides helper functions for checking empty-ish values

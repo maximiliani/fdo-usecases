@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Karlsruhe Institute of Technology
+#
+# SPDX-License-Identifier: Apache2.0
+
 """MatWerk Creep Reference Dataset-specific FDO designs."""
 
 from fdo_usecases.designer_lib.executor import Executor

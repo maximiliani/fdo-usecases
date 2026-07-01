@@ -26,6 +26,7 @@ dependencies = [
     "jsonpath-python (>=1.1.6,<2.0.0)",
     "pytypid @ git+https://github.com/kit-data-manager/typid-client.git",
     "pydantic (>=2.13.4,<3.0.0)",
+    "colorama (>=0.4.6,<0.5.0)",
 ]
 
 # ----------------------------------------------------------------
@@ -75,6 +76,7 @@ hypothesis = "^6.155.7"
 licensecheck = "^2026.0.8"
 typer = "^0.26.8"
 reuse="^6.2.0"
+pytest-asyncio = "^1.4.0"
 
 [tool.poetry.group.docs]
 optional = true
@@ -118,6 +120,8 @@ licensecheck = "licensecheck"  # run this when you add new deps
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 addopts = "--cov-report=term-missing:skip-covered"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 filterwarnings = [
     # Example:
     # "ignore::DeprecationWarning:importlib_metadata.*"

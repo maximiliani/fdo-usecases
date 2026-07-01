@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Karlsruhe Institute of Technology
+#
+# SPDX-License-Identifier: Apache2.0
+
 """Executor for FDO record designs.
 
 This module provides classes and functions for executing record designs,

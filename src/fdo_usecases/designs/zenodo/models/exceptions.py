@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Karlsruhe Institute of Technology
+#
+# SPDX-License-Identifier: Apache2.0
+
 """Custom exceptions for Zenodo metadata extractor.
 
 This module defines a hierarchy of exceptions for handling various error conditions
