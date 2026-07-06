@@ -13,7 +13,7 @@
       }
     ],
     "creationDate": "2026-06-22T16:38:31.467Z",
-    "lastModificationDate": "2026-06-22T16:38:31.467Z"
+    "lastModificationDate": "2026-07-06T16:37:16.746Z"
   },
   "ExpectedUse": "Foundation profile for all FAIR Digital Objects, ensuring consistent core metadata across diverse research outputs including datasets, software, publications, and experimental records.",
   "References": [],
@@ -93,7 +93,7 @@
         "Description": "Free-text description providing contextual information about a resource's content, purpose, or characteristics.",
         "Type": "21.T11969/880724416f5857987e70",
         "Properties": {
-          "Cardinality": "0 - 1"
+          "Cardinality": "0 - n"
         }
       }
     ]
