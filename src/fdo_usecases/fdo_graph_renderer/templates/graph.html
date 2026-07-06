@@ -1849,16 +1849,13 @@
 
         document.getElementById('export-svg').addEventListener('click', function() {
             try {
-                if (typeof cy.svg !== 'function') {
-                    throw new Error('SVG export plugin not loaded. Please try PNG export instead.');
-                }
-
-                const svgBlob = cy.svg({ scale: 1, full: true });
-                if (!svgBlob) {
+                const svgString = cy.svg();
+                if (!svgString || typeof svgString !== 'string') {
                     throw new Error('Failed to generate SVG. The graph may be too large or complex.');
                 }
 
-                const url = URL.createObjectURL(svgBlob);
+                const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.download = 'fdo_graph.svg';
                 link.href = url;
