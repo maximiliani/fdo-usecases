@@ -90,6 +90,8 @@ INFOTYPES = {
     "references": "21.T11969/f4c9a69f715c3c60aa2f",
     #: Publication isReferencedBy relationship
     "isReferencedBy": "21.T11969/e5945ef3ff07f314a146",
+    #: Generic cross-dataset reference (composite: predicate + target)
+    "namedReference": "21.T11969/46b995a19dd6f5d36d0d",
     #: Landing page URL location
     "landingPageLocation": "21.T11969/8710d753ad10f371189b",
     #: Preview image URL for dataset landing page
@@ -254,6 +256,10 @@ BACKLINK_PUBLICATION_REFERENCE = ("references", "isReferencedBy")
 #: File version chain relationship (forward: isNewVersionOf, backward: isPreviousVersionOf)
 BACKLINK_FILE_VERSION_CHAIN = ("isNewVersionOf", "isPreviousVersionOf")
 
+#: Generic cross-dataset reference using namedReference composite type
+#: Forward predicate stored in relationshipPredicate, backward inferred from DataCite vocabulary
+BACKLINK_NAMED_REFERENCE = ("namedReference", "namedReference")
+
 
 __all__ = [
     # Profile identifiers
@@ -273,4 +279,5 @@ __all__ = [
     "BACKLINK_PUBLICATION_CITATION",
     "BACKLINK_PUBLICATION_REFERENCE",
     "BACKLINK_FILE_VERSION_CHAIN",
+    "BACKLINK_NAMED_REFERENCE",
 ]

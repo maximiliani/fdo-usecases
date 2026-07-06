@@ -153,27 +153,27 @@ class ReferenceProcessor:
         )
 
         for identifier in identifiers:
-            # Handle "references" relation specially for cross-dataset linking
-            if identifier.relation == "references":
-                if "zenodo" in identifier.identifier.lower():
-                    # Check recursion depth limit
-                    if current_depth >= self.orchestrator._reference_recursion_depth:
-                        logger.warning(
-                            f"Skipping recursive fetch for {identifier.identifier}: "
-                            f"max depth ({self.orchestrator._reference_recursion_depth}) reached"
-                        )
-                        continue
-
-                    # Process cross-dataset reference
-                    await self._process_cross_dataset_reference(
-                        identifier,
-                        referencing_dataset_doi,
-                        referencing_concept_doi,
-                        current_depth + 1,
+            # Handle Zenodo dataset references specially for cross-dataset linking
+            # This applies to ALL relation types, not just "references"
+            if "zenodo" in identifier.identifier.lower():
+                # Check recursion depth limit
+                if current_depth >= self.orchestrator._reference_recursion_depth:
+                    logger.warning(
+                        f"Skipping recursive fetch for {identifier.identifier}: "
+                        f"max depth ({self.orchestrator._reference_recursion_depth}) reached"
                     )
                     continue
 
-            # Standard handler processing for other relations
+                # Process cross-dataset reference with appropriate relation type
+                await self._process_cross_dataset_reference(
+                    identifier,
+                    referencing_dataset_doi,
+                    referencing_concept_doi,
+                    current_depth + 1,
+                )
+                continue
+
+            # Standard handler processing for non-Zenodo relations
             for handler in self.handlers:
                 if await handler.can_handle(identifier):
                     logger.debug(
@@ -202,8 +202,9 @@ class ReferenceProcessor:
     ) -> None:
         """Process cross-dataset reference and establish bidirectional links.
 
-        This handles "references" relations between different datasets (not version chains).
-        Uses existing backlink inference mechanism for isReferencedBy.
+        This handles ALL DataCite relation types between different datasets (not version chains).
+        Each relation type gets its corresponding InfoType PID.
+        Backward links are inferred by Executor from backlink rules.
 
         Args:
             identifier: Related identifier pointing to referenced dataset
@@ -213,8 +214,9 @@ class ReferenceProcessor:
 
         """
         referenced_doi = identifier.identifier
+        relation_type = identifier.relation
         logger.info(
-            f"Processing cross-dataset reference: {referencing_dataset_doi} -> {referenced_doi}"
+            f"Processing cross-dataset {relation_type} link: {referencing_dataset_doi} -> {referenced_doi}"
         )
 
         # Check if already processed (avoid cycles)
@@ -243,19 +245,32 @@ class ReferenceProcessor:
             referencing_dataset_doi
         )
 
-        # Add forward link: referencing dataset → references → referenced dataset
+        # Add forward link using composite namedReference type
         referencing_record = self.orchestrator._record_graph.get(
             referencing_dataset_doi
         )
         if referencing_record:
+            import json
+
             from fdo_usecases.designs.zenodo.constants import INFOTYPES
 
-            referencing_record.addAttribute(INFOTYPES["references"], referenced_doi)
-            logger.debug(
-                f"Added references link: {referencing_dataset_doi} -> {referenced_doi}"
-            )
+            #: Use composite namedReference with relationshipPredicate and target
+            #: This allows storing any DataCite relation type without needing separate InfoTypes
+            named_ref_pid = INFOTYPES.get("namedReference")
+            if named_ref_pid:
+                #: Store as JSON string: predicate + target
+                #: PidRecord only supports primitive types (str, int, float, bool)
+                reference_json = json.dumps(
+                    {"relationshipPredicate": relation_type, "target": referenced_doi}
+                )
+                referencing_record.addAttribute(named_ref_pid, reference_json)
+                logger.debug(
+                    f"Added {relation_type} reference: {referencing_dataset_doi} -> {referenced_doi}"
+                )
+            else:
+                logger.error("namedReference InfoType not found in INFOTYPES")
 
-        # Backward link (isReferencedBy) will be inferred by Executor from backlink rules
+        # Backward link will be inferred by Executor from backlink rules
         # No need to explicitly add it
 
         # Recursively process referenced dataset's references

@@ -1,0 +1,50 @@
+{
+  "Identifier": "21.T11969/46b995a19dd6f5d36d0d",
+  "name": "namedReference",
+  "description": "Handle identifier for a generic reference relationship with explicit predicate and target.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-07-06T11:18:32.732Z",
+    "lastModificationDate": "2026-07-06T11:18:32.742Z"
+  },
+  "ExpectedUse": "Expressing arbitrary relationships between FDOs with additional predicates. ",
+  "References": [],
+  "Aliases": [
+    "Generic Reference",
+    "Typed Reference"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "subCond": "allOf",
+    "Properties": [
+      {
+        "Name": "relationshipPredicate",
+        "Title": "Relationship Predicate",
+        "Description": "DataCite relation type defining the nature of the relationship (e.g., 'cites', 'isSupplementTo', 'references').",
+        "Type": "21.T11969/bd3e9fb9b606d2198c9e",
+        "Properties": {
+          "Cardinality": "1 - n",
+          "extractProperties": false
+        }
+      },
+      {
+        "Name": "target",
+        "Title": "Target Identifier",
+        "Description": "Persistent identifier (DOI, Handle) of the referenced FDO.",
+        "Type": "21.T11969/3bbedeeb04fa80daf501",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": false
+        }
+      }
+    ]
+  }
+}

@@ -14,6 +14,7 @@ from typing import TYPE_CHECKING
 from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign
 from fdo_usecases.designs.zenodo.constants import (
     BACKLINK_DATASET_FILE,
+    BACKLINK_NAMED_REFERENCE,
     BACKLINK_VERSION_CHAIN,
     BASE_PROFILE,
     INFOTYPES,
@@ -147,6 +148,10 @@ class ZenodoDatasetDesign(RecordDesign):
         # Backlinks for inference
         self.addBacklink(*BACKLINK_DATASET_FILE)
         self.addBacklink(*BACKLINK_VERSION_CHAIN)
+
+        #: Cross-dataset relationships using composite namedReference type
+        #: Enables bidirectional navigation for any DataCite relation type
+        self.addBacklink(*BACKLINK_NAMED_REFERENCE)
 
         # Store locally for testing, or in orchestrator's graph
         self._local_records[data.doi] = record
