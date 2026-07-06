@@ -220,19 +220,107 @@ class ReferenceProcessor:
         )
 
         # Check if already processed or currently being processed (avoid cycles)
+        should_fetch = True
+        referenced_dataset = None
+
         if referenced_doi in self.orchestrator._processing_datasets:
             logger.warning(
-                f"Cycle detected! Skipping dataset currently being processed: {referenced_doi}"
+                f"Cycle detected! Skipping recursive fetch for: {referenced_doi}"
             )
-            return
+            should_fetch = False
 
         if referenced_doi in self.orchestrator._processed_datasets:
             logger.debug(f"Referenced dataset already processed: {referenced_doi}")
-        else:
-            # Recursively fetch and process referenced dataset
-            # Cycle detection is handled by _process_doi via _processing_datasets
+            should_fetch = False
+
+        # Fetch and process if needed
+        if should_fetch:
             logger.info(f"Recursively fetching referenced dataset: {referenced_doi}")
             await self.orchestrator._process_zenodo_reference(referenced_doi)
+
+            # Get the dataset metadata for DOI resolution
+            try:
+                referenced_dataset = await self.orchestrator._fetch_metadata(
+                    referenced_doi
+                )
+            except Exception as e:
+                logger.warning(f"Failed to fetch metadata for {referenced_doi}: {e}")
+        else:
+            # Try to get from cache even if we didn't fetch
+            try:
+                referenced_dataset = await self.orchestrator._fetch_metadata(
+                    referenced_doi
+                )
+            except Exception as e:
+                logger.debug(
+                    f"Could not fetch cached metadata for {referenced_doi}: {e}"
+                )
+
+        # ALWAYS create the forward link, regardless of whether we fetched
+        # This ensures no independent subgraphs are created
+
+        # Resolve referencing DOI to version DOI if it's a concept DOI
+        # First check if we already have the metadata cached
+        actual_referencing_doi = referencing_dataset_doi
+        if referenced_dataset and hasattr(referenced_dataset, "latest_version_doi"):
+            # Use the dataset object we already fetched
+            actual_referencing_doi = referenced_dataset.latest_version_doi
+        else:
+            try:
+                referencing_metadata = await self.orchestrator._fetch_metadata(
+                    referencing_dataset_doi
+                )
+                if hasattr(referencing_metadata, "latest_version_doi"):
+                    actual_referencing_doi = referencing_metadata.latest_version_doi
+                    logger.debug(
+                        f"Resolved referencing DOI {referencing_dataset_doi} to version {actual_referencing_doi}"
+                    )
+            except Exception as e:
+                logger.warning(
+                    f"Failed to resolve referencing DOI {referencing_dataset_doi}: {e}"
+                )
+
+        referencing_record = self.orchestrator._record_graph.get(actual_referencing_doi)
+        if referencing_record:
+            import json
+
+            from fdo_usecases.designs.zenodo.constants import INFOTYPES
+
+            #: Use composite namedReference with relationshipPredicate and target
+            #: This allows storing any DataCite relation type without needing separate InfoTypes
+
+            #: Resolve concept DOI to version DOI if needed
+            #: Zenodo related identifiers often use concept DOIs, but we create FDOs for version DOIs
+            target_doi = referenced_doi
+            if should_fetch and referenced_dataset:
+                # Use the latest version DOI instead of concept DOI
+                if hasattr(referenced_dataset, "latest_version_doi"):
+                    target_doi = referenced_dataset.latest_version_doi
+                    logger.debug(
+                        f"Resolved concept DOI {referenced_doi} to version DOI {target_doi}"
+                    )
+
+            named_ref_pid = INFOTYPES.get("namedReference")
+            if named_ref_pid:
+                #: Store as JSON string: predicate + target
+                #: PidRecord only supports primitive types (str, int, float, bool)
+                reference_json = json.dumps(
+                    {"relationshipPredicate": relation_type, "target": target_doi}
+                )
+                referencing_record.addAttribute(named_ref_pid, reference_json)
+                logger.debug(
+                    f"Added {relation_type} reference: {referencing_dataset_doi} -> {target_doi}"
+                )
+            else:
+                logger.error("namedReference InfoType not found in INFOTYPES")
+        else:
+            logger.warning(
+                f"Referencing record not found for {referencing_dataset_doi}, cannot add link"
+            )
+
+        # If we skipped fetching due to cycle, don't try to get metadata or recurse further
+        if not should_fetch:
+            return
 
         # Get concept DOI of referenced dataset to confirm it's cross-dataset
         referenced_dataset = await self.orchestrator._fetch_metadata(referenced_doi)
@@ -251,31 +339,6 @@ class ReferenceProcessor:
         self.orchestrator._cross_reference_registry[referenced_doi].add(
             referencing_dataset_doi
         )
-
-        # Add forward link using composite namedReference type
-        referencing_record = self.orchestrator._record_graph.get(
-            referencing_dataset_doi
-        )
-        if referencing_record:
-            import json
-
-            from fdo_usecases.designs.zenodo.constants import INFOTYPES
-
-            #: Use composite namedReference with relationshipPredicate and target
-            #: This allows storing any DataCite relation type without needing separate InfoTypes
-            named_ref_pid = INFOTYPES.get("namedReference")
-            if named_ref_pid:
-                #: Store as JSON string: predicate + target
-                #: PidRecord only supports primitive types (str, int, float, bool)
-                reference_json = json.dumps(
-                    {"relationshipPredicate": relation_type, "target": referenced_doi}
-                )
-                referencing_record.addAttribute(named_ref_pid, reference_json)
-                logger.debug(
-                    f"Added {relation_type} reference: {referencing_dataset_doi} -> {referenced_doi}"
-                )
-            else:
-                logger.error("namedReference InfoType not found in INFOTYPES")
 
         # Backward link will be inferred by Executor from backlink rules
         # No need to explicitly add it

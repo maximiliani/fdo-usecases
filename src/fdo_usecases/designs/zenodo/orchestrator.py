@@ -289,6 +289,12 @@ class ZenodoFDODesign(RecordDesign):
 
         """
         logger.info(f"Processing nested Zenodo reference: {doi}")
+
+        # Skip if already fully processed
+        if doi in self._processed_datasets and doi not in self._processing_datasets:
+            logger.debug(f"Nested reference already processed: {doi}")
+            return
+
         nested_design = ZenodoFDODesign(dois=doi, max_concurrent=self._max_concurrent)
         nested_design._processed_datasets = self._processed_datasets
         nested_design._processing_datasets = (
@@ -395,12 +401,16 @@ class ZenodoFDODesign(RecordDesign):
 
         # Process references with context of which dataset is referencing them
         # Pass concept DOI to detect cross-dataset references
+        # Keep in _processing_datasets until after links are added
         await self.reference_processor.process_all(
             dataset.related_identifiers,
             doi,
             dataset.concept_doi,
             depth,
         )
+
+        # Now mark as fully processed - remove from processing set
+        self._processing_datasets.discard(doi)
 
         logger.info(f"Completed FDO creation for DOI: {doi}")
 

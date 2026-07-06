@@ -12,7 +12,11 @@
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-svg@latest/cytoscape-svg.min.js"></script>
 
     <!-- Load pid-component web component -->
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@kit-data-manager/pid-component/dist/index.js"></script>
+<!--    <script type="module" src="https://cdn.jsdelivr.net/npm/@kit-data-manager/pid-component/dist/index.js"></script>-->
+    <script type="module">
+        import { defineCustomElements } from 'https://cdn.jsdelivr.net/npm/@kit-data-manager/pid-component/dist/loader/index.js';
+        defineCustomElements();
+    </script>
     <style>
         * {
             margin: 0;
@@ -1334,7 +1338,7 @@
                 component.setAttribute('value', value);
                 component.setAttribute('dark-mode', 'light');
                 component.setAttribute('level-of-subcomponents', '3');
-                component.setAttribute('emphasize-component', 'true');
+                component.setAttribute('emphasize-component', 'false');
                 component.setAttribute('show-top-level-copy', 'true');
                 return component;
             }
@@ -2017,6 +2021,7 @@
         document.addEventListener('DOMContentLoaded', async () => {
             await initializeGraph();
         });
+        customElements.upgrade(document.querySelector('pid-component'));
     </script>
 </body>
 </html>
