@@ -13,7 +13,6 @@ Both clients support response caching and proper error handling.
 
 import json
 import logging
-from pathlib import Path
 from typing import Any
 
 import aiohttp
@@ -116,7 +115,9 @@ class ZenodoAPIClient:
                 return data
             except json.JSONDecodeError as e:
                 logger.warning(f"Invalid JSON in file cache for {endpoint}: {e}")
-                file_cache._cache_dir.joinpath(file_cache._url_to_filename(cache_key).name).unlink(missing_ok=True)
+                file_cache._cache_dir.joinpath(
+                    file_cache._url_to_filename(cache_key).name
+                ).unlink(missing_ok=True)
 
         # Validate session is active
         if self._session is None:
@@ -157,7 +158,7 @@ class ZenodoAPIClient:
                 # Cache the response (both in-memory and file-based)
                 if self._cache is not None:
                     self._cache[cache_key] = data
-                
+
                 # Save to file cache
                 try:
                     file_cache.set(cache_key, json.dumps(data))
