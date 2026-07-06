@@ -521,6 +521,139 @@
             background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
             border-left: 3px solid #e74c3c;
         }
+
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            animation: slideIn 0.3s ease-out;
+            pointer-events: auto;
+            min-width: 250px;
+            max-width: 400px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .toast.toast-success { background: #27ae60; }
+        .toast.toast-error { background: #e74c3c; }
+        .toast.toast-warning { background: #f39c12; }
+        .toast.toast-info { background: #3498db; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        .node.newly-added {
+            animation: pulse-highlight 2s ease-out;
+        }
+
+        @keyframes pulse-highlight {
+            0% {
+                border-color: #2ecc71;
+                border-width: 6px;
+                background-color: rgba(46, 204, 113, 0.3);
+            }
+            100% {
+                border-color: #2c3e50;
+                border-width: 2px;
+                background-color: transparent;
+            }
+        }
+
+        .profile-settings-popover {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            padding: 15px;
+            z-index: 1000;
+            min-width: 250px;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .profile-settings-popover.active {
+            display: block;
+        }
+
+        .popover-content .form-group {
+            margin-bottom: 12px;
+        }
+
+        .popover-content label {
+            display: block;
+            font-size: 12px;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .color-picker-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .custom-color-input {
+            width: 50px;
+            height: 35px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .color-hex-display {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+
+        .popover-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .popover-actions .btn {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .group-settings-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0 5px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .group-settings-btn:hover {
+            opacity: 1;
+        }
+
+        #search-input.search-mode-active {
+            outline: 2px solid #f39c12;
+            background: #3d566e;
+        }
     </style>
 </head>
 <body>
@@ -531,6 +664,8 @@
         </div>
         <div class="progress-percentage" id="progress-percentage">0%</div>
     </div>
+
+    <div id="toast-container"></div>
 
     <div id="container">
         <div id="control-panel">
@@ -635,8 +770,13 @@
         let cy;
         let currentDisplayMode = 'name';
         let focusedNodeId = null;
+        let focusedNodeSet = new Set();
+        let focusedEdgeSet = new Set();
         let visibleRelationships = new Set();
-        let visibleProfiles = new Set();
+        let profileGroupVisibility = new Map();
+        let profileGroupCustomizations = new Map();
+        let searchMode = false;
+        let preSearchState = null;
 
         // Cache for resolved attribute metadata
         const attrMetaCache = new Map();
@@ -676,6 +816,67 @@
             return `${pid.substring(0, Math.floor(maxLength / 2))}...${pid.substring(pid.length - Math.ceil(maxLength / 2))}`;
         }
 
+        function showToast(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            const colors = {
+                success: '#27ae60',
+                error: '#e74c3c',
+                warning: '#f39c12',
+                info: '#3498db'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.style.cssText = `
+                background: ${colors[type] || colors.info};
+                animation: slideIn 0.3s ease-out;
+            `;
+            toast.textContent = message;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        function hexToHsl(hex) {
+            hex = hex.replace(/^#/, '');
+            const r = parseInt(hex.substring(0, 2), 16) / 255;
+            const g = parseInt(hex.substring(2, 4), 16) / 255;
+            const b = parseInt(hex.substring(4, 6), 16) / 255;
+
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function hslToHex(h, s, l) {
+            s /= 100;
+            l /= 100;
+            const k = n => (n + h / 30) % 12;
+            const a = s * Math.min(l, 1 - l);
+            const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+            return '#' + [f(0), f(8), f(4)].map(x => {
+                const hex = Math.round(x * 255).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+
         function calculateProfileFrequencies() {
             const frequencyMap = new Map();
             const totalNodes = Object.keys(RAW_GRAPH_DATA).length;
@@ -710,6 +911,12 @@
         }
 
         function getProfileHSL(profilePid) {
+            for (const [groupId, groupData] of profileGroupVisibility) {
+                if (groupData.profiles.has(profilePid) && groupData.customColor) {
+                    return hexToHsl(groupData.customColor);
+                }
+            }
+
             let hash = 0;
             for (let i = 0; i < profilePid.length; i++) {
                 hash = profilePid.charCodeAt(i) + ((hash << 5) - hash);
@@ -1306,6 +1513,22 @@
                 showNodeDetails(evt.target);
             });
 
+            cy.on('dblclick', 'node', function(evt) {
+                const clickedNode = evt.target;
+
+                if (!focusedNodeId) {
+                    showToast('Double-click works in focus mode. Click "Focus on This Node" first.', 'info');
+                    return;
+                }
+
+                if (!focusedNodeSet.has(clickedNode.id())) {
+                    showToast('Click on a visible node to expand', 'warning');
+                    return;
+                }
+
+                expandFocusToNeighbors(clickedNode);
+            });
+
             cy.on('tap', function(evt) {
                 if (evt.target === cy) {
                     closeDetailsPanel();
@@ -1558,11 +1781,212 @@
             document.getElementById('details-panel').classList.remove('open');
         }
 
+        function closeAllPopovers() {
+            document.querySelectorAll('.profile-settings-popover.active').forEach(popover => {
+                popover.classList.remove('active');
+            });
+        }
+
+        function togglePopover(groupId, button) {
+            const existingPopover = document.querySelector(
+                `.profile-settings-popover[data-group-id="${groupId}"]`
+            );
+
+            if (existingPopover && existingPopover.classList.contains('active')) {
+                closeAllPopovers();
+                return;
+            }
+
+            closeAllPopovers();
+
+            const customization = profileGroupCustomizations.get(groupId);
+            const groupData = profileGroupVisibility.get(groupId);
+            const defaultColor = getProfileHSL(groupId);
+            const defaultColorHex = hslToHex(defaultColor.h, defaultColor.s, defaultColor.l);
+
+            const popover = createPopover(groupId, {
+                customName: customization?.customName || '',
+                customColor: customization?.customColor || defaultColorHex
+            });
+
+            const rect = button.getBoundingClientRect();
+            popover.style.left = `${rect.left + window.scrollX}px`;
+            popover.style.top = `${rect.bottom + window.scrollY + 5}px`;
+
+            popover.classList.add('active');
+        }
+
+        function createPopover(groupId, initialValues) {
+            const existing = document.querySelector(`.profile-settings-popover[data-group-id="${groupId}"]`);
+            if (existing) existing.remove();
+
+            const groupData = profileGroupVisibility.get(groupId);
+            const currentName = initialValues.customName || groupData?.groupName || '';
+
+            const popover = document.createElement('div');
+            popover.className = 'profile-settings-popover';
+            popover.dataset.groupId = groupId;
+
+            popover.innerHTML = `
+                <div class="popover-content">
+                    <div class="form-group">
+                        <label>Display Name</label>
+                        <input type="text"
+                               class="custom-name-input"
+                               value="${escapeHtml(currentName)}"
+                               placeholder="Enter custom name" />
+                    </div>
+                    <div class="form-group">
+                        <label>Color</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color"
+                                   class="custom-color-input"
+                                   value="${initialValues.customColor}" />
+                            <span class="color-hex-display">${initialValues.customColor}</span>
+                        </div>
+                    </div>
+                    <div class="popover-actions">
+                        <button class="btn-save btn-primary">Save</button>
+                        <button class="btn-reset btn-secondary">Reset</button>
+                    </div>
+                </div>
+            `;
+
+            const colorInput = popover.querySelector('.custom-color-input');
+            const hexDisplay = popover.querySelector('.color-hex-display');
+
+            colorInput.addEventListener('input', (e) => {
+                hexDisplay.textContent = e.target.value;
+            });
+
+            popover.querySelector('.btn-save').addEventListener('click', () => {
+                const customName = popover.querySelector('.custom-name-input').value.trim();
+                const customColor = colorInput.value;
+
+                saveGroupCustomization(groupId, {
+                    customName: customName || undefined,
+                    customColor: customColor || undefined
+                });
+
+                closeAllPopovers();
+                updateGroupDisplay(groupId);
+                updateUrlParams();
+                showToast('Group customization saved', 'success');
+            });
+
+            popover.querySelector('.btn-reset').addEventListener('click', () => {
+                profileGroupCustomizations.delete(groupId);
+                closeAllPopovers();
+                updateGroupDisplay(groupId);
+                updateUrlParams();
+                showToast('Group settings reset to defaults', 'info');
+            });
+
+            document.body.appendChild(popover);
+            return popover;
+        }
+
+        function saveGroupCustomization(groupId, customization) {
+            if (customization.customName || customization.customColor) {
+                profileGroupCustomizations.set(groupId, customization);
+            } else {
+                profileGroupCustomizations.delete(groupId);
+            }
+        }
+
+        function updateGroupDisplay(groupId) {
+            const groupData = profileGroupVisibility.get(groupId);
+            const customization = profileGroupCustomizations.get(groupId);
+
+            const headerElement = document.querySelector(
+                `.profile-group-header[data-group-id="${groupId}"]`
+            );
+            if (headerElement) {
+                const nameElement = headerElement.querySelector('.group-name');
+                if (nameElement) {
+                    nameElement.textContent = customization?.customName || groupData?.groupName || '';
+                }
+            }
+
+            if (customization?.customColor) {
+                groupData.customColor = customization.customColor;
+            } else {
+                delete groupData.customColor;
+            }
+
+            cy.nodes().forEach(node => {
+                const profiles = node.data('profiles') || [];
+                if (profiles.some(p => groupData?.allProfiles?.has(p))) {
+                    node.style('background-color', getNodeColor(node));
+                }
+            });
+        }
+
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function encodeCustomizationsToUrl() {
+            if (profileGroupCustomizations.size === 0) {
+                return '';
+            }
+
+            const configArray = Array.from(profileGroupCustomizations.entries())
+                .map(([pid, data]) => ({
+                    pid,
+                    n: data.customName || '',
+                    c: data.customColor || ''
+                }));
+
+            const jsonString = JSON.stringify(configArray);
+            return btoa(encodeURIComponent(jsonString));
+        }
+
+        function decodeCustomizationsFromUrl(encoded) {
+            try {
+                const jsonString = decodeURIComponent(atob(encoded));
+                const configArray = JSON.parse(jsonString);
+
+                const map = new Map();
+                configArray.forEach(item => {
+                    map.set(item.pid, {
+                        customName: item.n || undefined,
+                        customColor: item.c || undefined
+                    });
+                });
+
+                return map;
+            } catch (error) {
+                console.error('Failed to decode profile customizations:', error);
+                return new Map();
+            }
+        }
+
+        function updateUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            const encoded = encodeCustomizationsToUrl();
+
+            if (encoded) {
+                params.set('cfg', encoded);
+            } else {
+                params.delete('cfg');
+            }
+
+            const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+            history.replaceState({}, '', newUrl);
+        }
+
+        function loadCustomizationsFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const encoded = params.get('cfg');
+
+            if (encoded) {
+                profileGroupCustomizations = decodeCustomizationsFromUrl(encoded);
+                console.log(`Loaded ${profileGroupCustomizations.size} group customizations from URL`);
+            }
         }
 
         function getPrimaryProfile(profiles, stats) {
@@ -1602,18 +2026,21 @@
             const sortedGroups = Array.from(primaryProfileGroups.entries())
                 .sort((a, b) => b[1].nodeCount - a[1].nodeCount);
 
-            visibleProfiles.clear();
+            profileGroupVisibility.clear();
 
             sortedGroups.forEach(([primaryPid, group]) => {
                 const primaryMeta = attrMetaCache.get(primaryPid);
-                const primaryName = primaryMeta?.name || truncatePid(primaryPid, 25);
+                const customization = profileGroupCustomizations.get(primaryPid);
+                const displayName = customization?.customName || primaryMeta?.name || truncatePid(primaryPid, 25);
 
                 const groupDiv = document.createElement('div');
                 groupDiv.className = 'profile-group';
+                groupDiv.dataset.groupId = primaryPid;
                 groupDiv.innerHTML = `
-                    <div class="profile-group-header">
+                    <div class="profile-group-header" data-group-id="${primaryPid}">
                         <span class="collapse-icon">▼</span>
-                        <span class="group-name">${escapeHtml(primaryName)}</span>
+                        <span class="group-name">${escapeHtml(displayName)}</span>
+                        <button class="group-settings-btn" title="Customize">⚙️</button>
                         <span class="group-count">(${group.nodeCount})</span>
                     </div>
                     <div class="profile-group-members">
@@ -1629,10 +2056,11 @@
                         return freqA - freqB;
                     });
 
+                const profilesVisibility = new Map();
                 sortedProfiles.forEach(profilePid => {
-                    visibleProfiles.add(profilePid);
+                    profilesVisibility.set(profilePid, true);
                     const meta = attrMetaCache.get(profilePid);
-                    const displayName = meta?.name || truncatePid(profilePid, 25);
+                    const profileDisplayName = meta?.name || truncatePid(profilePid, 25);
                     const isPrimary = profilePid === primaryPid;
 
                     const checkboxDiv = document.createElement('div');
@@ -1641,14 +2069,25 @@
                         <label>
                             <input type="checkbox" class="profile-filter"
                                    data-profile="${escapeHtml(profilePid)}" checked>
-                            <span>${escapeHtml(displayName)}${isPrimary ? ' ★' : ''}</span>
+                            <span>${escapeHtml(profileDisplayName)}${isPrimary ? ' ★' : ''}</span>
                         </label>
                     `;
                     membersContainer.appendChild(checkboxDiv);
                 });
 
+                profileGroupVisibility.set(primaryPid, {
+                    primaryPid,
+                    groupName: primaryMeta?.name || truncatePid(primaryPid, 25),
+                    nodeCount: group.nodeCount,
+                    allProfiles: group.allProfiles,
+                    profiles: profilesVisibility,
+                    customName: customization?.customName,
+                    customColor: customization?.customColor
+                });
+
                 const header = groupDiv.querySelector('.profile-group-header');
-                header.addEventListener('click', () => {
+                header.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('group-settings-btn')) return;
                     const members = groupDiv.querySelector('.profile-group-members');
                     const icon = header.querySelector('.collapse-icon');
                     if (members.style.display === 'none') {
@@ -1660,16 +2099,23 @@
                     }
                 });
 
+                const settingsBtn = header.querySelector('.group-settings-btn');
+                settingsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    togglePopover(primaryPid, e.currentTarget);
+                });
+
                 container.appendChild(groupDiv);
             });
 
             document.querySelectorAll('.profile-filter').forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
                     const profile = this.dataset.profile;
-                    if (this.checked) {
-                        visibleProfiles.add(profile);
-                    } else {
-                        visibleProfiles.delete(profile);
+                    for (const [groupId, groupData] of profileGroupVisibility) {
+                        if (groupData.profiles.has(profile)) {
+                            groupData.profiles.set(profile, this.checked);
+                            break;
+                        }
                     }
                     filterByProfile();
                 });
@@ -1769,7 +2215,24 @@
                 });
 
                 const profiles = node.data('profiles') || [];
-                const passesProfileFilter = profiles.some(p => visibleProfiles.has(p));
+                const profilesByGroup = groupProfilesByFamily(profiles);
+
+                let passesProfileFilter = profiles.length === 0;
+                if (!passesProfileFilter) {
+                    for (const [groupId, groupProfiles] of profilesByGroup) {
+                        const groupVisibility = profileGroupVisibility.get(groupId);
+                        if (!groupVisibility) continue;
+
+                        const allDeselected = groupProfiles.every(
+                            p => !groupVisibility.profiles.get(p)
+                        );
+
+                        if (!allDeselected) {
+                            passesProfileFilter = true;
+                            break;
+                        }
+                    }
+                }
 
                 if (!hasVisibleEdge && passesProfileFilter) {
                     node.addClass('hidden-isolated');
@@ -1779,13 +2242,62 @@
             });
         }
 
-        function focusOnNode(node) {
-            focusedNodeId = node.id();
-            const connectedEdges = node.connectedEdges();
-            const connectedNodes = connectedEdges.connectedNodes();
+        function highlightNewNodes(nodes) {
+            nodes.forEach(node => {
+                node.addClass('newly-added');
+            });
 
+            setTimeout(() => {
+                nodes.forEach(node => {
+                    node.removeClass('newly-added');
+                });
+            }, 2000);
+        }
+
+        function expandFocusToNeighbors(node) {
+            const neighbors = node.connectedNodes();
+            const connectingEdges = node.connectedEdges();
+
+            let newCount = 0;
+            const newlyAdded = [];
+
+            neighbors.forEach(n => {
+                if (!focusedNodeSet.has(n.id())) {
+                    focusedNodeSet.add(n.id());
+                    newlyAdded.push(n);
+                    newCount++;
+                }
+            });
+
+            connectingEdges.forEach(e => {
+                if (!focusedEdgeSet.has(e.id())) {
+                    focusedEdgeSet.add(e.id());
+                }
+            });
+
+            updateFocusVisibility();
+            highlightNewNodes(newlyAdded);
+
+            if (newCount > 0) {
+                showToast(`Added ${newCount} neighbor${newCount > 1 ? 's' : ''} to focus`, 'success');
+            } else {
+                showToast('No new neighbors to add', 'info');
+            }
+
+            cy.animate({
+                fit: {
+                    eles: cy.elements().filter(e =>
+                        focusedNodeSet.has(e.id()) || focusedEdgeSet.has(e.id())
+                    ),
+                    padding: 50
+                },
+                duration: 500
+            });
+        }
+
+        function updateFocusVisibility() {
             cy.nodes().forEach(n => {
-                if (n.id() === focusedNodeId || connectedNodes.has(n)) {
+                if (focusedNodeSet.has(n.id())) {
                     n.removeClass('hidden-focus');
                 } else {
                     n.addClass('hidden-focus');
@@ -1793,29 +2305,50 @@
             });
 
             cy.edges().forEach(e => {
-                if (connectedEdges.has(e)) {
+                if (focusedEdgeSet.has(e.id())) {
                     e.removeClass('hidden-focus');
                 } else {
                     e.addClass('hidden-focus');
                 }
             });
+        }
 
-            const focusBtn = document.getElementById('focus-node-btn');
-            const clearBtn = document.getElementById('clear-focus-btn');
-            if (focusBtn) focusBtn.style.display = 'none';
-            if (clearBtn) clearBtn.style.display = 'inline-block';
+        function focusOnNode(node) {
+            focusedNodeId = node.id();
+            focusedNodeSet = new Set([node.id()]);
+            focusedEdgeSet = new Set();
+
+            const connectedEdges = node.connectedEdges();
+            const connectedNodes = connectedEdges.connectedNodes();
+
+            connectedNodes.forEach(n => focusedNodeSet.add(n.id()));
+            connectedEdges.forEach(e => focusedEdgeSet.add(e.id()));
+
+            updateFocusVisibility();
+            updateFocusButtons();
 
             cy.animate({
                 fit: {
-                    eles: node.union(connectedNodes),
+                    eles: cy.elements().filter(e =>
+                        focusedNodeSet.has(e.id()) || focusedEdgeSet.has(e.id())
+                    ),
                     padding: 50
                 },
                 duration: 500
             });
         }
 
+        function updateFocusButtons() {
+            const focusBtn = document.getElementById('focus-node-btn');
+            const clearBtn = document.getElementById('clear-focus-btn');
+            if (focusBtn) focusBtn.style.display = 'none';
+            if (clearBtn) clearBtn.style.display = 'inline-block';
+        }
+
         function clearFocus() {
             focusedNodeId = null;
+            focusedNodeSet.clear();
+            focusedEdgeSet.clear();
             cy.elements().removeClass('hidden-focus');
 
             const focusBtn = document.getElementById('focus-node-btn');
@@ -1827,16 +2360,57 @@
             filterByRelationship();
         }
 
+        function groupProfilesByFamily(profilePids) {
+            const groups = new Map();
+
+            profilePids.forEach(profilePid => {
+                for (const [groupId, groupData] of profileGroupVisibility) {
+                    if (groupData.profiles.has(profilePid)) {
+                        if (!groups.has(groupId)) {
+                            groups.set(groupId, []);
+                        }
+                        groups.get(groupId).push(profilePid);
+                        break;
+                    }
+                }
+            });
+
+            return groups;
+        }
+
         function filterByProfile() {
             if (focusedNodeId) return;
 
             cy.nodes().forEach(node => {
-                const profiles = node.data('profiles') || [];
-                const hasVisibleProfile = profiles.some(p => visibleProfiles.has(p));
-                if (hasVisibleProfile) {
-                    node.removeClass('hidden-profile');
-                } else {
+                const nodeProfiles = node.data('profiles') || [];
+
+                if (nodeProfiles.length === 0) {
                     node.addClass('hidden-profile');
+                    return;
+                }
+
+                const profilesByGroup = groupProfilesByFamily(nodeProfiles);
+
+                let shouldHide = false;
+
+                for (const [groupId, groupProfiles] of profilesByGroup) {
+                    const groupVisibility = profileGroupVisibility.get(groupId);
+                    if (!groupVisibility) continue;
+
+                    const allDeselected = groupProfiles.every(
+                        p => !groupVisibility.profiles.get(p)
+                    );
+
+                    if (allDeselected && groupProfiles.length > 0) {
+                        shouldHide = true;
+                        break;
+                    }
+                }
+
+                if (shouldHide) {
+                    node.addClass('hidden-profile');
+                } else {
+                    node.removeClass('hidden-profile');
                 }
             });
 
@@ -1851,6 +2425,51 @@
             });
         }
 
+        function hasActiveFilters() {
+            for (const groupData of profileGroupVisibility.values()) {
+                for (const isVisible of groupData.profiles.values()) {
+                    if (!isVisible) return true;
+                }
+            }
+            return false;
+        }
+
+        function enterSearchMode() {
+            searchMode = true;
+
+            preSearchState = {
+                focusedNodeId: focusedNodeId,
+                focusedNodeSet: new Set(focusedNodeSet),
+                focusedEdgeSet: new Set(focusedEdgeSet),
+                filtersActive: hasActiveFilters()
+            };
+
+            cy.elements().removeClass('hidden-focus hidden-profile hidden-relationship hidden-isolated');
+
+            document.getElementById('search-input').classList.add('search-mode-active');
+            showToast('Search mode: All filters temporarily disabled', 'info');
+        }
+
+        function exitSearchMode() {
+            if (!searchMode) return;
+
+            searchMode = false;
+            cy.elements().removeClass('highlighted');
+
+            if (preSearchState?.focusedNodeId) {
+                focusedNodeId = preSearchState.focusedNodeId;
+                focusedNodeSet = preSearchState.focusedNodeSet;
+                focusedEdgeSet = preSearchState.focusedEdgeSet;
+                updateFocusVisibility();
+            } else {
+                filterByProfile();
+                filterByRelationship();
+            }
+
+            document.getElementById('search-input').classList.remove('search-mode-active');
+            preSearchState = null;
+        }
+
         let searchTimeout;
         document.getElementById('search-input').addEventListener('input', function() {
             clearTimeout(searchTimeout);
@@ -1861,12 +2480,15 @@
 
         function performSearch(query) {
             if (!query.trim()) {
-                cy.elements().removeClass('highlighted');
+                exitSearchMode();
                 return;
             }
 
-            const lowerQuery = query.toLowerCase();
+            if (!searchMode) {
+                enterSearchMode();
+            }
 
+            const lowerQuery = query.toLowerCase();
             cy.elements().removeClass('highlighted');
 
             const matches = cy.elements().filter(function() {
@@ -1875,7 +2497,9 @@
                 if (this.isNode()) {
                     return data.full_pid?.toLowerCase().includes(lowerQuery) ||
                            data.attrs?.some(attr =>
-                               Array.isArray(attr.v) ? attr.v.some(v => v.toLowerCase().includes(lowerQuery)) : attr.v.toLowerCase().includes(lowerQuery)
+                               Array.isArray(attr.v)
+                                   ? attr.v.some(v => v.toLowerCase().includes(lowerQuery))
+                                   : attr.v.toLowerCase().includes(lowerQuery)
                            );
                 } else {
                     return data.label?.toLowerCase().includes(lowerQuery) ||
@@ -1893,6 +2517,9 @@
                     },
                     duration: 500
                 });
+                showToast(`Found ${matches.length} match${matches.length > 1 ? 'es' : ''}`, 'success');
+            } else {
+                showToast('No matches found', 'warning');
             }
         }
 
@@ -1959,6 +2586,13 @@
             }
         });
 
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.profile-settings-popover') &&
+                !e.target.closest('.group-settings-btn')) {
+                closeAllPopovers();
+            }
+        });
+
         const detailsPanel = document.getElementById('details-panel');
 
         detailsPanel.addEventListener('transitionend', function(e) {
@@ -2007,8 +2641,10 @@
                     console.log('Initializing Cytoscape...');
                     initCytoscapeWithElements(elements);
 
-                    // Initialize filters AFTER metadata resolution
+                    // Load customizations BEFORE initializing filters
                     updateLoading(4, 0);
+                    loadCustomizationsFromUrl();
+
                     console.log('Initializing hierarchical profile filters...');
                     initProfileFilters();
                     initRelationshipFilters();
