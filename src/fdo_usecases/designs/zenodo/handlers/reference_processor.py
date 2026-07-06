@@ -219,11 +219,18 @@ class ReferenceProcessor:
             f"Processing cross-dataset {relation_type} link: {referencing_dataset_doi} -> {referenced_doi}"
         )
 
-        # Check if already processed (avoid cycles)
+        # Check if already processed or currently being processed (avoid cycles)
+        if referenced_doi in self.orchestrator._processing_datasets:
+            logger.warning(
+                f"Cycle detected! Skipping dataset currently being processed: {referenced_doi}"
+            )
+            return
+
         if referenced_doi in self.orchestrator._processed_datasets:
             logger.debug(f"Referenced dataset already processed: {referenced_doi}")
         else:
             # Recursively fetch and process referenced dataset
+            # Cycle detection is handled by _process_doi via _processing_datasets
             logger.info(f"Recursively fetching referenced dataset: {referenced_doi}")
             await self.orchestrator._process_zenodo_reference(referenced_doi)
 

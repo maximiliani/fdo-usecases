@@ -826,18 +826,42 @@
 
             // Create edges: AUTOMATIC RELATIONSHIP DETECTION
             // Rule: If attribute.value == another FDO's PID → relationship exists
+            // Special case: namedReference stores target in JSON structure
             Object.entries(RAW_GRAPH_DATA).forEach(([sourcePid, recordData]) => {
                 const recordArray = recordData.record || [];
 
                 recordArray.forEach(attr => {
-                    const isRelationship = allPids.includes(attr.value);
+                    let targetValue = attr.value;
+
+                    // Check if this is a namedReference complex attribute
+                    if (typeof attr.value === 'string' && attr.value.startsWith('{')) {
+                        try {
+                            const parsed = JSON.parse(attr.value);
+                            if (parsed.relationshipPredicate && parsed.target) {
+                                targetValue = parsed.target;
+                            }
+                        } catch (e) {
+                            // Not valid JSON, use original value
+                        }
+                    }
+
+                    const isRelationship = allPids.includes(targetValue);
 
                     if (isRelationship) {
                         const edge = {
                             data: {
                                 source: sourcePid,
-                                target: attr.value,
-                                k: attr.key
+                                target: targetValue,
+                                k: attr.key,
+                                predicate: typeof attr.value === 'string' && attr.value.startsWith('{')
+                                    ? (() => {
+                                        try {
+                                            return JSON.parse(attr.value).relationshipPredicate;
+                                        } catch (e) {
+                                            return null;
+                                        }
+                                    })()
+                                    : null
                             }
                         };
                         elements.push(edge);
@@ -1022,6 +1046,12 @@
             const mode = currentDisplayMode;
             const key = edge.data('k') || '';
             const meta = attrMetaCache.get(key) || { name: truncatePid(key, 20), description: '' };
+
+            // Check if this edge has a namedReference predicate
+            const predicate = edge.data('predicate');
+            if (predicate) {
+                return predicate;
+            }
 
             if (mode === 'pid') {
                 return truncate(key, 20);
@@ -1331,6 +1361,48 @@
 
             function createAttributeValueElement(value) {
                 const wrapper = document.createElement('div');
+
+                // Special case: Check if this is a namedReference complex attribute
+                if (typeof value === 'string' && value.startsWith('{')) {
+                    try {
+                        const parsed = JSON.parse(value);
+                        if (parsed.relationshipPredicate && parsed.target) {
+                            // This is a namedReference - render predicate + target link
+                            const container = document.createElement('div');
+                            container.style.display = 'flex';
+                            container.style.flexDirection = 'column';
+                            container.style.gap = '4px';
+
+                            // Predicate badge
+                            const predicateBadge = document.createElement('span');
+                            predicateBadge.style.background = '#3498db';
+                            predicateBadge.style.color = 'white';
+                            predicateBadge.style.padding = '2px 8px';
+                            predicateBadge.style.borderRadius = '12px';
+                            predicateBadge.style.fontSize = '11px';
+                            predicateBadge.style.fontWeight = '600';
+                            predicateBadge.textContent = parsed.relationshipPredicate;
+                            container.appendChild(predicateBadge);
+
+                            // Target PID component
+                            const targetLabel = document.createElement('span');
+                            targetLabel.style.fontSize = '10px';
+                            targetLabel.style.color = '#7f8c8d';
+                            targetLabel.textContent = '→ Target:';
+                            container.appendChild(targetLabel);
+
+                            const targetPidComp = createPidComponent(parsed.target);
+                            container.appendChild(targetPidComp);
+
+                            wrapper.appendChild(container);
+                            return wrapper;
+                        }
+                    } catch (e) {
+                        // Not valid JSON, fall through to normal PID handling
+                    }
+                }
+
+                // Default: treat as regular PID
                 wrapper.appendChild(createPidComponent(value));
                 return wrapper;
             }

@@ -141,6 +141,9 @@ class ZenodoFDODesign(RecordDesign):
         self._reference_recursion_depth = reference_recursion_depth
         self._semaphore: asyncio.Semaphore | None = None
         self._processed_datasets: set[str] = set()
+        self._processing_datasets: set[str] = (
+            set()
+        )  # Currently being processed (cycle detection)
         self._record_graph: dict[str, PidRecord] = {}
         self._cross_reference_registry: dict[str, set[str]] = {}
 
@@ -288,6 +291,9 @@ class ZenodoFDODesign(RecordDesign):
         logger.info(f"Processing nested Zenodo reference: {doi}")
         nested_design = ZenodoFDODesign(dois=doi, max_concurrent=self._max_concurrent)
         nested_design._processed_datasets = self._processed_datasets
+        nested_design._processing_datasets = (
+            self._processing_datasets
+        )  # Share processing set for cycle detection
         nested_design._record_graph = self._record_graph
         await nested_design.execute_async()
 
@@ -357,10 +363,19 @@ class ZenodoFDODesign(RecordDesign):
             depth: Current recursion depth (for reference processing)
 
         """
+        # Check for cycles - if already being processed, skip
+        if doi in self._processing_datasets:
+            logger.warning(
+                f"Cycle detected! Skipping dataset currently being processed: {doi}"
+            )
+            return
+
         if doi in self._processed_datasets:
             logger.warning(f"Skipping already processed dataset: {doi}")
             return
 
+        # Mark as currently being processed (cycle detection)
+        self._processing_datasets.add(doi)
         self._processed_datasets.add(doi)
         logger.info(f"Starting FDO creation for DOI: {doi}")
 
