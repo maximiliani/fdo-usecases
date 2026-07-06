@@ -16,7 +16,7 @@ import logging
 from pathlib import Path
 
 from fdo_usecases.designs.zenodo.orchestrator import ZenodoFDODesign
-from fdo_usecases.designs.zenodo.utils.logging_config import setup_logging
+from fdo_usecases.utils.logging_config import setup_logging
 
 if __name__ == "__main__":
     setup_logging()

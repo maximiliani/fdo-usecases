@@ -21,7 +21,7 @@ from fdo_usecases.designs.zenodo.constants import (
     PUBLICATION_PROFILE,
 )
 from fdo_usecases.designs.zenodo.models.exchange import PublicationFDOData
-from fdo_usecases.designs.zenodo.utils.text_utils import strip_html_and_truncate
+from fdo_usecases.utils.text_utils import strip_html_and_truncate
 
 if TYPE_CHECKING:
     from fdo_usecases.designs.zenodo.orchestrator import ZenodoFDODesign

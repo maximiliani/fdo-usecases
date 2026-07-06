@@ -11,7 +11,9 @@ This module provides async HTTP client wrappers for interacting with Zenodo:
 Both clients support response caching and proper error handling.
 """
 
+import json
 import logging
+from pathlib import Path
 from typing import Any
 
 import aiohttp
@@ -21,6 +23,7 @@ from fdo_usecases.designs.zenodo.models.exceptions import (
     RateLimitError,
     ZenodoAPIError,
 )
+from fdo_usecases.utils.http_cache import get_cache as get_file_cache
 
 logger = logging.getLogger(__name__)
 
@@ -69,12 +72,17 @@ class ZenodoAPIClient:
         self._session: aiohttp.ClientSession | None = None
 
     async def get(self, endpoint: str) -> dict[str, Any]:
-        """Make GET request with optional caching.
+        """Make GET request with optional caching (in-memory + file-based).
 
         Handles HTTP status codes and converts them to appropriate exceptions:
         - 404 → DOINotFoundError
         - 429 → RateLimitError (with Retry-After if provided)
         - 4xx/5xx → ZenodoAPIError
+
+        Caching strategy:
+        1. Check in-memory cache first (fastest)
+        2. Check file-based cache (persists across runs)
+        3. Make HTTP request and cache result
 
         Args:
             endpoint: API endpoint path (e.g., "/records/20132712")
@@ -90,10 +98,25 @@ class ZenodoAPIClient:
         """
         cache_key = f"{self.base_url}{endpoint}"
 
-        # Return cached response if available
+        # Return cached response if available (in-memory)
         if self._cache is not None and cache_key in self._cache:
-            logger.debug(f"Cache hit for {endpoint}")
+            logger.debug(f"In-memory cache hit for {endpoint}")
             return self._cache[cache_key]
+
+        # Check file-based cache
+        file_cache = get_file_cache(ttl_seconds=86400)  # 24 hour TTL
+        cached_content = file_cache.get(cache_key)
+        if cached_content:
+            logger.info(f"File cache hit for {endpoint}")
+            try:
+                data = json.loads(cached_content)
+                # Also populate in-memory cache
+                if self._cache is not None:
+                    self._cache[cache_key] = data
+                return data
+            except json.JSONDecodeError as e:
+                logger.warning(f"Invalid JSON in file cache for {endpoint}: {e}")
+                file_cache._cache_dir.joinpath(file_cache._url_to_filename(cache_key).name).unlink(missing_ok=True)
 
         # Validate session is active
         if self._session is None:
@@ -131,9 +154,15 @@ class ZenodoAPIClient:
                 data = await resp.json()
                 logger.debug(f"Successfully fetched {url}")
 
-                # Cache the response if caching is enabled
+                # Cache the response (both in-memory and file-based)
                 if self._cache is not None:
                     self._cache[cache_key] = data
+                
+                # Save to file cache
+                try:
+                    file_cache.set(cache_key, json.dumps(data))
+                except Exception as e:
+                    logger.warning(f"Failed to write file cache for {endpoint}: {e}")
 
                 return data
 

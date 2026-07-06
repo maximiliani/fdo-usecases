@@ -2,13 +2,14 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-"""MatWerk Creep Reference Dataset-specific FDO designs."""
+"""Creep FDO design package."""
 
-from fdo_usecases.designer_lib.executor import Executor
-from fdo_usecases.designs.creep.design import CreepDesign
+from .designs.experiment import CreepExperimentDesign
+from .designs.material import MaterialDesign
+from .orchestrator import CreepFDOOrchestrator
 
-EXECUTOR: Executor = Executor()
-
-EXECUTOR.addDesign(CreepDesign())
-
-EXECUTOR.execute()
+__all__ = [
+    "CreepFDOOrchestrator",
+    "CreepExperimentDesign",
+    "MaterialDesign",
+]
