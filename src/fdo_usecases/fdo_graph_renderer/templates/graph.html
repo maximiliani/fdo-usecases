@@ -9,6 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-cose-bilkent@4.1.0/cytoscape-cose-bilkent.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dagre@0.8.5/dist/dagre.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
+
+    <!-- Load pid-component web component -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@kit-data-manager/pid-component/dist/index.js"></script>
     <style>
         * {
             margin: 0;
@@ -332,6 +335,19 @@
             margin-bottom: 4px;
         }
 
+        .attribute-key-link {
+            color: #3498db;
+            text-decoration: none;
+            border-bottom: 1px dotted #3498db;
+            transition: all 0.2s;
+        }
+
+        .attribute-key-link:hover {
+            color: #2980b9;
+            border-bottom-color: #2980b9;
+            background: rgba(52, 152, 219, 0.1);
+        }
+
         .attribute-value {
             font-size: 12px;
             color: #7f8c8d;
@@ -430,19 +446,11 @@
             color: #bdc3c7;
         }
 
-        .retry-indicator {
-            margin-top: 15px;
-            font-size: 12px;
-            color: #f39c12;
-            display: none;
-        }
 
-        .retry-indicator.active {
-            display: block;
-        }
 
         .filter-checkbox {
-            margin-bottom: 8px;
+            margin-bottom: 5px;
+            padding: 4px 12px;
         }
 
         .filter-checkbox label {
@@ -450,14 +458,58 @@
             align-items: center;
             gap: 8px;
             cursor: pointer;
+            font-size: 13px;
         }
 
-        .type-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            /* Colors now set dynamically via inline style in JavaScript */
+        .profile-group {
+            margin-bottom: 10px;
+            border: 1px solid #34495e;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .profile-group-header {
+            background: #34495e;
+            padding: 8px 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            user-select: none;
+        }
+
+        .profile-group-header:hover {
+            background: #3d566e;
+        }
+
+        .collapse-icon {
+            font-size: 10px;
+            width: 12px;
+        }
+
+        .group-name {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .group-count {
+            color: #95a5a6;
+            font-size: 12px;
+        }
+
+        .profile-group-members {
+            background: #2c3e50;
+            padding: 5px 0;
+        }
+
+        .profile-group-members .filter-checkbox {
+            padding-left: 15px;
+        }
+
+        .profile-group-members .filter-checkbox.primary-profile {
+            padding-left: 12px;
+            font-weight: bold;
+            border-left: 3px solid #3498db;
         }
     </style>
 </head>
@@ -468,7 +520,6 @@
             <div class="progress-bar" id="progress-bar"></div>
         </div>
         <div class="progress-percentage" id="progress-percentage">0%</div>
-        <div class="retry-indicator" id="retry-indicator">⚠️ Retrying failed resolutions...</div>
     </div>
 
     <div id="container">
@@ -492,7 +543,7 @@
             </div>
 
             <div class="control-section">
-                <h4>Layout</h4>
+                <h4><label for="layout-select">Layout</label></h4>
                 <select id="layout-select">
                     <option value="cose">Force-Directed (CoSE)</option>
                     <option value="grid">Grid</option>
@@ -506,7 +557,6 @@
                 <div class="btn-group">
                     <button class="btn btn-secondary" data-display="pid">PID</button>
                     <button class="btn btn-secondary active" data-display="name">Name</button>
-                    <button class="btn btn-secondary" data-display="combined">Both</button>
                 </div>
             </div>
 
@@ -521,13 +571,6 @@
             </div>
 
             <div class="control-section">
-                <h4>Filter by Type</h4>
-                <div id="type-filters">
-                    <!-- Dynamically populated based on graph data -->
-                </div>
-            </div>
-
-            <div class="control-section">
                 <h4>Filter by Profile</h4>
                 <div id="profile-filters">
                     <!-- Dynamically populated based on graph data -->
@@ -538,39 +581,6 @@
                 <h4>Filter by Relationship</h4>
                 <div id="relationship-filters">
                     <!-- Dynamically populated based on edge data -->
-                </div>
-            </div>
-
-            <div class="control-section">
-                <h4>Legend</h4>
-                <div class="legend-item">
-                    <div class="legend-node zenodo"></div>
-                    <span>Zenodo Record</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-node md5"></div>
-                    <span>MD5 File</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-node handle"></div>
-                    <span>Handle PID</span>
-                </div>
-                <hr style="border: none; border-top: 1px solid #34495e; margin: 10px 0;">
-                <div class="legend-item">
-                    <div class="legend-edge version"></div>
-                    <span>Version Link</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-edge file"></div>
-                    <span>File Link</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-edge citation"></div>
-                    <span>Citation</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-edge other"></div>
-                    <span>Other</span>
                 </div>
             </div>
 
@@ -601,11 +611,9 @@
         // Raw JSON injected from Python
         const RAW_GRAPH_DATA = $raw_json;
         const DEFAULT_LAYOUT = '$layout_algorithm';
-        const ENABLE_SVG_EXPORT = '$export_svg' === 'true';
 
         let cy;
         let currentDisplayMode = 'name';
-        let visibleTypes = new Set(['zenodo', 'md5', 'handle', 'other']);
         let focusedNodeId = null;
         let visibleRelationships = new Set();
         let visibleProfiles = new Set();
@@ -613,17 +621,14 @@
         // Cache for resolved attribute metadata
         const attrMetaCache = new Map();
 
-        // Track failed resolutions for retry
-        const failedResolutions = new Set();
-        window.remainingFailures = [];
-
         // Loading steps configuration
         const LOADING_STEPS = [
             { text: 'Parsing raw JSON...', weight: 5 },
+            { text: 'Analyzing profile distribution...', weight: 10 },
             { text: 'Building node structures...', weight: 10 },
-            { text: 'Detecting relationships...', weight: 15 },
-            { text: 'Resolving attribute PIDs...', weight: 60 },
-            { text: 'Initializing visualization...', weight: 10 }
+            { text: 'Collecting all attribute keys...', weight: 10 },
+            { text: 'Resolving attribute metadata...', weight: 50 },
+            { text: 'Initializing visualization...', weight: 15 }
         ];
 
         function updateLoading(stepIndex, progressInStep) {
@@ -638,27 +643,125 @@
                 `${Math.round(totalProgress)}% - ${step.text}`;
         }
 
-        function showRetryIndicator() {
-            document.getElementById('retry-indicator').classList.add('active');
-        }
-
         function hideLoadingOverlay() {
             setTimeout(() => {
                 document.getElementById('loading-overlay').classList.add('hidden');
             }, 500);
         }
 
-        function classifyNodeType(pid) {
-            if (pid.startsWith('10.5281/zenodo')) return 'zenodo';
-            if (pid.startsWith('md5:')) return 'md5';
-            if (pid.startsWith('21.T')) return 'handle';
-            return 'other';
-        }
 
         function truncatePid(pid, maxLength = 30) {
             if (!pid) return '';
             if (pid.length <= maxLength) return pid;
             return `${pid.substring(0, Math.floor(maxLength / 2))}...${pid.substring(pid.length - Math.ceil(maxLength / 2))}`;
+        }
+
+        function calculateProfileFrequencies() {
+            const frequencyMap = new Map();
+            const totalNodes = Object.keys(RAW_GRAPH_DATA).length;
+            
+            Object.values(RAW_GRAPH_DATA).forEach(recordData => {
+                const profiles = extractProfilePids(recordData.record || []);
+                profiles.forEach(p => {
+                    frequencyMap.set(p, (frequencyMap.get(p) || 0) + 1);
+                });
+            });
+            
+            const frequencies = Array.from(frequencyMap.values());
+            const mean = frequencies.reduce((a, b) => a + b, 0) / frequencies.length;
+            const sorted = [...frequencies].sort((a, b) => a - b);
+            const median = sorted[Math.floor(sorted.length / 2)];
+            const stddev = Math.sqrt(
+                frequencies.reduce((sum, f) => sum + Math.pow(f - mean, 2), 0) / frequencies.length
+            );
+            
+            return { frequencyMap, totalNodes, mean, median, stddev };
+        }
+
+        function getProfileWeight(frequency, stats) {
+            const { mean, stddev } = stats;
+            const zScore = (frequency - mean) / (stddev || 1);
+            
+            if (zScore > 1.5) return 0.1;
+            if (zScore > 0.5) return 0.3;
+            if (zScore > -0.5) return 0.6;
+            if (zScore > -1.5) return 0.9;
+            return 1.0;
+        }
+
+        function getProfileHSL(profilePid) {
+            let hash = 0;
+            for (let i = 0; i < profilePid.length; i++) {
+                hash = profilePid.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const hue = Math.abs(hash % 360);
+            return { h: hue, s: 70, l: 50 };
+        }
+
+        function hslToRgb(h, s, l) {
+            s /= 100;
+            l /= 100;
+            const k = n => (n + h / 30) % 12;
+            const a = s * Math.min(l, 1 - l);
+            const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+            return { r: Math.round(f(0) * 255), g: Math.round(f(8) * 255), b: Math.round(f(4) * 255) };
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+
+        function blendColorsWeighted(profiles, stats) {
+            if (profiles.length === 0) return '#95a5a6';
+            if (profiles.length === 1) {
+                const hsl = getProfileHSL(profiles[0]);
+                return `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+            }
+            
+            const weightedProfiles = profiles.map(pid => ({
+                pid,
+                color: getProfileHSL(pid),
+                weight: getProfileWeight(stats.frequencyMap.get(pid), stats)
+            }));
+            
+            const mostSpecific = weightedProfiles.reduce((max, p) => 
+                p.weight > max.weight ? p : max, weightedProfiles[0]
+            );
+            
+            const dominantWeight = 0.8;
+            const otherWeight = 0.2 / (weightedProfiles.length - 1);
+            
+            let totalR = 0, totalG = 0, totalB = 0;
+            
+            weightedProfiles.forEach(p => {
+                const rgb = hslToRgb(p.color.h, p.color.s, p.color.l);
+                const w = p.pid === mostSpecific.pid ? dominantWeight : otherWeight;
+                totalR += rgb.r * w;
+                totalG += rgb.g * w;
+                totalB += rgb.b * w;
+            });
+            
+            const blended = rgbToHsl(
+                Math.round(totalR),
+                Math.round(totalG),
+                Math.round(totalB)
+            );
+            
+            return `hsl(${blended.h}, ${blended.s}%, ${blended.l}%)`;
         }
 
         function extractProfilePids(recordArray) {
@@ -698,11 +801,9 @@
                         id: pid,
                         label: truncatePid(pid),
                         full_pid: pid,
-                        type: classifyNodeType(pid),
                         profiles: profilePids,
                         attrs: groupedAttrs
                     },
-                    classes: classifyNodeType(pid)
                 };
                 elements.push(node);
             });
@@ -737,244 +838,157 @@
             }
 
             try {
-                const { PID, PIDDataType } = await import('https://unpkg.com/@kit-data-manager/pid-component/dist/esm/index.js');
+                const handleNetUrl = `https://hdl.handle.net/api/handles/${encodeURIComponent(attrKeyPid)}?noredirect=true`;
+                const response = await fetch(handleNetUrl);
 
-                const pid = PID.getPIDFromString(attrKeyPid);
-
-                // Check if resolvable
-                if (!pid.isResolvable()) {
-                    console.debug(`PID ${attrKeyPid} marked as unresolvable`);
-                    const fallback = { name: truncatePid(attrKeyPid, 25), description: '' };
-                    attrMetaCache.set(attrKeyPid, fallback);
-                    failedResolutions.add(attrKeyPid);
-                    return fallback;
+                if (!response.ok) {
+                    console.warn(`Failed to fetch ${attrKeyPid}: ${response.status}`);
+                    return { name: truncatePid(attrKeyPid, 25), description: '' };
                 }
 
-                // Resolve the PID
-                const record = await pid.resolve();
+                const record = await response.json();
 
-                if (!record || !record.values) {
-                    console.debug(`PID ${attrKeyPid} could not be resolved via API`);
-                    const fallback = { name: truncatePid(attrKeyPid, 25), description: '' };
-                    attrMetaCache.set(attrKeyPid, fallback);
-                    failedResolutions.add(attrKeyPid);
-                    return fallback;
+                if (!record.values || record.values.length === 0) {
+                    return { name: truncatePid(attrKeyPid, 25), description: '' };
                 }
 
-                // Try to resolve as PIDDataType first
-                const dataType = await PIDDataType.resolveDataType(pid);
-                if (dataType) {
-                    const meta = {
-                        name: dataType.name || truncatePid(attrKeyPid, 25),
-                        description: dataType.description || ''
-                    };
-                    attrMetaCache.set(attrKeyPid, meta);
-                    return meta;
-                }
-
-                // Fallback: Look for 10320/loc reference and parse XML
                 let name = '';
                 let description = '';
 
-                for (const val of record.values) {
-                    const typeStr = val.type?.toString() || '';
+                const locationEntry = record.values.find(v => v.type === '10320/loc');
+                if (locationEntry?.data?.value) {
+                    try {
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(locationEntry.data.value, 'text/xml');
+                        const locations = xmlDoc.getElementsByTagName('location');
 
-                    // Check for location type reference (10320/loc)
-                    if (typeStr === '10320/loc' || typeStr.includes('10320/loc')) {
-                        try {
-                            const xmlValue = val.data?.value || '';
-                            const parser = new DOMParser();
-                            const xmlDoc = parser.parseFromString(xmlValue, 'text/xml');
+                        for (let j = 0; j < locations.length; j++) {
+                            const href = locations[j].getAttribute('href');
+                            const view = locations[j].getAttribute('view');
 
-                            // Get all locations from XML
-                            const xmlLocations = xmlDoc.getElementsByTagName('location');
-                            for (let j = 0; j < xmlLocations.length; j++) {
-                                const href = xmlLocations[j].getAttribute('href');
-                                const view = xmlLocations[j].getAttribute('view');
-
-                                // If view is json, fetch and extract name/description
-                                if (view === 'json' && href) {
-                                    try {
-                                        const response = await fetch(href);
-                                        const epicJson = await response.json();
-                                        name = epicJson['name'] || '';
-                                        description = epicJson['description'] || '';
-                                        break;
-                                    } catch (e) {
-                                        console.warn(`Failed to fetch ePIC JSON from ${href}:`, e);
-                                    }
+                            if (view === 'json' && href) {
+                                const epicResponse = await fetch(href);
+                                if (epicResponse.ok) {
+                                    const epicJson = await epicResponse.json();
+                                    name = epicJson['name'] || '';
+                                    description = epicJson['description'] || '';
+                                    console.log(`Resolved ${attrKeyPid}: ${name}`);
+                                    break;
                                 }
                             }
-                        } catch (e) {
-                            console.warn(`Failed to parse location XML for ${attrKeyPid}:`, e);
                         }
+                    } catch (e) {
+                        console.warn(`Failed to parse location XML for ${attrKeyPid}:`, e);
                     }
+                }
 
-                    // Also check common name/title fields as backup
-                    if (!name) {
+                if (!name || !description) {
+                    for (const val of record.values) {
+                        const typeStr = val.type || '';
                         const dataValue = val.data?.value || '';
-                        if (typeStr.includes('bd3e9fb9b606d2198c9e') ||
-                            typeStr.includes('name') ||
-                            typeStr.includes('title')) {
+
+                        if (!name && (typeStr.includes('bd3e9fb9b606d2198c9e') ||
+                            typeStr.toLowerCase().includes('name') ||
+                            typeStr.toLowerCase().includes('title'))) {
                             name = dataValue;
                         }
 
-                        if (typeStr.includes('880724416f5857987e70') ||
-                            typeStr.includes('description') ||
-                            typeStr.includes('abstract')) {
+                        if (!description && (typeStr.includes('880724416f5857987e70') ||
+                            typeStr.toLowerCase().includes('description'))) {
                             description = dataValue;
                         }
                     }
                 }
 
-                if (!name) {
-                    name = truncatePid(attrKeyPid, 25);
-                }
-
-                const meta = { name, description };
+                const meta = { name: name || truncatePid(attrKeyPid, 25), description };
                 attrMetaCache.set(attrKeyPid, meta);
                 return meta;
             } catch (error) {
                 console.warn(`Failed to resolve ${attrKeyPid}:`, error);
             }
 
-            const fallback = { name: truncatePid(attrKeyPid, 25), description: '' };
-            attrMetaCache.set(attrKeyPid, fallback);
-            failedResolutions.add(attrKeyPid);
-            return fallback;
+            return { name: truncatePid(attrKeyPid, 25), description: '' };
+        }
+
+        class Semaphore {
+            constructor(count) {
+                this.count = count;
+                this.queue = [];
+            }
+            
+            acquire() {
+                return new Promise(resolve => {
+                    if (this.count > 0) {
+                        this.count--;
+                        resolve();
+                    } else {
+                        this.queue.push(resolve);
+                    }
+                });
+            }
+            
+            release() {
+                this.count++;
+                if (this.queue.length > 0) {
+                    this.count--;
+                    this.queue.shift()();
+                }
+            }
         }
 
         async function preloadAttributeMetadata(cytoscapeElements) {
-            // Collect unique attribute keys from edges
-            const edgeAttrKeys = new Set();
-            cytoscapeElements.elements.forEach(elem => {
-                if (elem.data.k) {
-                    edgeAttrKeys.add(elem.data.k);
-                }
-            });
-
-            // ALSO collect profile PIDs for resolution
+            const allAttrKeys = new Set();
             const profilePids = new Set();
+            
             Object.values(RAW_GRAPH_DATA).forEach(recordData => {
-                const profiles = extractProfilePids(recordData.record || []);
+                const recordArray = recordData.record || [];
+                
+                const profiles = extractProfilePids(recordArray);
                 profiles.forEach(p => profilePids.add(p));
+                
+                recordArray.forEach(attr => {
+                    if (attr.key) {
+                        allAttrKeys.add(attr.key);
+                    }
+                });
             });
-
-            // Combine all PIDs to resolve
-            const uniqueAttrKeys = new Set([...edgeAttrKeys, ...profilePids]);
-
+            
+            const uniqueAttrKeys = new Set([...allAttrKeys, ...profilePids]);
+            
             const totalToResolve = uniqueAttrKeys.size;
             let resolvedCount = 0;
-
+            
             if (totalToResolve === 0) {
                 return;
             }
-
-            console.log(`Resolving ${totalToResolve} unique PIDs (${edgeAttrKeys.size} attributes + ${profilePids.size} profiles)...`);
+            
+            console.log(`Resolving ${totalToResolve} unique PIDs (${allAttrKeys.size} attributes + ${profilePids.size} profiles)...`);
             updateLoading(3, 0);
-
-            const batchSize = 10;
+            
+            const batchSize = 20;
+            const maxConcurrent = 5;
             const keysArray = Array.from(uniqueAttrKeys);
-
-            async function resolveBatch(batch) {
-                const results = await Promise.allSettled(
-                    batch.map(key => resolveAttributeName(key))
+            
+            async function resolveBatchWithConcurrency(batch) {
+                const semaphore = new Semaphore(maxConcurrent);
+                
+                const promises = batch.map(key => 
+                    semaphore.acquire().then(() => 
+                        resolveAttributeName(key).finally(() => semaphore.release())
+                    )
                 );
-
-                results.forEach((result, idx) => {
-                    if (result.status === 'fulfilled') {
-                        resolvedCount++;
-                    }
-                });
-
+                
+                await Promise.allSettled(promises);
+                resolvedCount += batch.length;
                 updateLoading(3, (resolvedCount / totalToResolve) * 100);
             }
-
+            
             for (let i = 0; i < keysArray.length; i += batchSize) {
                 const batch = keysArray.slice(i, i + batchSize);
-                await resolveBatch(batch);
+                await resolveBatchWithConcurrency(batch);
             }
-
-            if (failedResolutions.size > 0) {
-                console.log(`Retrying ${failedResolutions.size} failed resolutions...`);
-                showRetryIndicator();
-
-                const failedArray = Array.from(failedResolutions);
-                const initialFailedCount = failedResolutions.size;
-
-                for (let i = 0; i < failedArray.length; i += batchSize) {
-                    const batch = failedArray.slice(i, i + batchSize);
-                    await resolveBatch(batch);
-                }
-
-                const stillFailed = failedResolutions.size;
-                const recovered = initialFailedCount - stillFailed;
-
-                console.log(`Retry recovered ${recovered} of ${initialFailedCount} failed resolutions`);
-
-                window.remainingFailures = Array.from(failedResolutions);
-
-                if (window.remainingFailures.length > 0) {
-                    setTimeout(() => startBackgroundRetries(), 1000);
-                }
-            }
-
+            
             hideLoadingOverlay();
-        }
-
-        function startBackgroundRetries() {
-            if (!window.remainingFailures || window.remainingFailures.length === 0) {
-                return;
-            }
-
-            console.log(`Background retry: ${window.remainingFailures.length} PIDs remaining`);
-
-            const interval = setInterval(() => {
-                if (window.remainingFailures.length === 0) {
-                    clearInterval(interval);
-                    return;
-                }
-
-                const batch = window.remainingFailures.splice(0, 5);
-                batch.forEach(async key => {
-                    try {
-                        const { PID } = await import('https://unpkg.com/@kit-data-manager/pid-component/dist/esm/index.js');
-                        const pid = PID.getPIDFromString(key);
-                        const record = await pid.resolve();
-
-                        if (record) {
-                            let name = '';
-                            let description = '';
-
-                            for (const val of record.values) {
-                                const typeStr = val.type?.toString() || '';
-                                const dataValue = val.data?.value || '';
-
-                                if (typeStr.includes('bd3e9fb9b606d2198c9e') ||
-                                    typeStr.includes('name') ||
-                                    typeStr.includes('title')) {
-                                    name = dataValue;
-                                }
-
-                                if (typeStr.includes('880724416f5857987e70') ||
-                                    typeStr.includes('description')) {
-                                    description = dataValue;
-                                }
-                            }
-
-                            if (!name) {
-                                name = truncatePid(key, 25);
-                            }
-
-                            attrMetaCache.set(key, { name, description });
-                        } else {
-                            window.remainingFailures.push(key);
-                        }
-                    } catch (error) {
-                        window.remainingFailures.push(key);
-                    }
-                });
-            }, 2000);
         }
 
         function getEdgeColor(edge) {
@@ -992,25 +1006,14 @@
             const mode = currentDisplayMode;
             const key = edge.data('k') || '';
             const meta = attrMetaCache.get(key) || { name: truncatePid(key, 20), description: '' };
-            const isFailed = failedResolutions.has(key);
-
-            let labelText;
 
             if (mode === 'pid') {
-                labelText = truncate(key, 20);
+                return truncate(key, 20);
             } else if (mode === 'name') {
-                labelText = truncate(meta.name || key, 20);
+                return truncate(meta.name || key, 20);
             } else {
-                labelText = meta.name && meta.name !== truncatePid(key, 25)
-                    ? meta.name
-                    : truncate(key, 20);
+                return meta.name && meta.name !== truncatePid(key, 25) ? meta.name : truncate(key, 20);
             }
-
-            if (isFailed && mode !== 'pid') {
-                labelText += ' ⚠️';
-            }
-
-            return labelText;
         }
 
         function truncate(str, len) {
@@ -1028,7 +1031,7 @@
                         selector: 'node',
                         style: {
                             'background-color': getNodeColor,
-                            'shape': getNodeShape,
+                            'shape': 'ellipse',
                             'label': 'data(label)',
                             'font-size': '11px',
                             'color': '#2c3e50',
@@ -1159,25 +1162,11 @@
         }
 
         function getNodeColor(node) {
-            const type = node.data('type');
-            const colors = {
-                zenodo: '#3498db',
-                md5: '#2ecc71',
-                handle: '#e67e22',
-                other: '#9b59b6'
-            };
-            return colors[type] || '#95a5a6';
-        }
-
-        function getNodeShape(node) {
-            const type = node.data('type');
-            const shapes = {
-                zenodo: 'ellipse',
-                md5: 'rectangle',
-                handle: 'diamond',
-                other: 'hexagon'
-            };
-            return shapes[type] || 'ellipse';
+            const profiles = node.data('profiles') || [];
+            if (profiles.length === 0) return '#95a5a6';
+            
+            const stats = window.profileStats;
+            return blendColorsWeighted(profiles, stats);
         }
 
         function updateStatistics() {
@@ -1190,81 +1179,185 @@
         function showNodeDetails(node) {
             const data = node.data();
             const content = document.getElementById('details-content');
+            content.innerHTML = '';
 
-            const profilesHtml = data.profiles && data.profiles.length > 0
-                ? data.profiles.map(p => `<span class="profile-badge">${escapeHtml(p)}</span>`).join('')
-                : '<span style="color: #95a5a6;">None</span>';
-
-            const attributesHtml = data.attrs && data.attrs.length > 0
-                ? `<ul class="attribute-list">
-                    ${data.attrs.map(attr => {
-                        const meta = attrMetaCache.get(attr.k) || { name: attr.k, description: '' };
-                        const hasMultiple = attr.c && attr.c > 1;
-                        const values = Array.isArray(attr.v) ? attr.v : [attr.v];
-                        const isFailed = failedResolutions.has(attr.k);
-
-                        return `
-                        <li class="attribute-item" style="${isFailed ? 'border-left-color: #f39c12;' : ''}">
-                            <div class="attribute-key">
-                                ${escapeHtml(meta.name)}
-                                ${isFailed ? '<span style="color: #f39c12; font-size: 10px;" title="Could not resolve PID">⚠️</span>' : ''}
-                                <span style="color: #95a5a6; font-weight: normal;">(${attr.c || 1} ${hasMultiple ? 'values' : 'value'})</span>
-                            </div>
-                            ${!hasMultiple
-                                ? `<div class="attribute-value">${values[0]}</div>`
-                                : `<div class="attribute-values">
-                                    <ul>
-                                        ${values.map(v => `<li><span class="attribute-value">${v}</span></li>`).join('')}
-                                    </ul>
-                                   </div>`
-                            }
-                            ${document.getElementById('show-descriptions').checked && meta.description ?
-                                `<div class="attribute-description">${escapeHtml(meta.description)}</div>` : ''}
-                        </li>`;
-                    }).join('')}
-                   </ul>`
-                : '<p style="color: #95a5a6;">No attributes</p>';
-
-            content.innerHTML = `
-                <div class="detail-row">
-                    <div class="detail-label">PID</div>
-                    <div class="detail-value pid">${escapeHtml(data.full_pid || data.id)}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Type</div>
-                    <div class="detail-value">${escapeHtml(data.type)}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Profiles</div>
-                    <div class="detail-value">${profilesHtml}</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Attributes (${data.attrs?.length || 0})</div>
-                    ${attributesHtml}
-                </div>
-                <div class="detail-row">
-                    <button class="btn btn-primary btn-inline" id="focus-node-btn">Focus on This Node</button>
-                    <button class="btn btn-secondary btn-inline" id="clear-focus-btn" style="display: none;">Clear Focus</button>
-                </div>
-            `;
-
-            if (window.pidDetectionController) {
-                // First rescan after short delay
-                setTimeout(() => {
-                    window.pidDetectionController.rescan();
-
-                    // Second rescan after components start rendering
-                    setTimeout(() => {
-                        window.pidDetectionController.rescan();
-                    }, 500);
-                }, 100);
+            function createPidComponent(value) {
+                const component = document.createElement('pid-component');
+                component.setAttribute('value', value);
+                component.setAttribute('dark-mode', 'light');
+                component.setAttribute('level-of-subcomponents', '3');
+                component.setAttribute('emphasize-component', 'true');
+                component.setAttribute('show-top-level-copy', 'true');
+                return component;
             }
+
+            function createProfileLink(profilePid) {
+                const link = document.createElement('a');
+                link.href = `https://hdl.handle.net/${profilePid}`;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'profile-badge';
+                link.textContent = profilePid;
+                return link;
+            }
+
+            function createAttributeKeyLink(attrKey, attrName) {
+                const link = document.createElement('a');
+                link.href = `https://hdl.handle.net/${attrKey}`;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.className = 'attribute-key-link';
+                link.textContent = attrName;
+                return link;
+            }
+
+            function createAttributeValueElement(value) {
+                const wrapper = document.createElement('div');
+                wrapper.appendChild(createPidComponent(value));
+                return wrapper;
+            }
+
+            const pidRow = document.createElement('div');
+            pidRow.className = 'detail-row';
+            pidRow.innerHTML = `
+                <div class="detail-label">PID</div>
+                <div class="detail-value pid" data-pid="${escapeHtml(data.full_pid || data.id)}">${escapeHtml(data.full_pid || data.id)}</div>
+            `;
+            content.appendChild(pidRow);
+
+            const profilesRow = document.createElement('div');
+            profilesRow.className = 'detail-row';
+            const profilesLabel = document.createElement('div');
+            profilesLabel.className = 'detail-label';
+            profilesLabel.textContent = 'Profiles';
+            profilesRow.appendChild(profilesLabel);
+
+            const profilesValue = document.createElement('div');
+            profilesValue.className = 'detail-value';
+
+            if (data.profiles && data.profiles.length > 0) {
+                data.profiles.forEach(p => {
+                    profilesValue.appendChild(createProfileLink(p));
+                    profilesValue.appendChild(document.createTextNode(' '));
+                });
+            } else {
+                const noneSpan = document.createElement('span');
+                noneSpan.style.color = '#95a5a6';
+                noneSpan.textContent = 'None';
+                profilesValue.appendChild(noneSpan);
+            }
+
+            profilesRow.appendChild(profilesValue);
+            content.appendChild(profilesRow);
+
+            const attrsRow = document.createElement('div');
+            attrsRow.className = 'detail-row';
+            const attrsLabel = document.createElement('div');
+            attrsLabel.className = 'detail-label';
+            attrsLabel.textContent = `Attributes (${data.attrs?.length || 0})`;
+            attrsRow.appendChild(attrsLabel);
+
+            if (data.attrs && data.attrs.length > 0) {
+                const attrList = document.createElement('ul');
+                attrList.className = 'attribute-list';
+
+                data.attrs.forEach(attr => {
+                    const meta = attrMetaCache.get(attr.k) || { name: attr.k, description: '' };
+                    const hasMultiple = attr.c && attr.c > 1;
+                    const values = Array.isArray(attr.v) ? attr.v : [attr.v];
+
+                    const attrItem = document.createElement('li');
+                    attrItem.className = 'attribute-item';
+
+                    const attrKeyDiv = document.createElement('div');
+                    attrKeyDiv.className = 'attribute-key';
+
+                    const keyLink = createAttributeKeyLink(attr.k, meta.name);
+                    attrKeyDiv.appendChild(keyLink);
+
+                    const countSpan = document.createElement('span');
+                    countSpan.style.color = '#95a5a6';
+                    countSpan.style.fontWeight = 'normal';
+                    countSpan.textContent = `(${attr.c || 1} ${hasMultiple ? 'values' : 'value'})`;
+                    attrKeyDiv.appendChild(countSpan);
+
+                    attrItem.appendChild(attrKeyDiv);
+
+                    if (!hasMultiple) {
+                        attrItem.appendChild(createAttributeValueElement(values[0]));
+                    } else {
+                        const valuesDiv = document.createElement('div');
+                        valuesDiv.className = 'attribute-values';
+                        const ul = document.createElement('ul');
+                        values.forEach(v => {
+                            const li = document.createElement('li');
+                            li.appendChild(createAttributeValueElement(v));
+                            ul.appendChild(li);
+                        });
+                        valuesDiv.appendChild(ul);
+                        attrItem.appendChild(valuesDiv);
+                    }
+
+                    const showDescriptions = document.getElementById('show-descriptions')?.checked;
+                    if (showDescriptions && meta.description) {
+                        const descDiv = document.createElement('div');
+                        descDiv.className = 'attribute-description';
+                        descDiv.textContent = meta.description;
+                        attrItem.appendChild(descDiv);
+                    }
+
+                    attrList.appendChild(attrItem);
+                });
+
+                attrsRow.appendChild(attrList);
+            } else {
+                const noAttrsP = document.createElement('p');
+                noAttrsP.style.color = '#95a5a6';
+                noAttrsP.textContent = 'No attributes';
+                attrsRow.appendChild(noAttrsP);
+            }
+
+            content.appendChild(attrsRow);
+
+            const buttonRow = document.createElement('div');
+            buttonRow.className = 'detail-row';
+
+            const focusBtn = document.createElement('button');
+            focusBtn.className = 'btn btn-primary btn-inline';
+            focusBtn.id = 'focus-node-btn';
+            focusBtn.textContent = 'Focus on This Node';
+            buttonRow.appendChild(focusBtn);
+
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'btn btn-secondary btn-inline';
+            clearBtn.id = 'clear-focus-btn';
+            clearBtn.style.display = 'none';
+            clearBtn.textContent = 'Clear Focus';
+            buttonRow.appendChild(clearBtn);
+
+            content.appendChild(buttonRow);
 
             document.getElementById('focus-node-btn')?.addEventListener('click', function() {
                 focusOnNode(node);
             });
 
+            if (typeof customElements !== 'undefined') {
+                if (customElements.get('pid-component')) {
+                    customElements.upgrade(content);
+                } else {
+                    customElements.whenDefined('pid-component').then(() => {
+                        customElements.upgrade(content);
+                    });
+                }
+            }
+
             document.getElementById('details-panel').classList.add('open');
+
+            setTimeout(() => {
+                if (typeof customElements !== 'undefined' && customElements.get('pid-component')) {
+                    customElements.upgrade(content);
+                }
+            }, 100);
         }
 
         function closeDetailsPanel() {
@@ -1278,89 +1371,104 @@
             return div.innerHTML;
         }
 
-        function initTypeFilters() {
-            const container = document.getElementById('type-filters');
-            container.innerHTML = '';
-
-            // Count actual types in graph data
-            const typeCounts = new Map();
-            Object.entries(RAW_GRAPH_DATA).forEach(([pid, recordData]) => {
-                const type = classifyNodeType(pid);
-                typeCounts.set(type, (typeCounts.get(type) || 0) + 1);
-            });
-
-            // Color mapping - MUST match graph node colors exactly
-            const typeColors = {
-                zenodo: '#3498db',
-                md5: '#2ecc71',
-                handle: '#e67e22',
-                other: '#9b59b6'
-            };
-
-            // Create checkboxes only for types that exist
-            typeCounts.forEach((count, type) => {
-                visibleTypes.add(type);
-                const div = document.createElement('div');
-                div.className = 'filter-checkbox';
-                div.innerHTML = `
-                    <label>
-                        <input type="checkbox" class="type-filter"
-                               data-type="${type}" checked>
-                        <span class="type-indicator"
-                              style="display: inline-block; width: 10px; height: 10px;
-                                     border-radius: 50%; background: ${typeColors[type]};"></span>
-                        ${type.charAt(0).toUpperCase() + type.slice(1)} (${count})
-                    </label>
-                `;
-                container.appendChild(div);
-            });
-
-            // Attach event listeners
-            document.querySelectorAll('.type-filter').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    const type = this.dataset.type;
-                    if (this.checked) {
-                        visibleTypes.add(type);
-                    } else {
-                        visibleTypes.delete(type);
-                    }
-                    filterByType();
-                });
+        function getPrimaryProfile(profiles, stats) {
+            if (!profiles || profiles.length === 0) return null;
+            if (profiles.length === 1) return profiles[0];
+            
+            return profiles.reduce((primary, current) => {
+                const currentFreq = stats.frequencyMap.get(current) || Infinity;
+                const primaryFreq = stats.frequencyMap.get(primary) || Infinity;
+                return currentFreq < primaryFreq ? current : primary;
             });
         }
 
         function initProfileFilters() {
-            const profiles = new Set();
-            Object.values(RAW_GRAPH_DATA).forEach(recordData => {
-                const profilePids = extractProfilePids(recordData.record || []);
-                profilePids.forEach(p => profiles.add(p));
-            });
-
+            const stats = window.profileStats;
             const container = document.getElementById('profile-filters');
-            visibleProfiles.clear();
-
-            profiles.forEach(profilePid => {
-                visibleProfiles.add(profilePid);
-
-                // Lookup resolved name from cache
-                const meta = attrMetaCache.get(profilePid);
-                const displayName = meta?.name || truncatePid(profilePid, 25);
-                const isFailed = !meta || meta.name === truncatePid(profilePid, 25);
-
-                const div = document.createElement('div');
-                div.className = 'filter-checkbox';
-                div.innerHTML = `
-                    <label>
-                        <input type="checkbox" class="profile-filter"
-                               data-profile="${escapeHtml(profilePid)}" checked>
-                        <span style="${isFailed ? 'color: #f39c12;' : ''}">
-                            ${escapeHtml(displayName)}${isFailed ? ' ⚠️' : ''}
-                        </span>
-                    </label>
-                `;
-                container.appendChild(div);
+            container.innerHTML = '';
+            
+            const primaryProfileGroups = new Map();
+            
+            Object.entries(RAW_GRAPH_DATA).forEach(([pid, recordData]) => {
+                const profiles = extractProfilePids(recordData.record || []);
+                if (profiles.length === 0) return;
+                
+                const primary = getPrimaryProfile(profiles, stats);
+                if (!primaryProfileGroups.has(primary)) {
+                    primaryProfileGroups.set(primary, {
+                        nodeCount: 0,
+                        allProfiles: new Set()
+                    });
+                }
+                const group = primaryProfileGroups.get(primary);
+                group.nodeCount++;
+                profiles.forEach(p => group.allProfiles.add(p));
             });
-
+            
+            const sortedGroups = Array.from(primaryProfileGroups.entries())
+                .sort((a, b) => b[1].nodeCount - a[1].nodeCount);
+            
+            visibleProfiles.clear();
+            
+            sortedGroups.forEach(([primaryPid, group]) => {
+                const primaryMeta = attrMetaCache.get(primaryPid);
+                const primaryName = primaryMeta?.name || truncatePid(primaryPid, 25);
+                
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'profile-group';
+                groupDiv.innerHTML = `
+                    <div class="profile-group-header">
+                        <span class="collapse-icon">▼</span>
+                        <span class="group-name">${escapeHtml(primaryName)}</span>
+                        <span class="group-count">(${group.nodeCount})</span>
+                    </div>
+                    <div class="profile-group-members">
+                    </div>
+                `;
+                
+                const membersContainer = groupDiv.querySelector('.profile-group-members');
+                
+                const sortedProfiles = Array.from(group.allProfiles)
+                    .sort((a, b) => {
+                        const freqA = stats.frequencyMap.get(a) || 0;
+                        const freqB = stats.frequencyMap.get(b) || 0;
+                        return freqA - freqB;
+                    });
+                
+                sortedProfiles.forEach(profilePid => {
+                    visibleProfiles.add(profilePid);
+                    const meta = attrMetaCache.get(profilePid);
+                    const displayName = meta?.name || truncatePid(profilePid, 25);
+                    const isPrimary = profilePid === primaryPid;
+                    
+                    const checkboxDiv = document.createElement('div');
+                    checkboxDiv.className = `filter-checkbox${isPrimary ? ' primary-profile' : ''}`;
+                    checkboxDiv.innerHTML = `
+                        <label>
+                            <input type="checkbox" class="profile-filter"
+                                   data-profile="${escapeHtml(profilePid)}" checked>
+                            <span>${escapeHtml(displayName)}${isPrimary ? ' ★' : ''}</span>
+                        </label>
+                    `;
+                    membersContainer.appendChild(checkboxDiv);
+                });
+                
+                const header = groupDiv.querySelector('.profile-group-header');
+                header.addEventListener('click', () => {
+                    const members = groupDiv.querySelector('.profile-group-members');
+                    const icon = header.querySelector('.collapse-icon');
+                    if (members.style.display === 'none') {
+                        members.style.display = 'block';
+                        icon.textContent = '▼';
+                    } else {
+                        members.style.display = 'none';
+                        icon.textContent = '▶';
+                    }
+                });
+                
+                container.appendChild(groupDiv);
+            });
+            
             document.querySelectorAll('.profile-filter').forEach(checkbox => {
                 checkbox.addEventListener('change', function() {
                     const profile = this.dataset.profile;
@@ -1425,10 +1533,10 @@
                 div.className = 'filter-checkbox';
                 div.style.marginBottom = '5px';
                 div.innerHTML = `
-                    <label style="${rel.failed ? 'color: #f39c12;' : ''}">
+                    <label>
                         <input type="checkbox" class="relationship-filter"
                                data-pid="${escapeHtml(pid)}" checked>
-                        <span>${escapeHtml(rel.name)} (${rel.count})${rel.failed ? ' ⚠️' : ''}</span>
+                        <span>${escapeHtml(rel.name)} (${rel.count})</span>
                     </label>
                 `;
                 container.appendChild(div);
@@ -1466,11 +1574,10 @@
                            !e.hasClass('hidden-profile');
                 });
 
-                const passesTypeFilter = visibleTypes.has(node.data('type'));
                 const profiles = node.data('profiles') || [];
                 const passesProfileFilter = profiles.some(p => visibleProfiles.has(p));
 
-                if (!hasVisibleEdge && passesTypeFilter && passesProfileFilter) {
+                if (!hasVisibleEdge && passesProfileFilter) {
                     node.addClass('hidden-isolated');
                 } else {
                     node.removeClass('hidden-isolated');
@@ -1522,32 +1629,8 @@
             if (focusBtn) focusBtn.style.display = 'inline-block';
             if (clearBtn) clearBtn.style.display = 'none';
 
-            filterByType();
             filterByProfile();
             filterByRelationship();
-        }
-
-        function filterByType() {
-            if (focusedNodeId) return;
-
-            cy.nodes().forEach(node => {
-                const type = node.data('type');
-                if (visibleTypes.has(type)) {
-                    node.removeClass('hidden');
-                } else {
-                    node.addClass('hidden');
-                }
-            });
-
-            cy.edges().forEach(edge => {
-                const sourceVisible = visibleTypes.has(edge.source().data('type'));
-                const targetVisible = visibleTypes.has(edge.target().data('type'));
-                if (sourceVisible && targetVisible) {
-                    edge.removeClass('hidden');
-                } else {
-                    edge.addClass('hidden');
-                }
-            });
         }
 
         function filterByProfile() {
@@ -1597,7 +1680,6 @@
 
                 if (this.isNode()) {
                     return data.full_pid?.toLowerCase().includes(lowerQuery) ||
-                           data.type?.toLowerCase().includes(lowerQuery) ||
                            data.attrs?.some(attr =>
                                Array.isArray(attr.v) ? attr.v.some(v => v.toLowerCase().includes(lowerQuery)) : attr.v.toLowerCase().includes(lowerQuery)
                            );
@@ -1647,18 +1729,6 @@
             }
         });
 
-        document.querySelectorAll('.type-filter').forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const type = this.dataset.type;
-                if (this.checked) {
-                    visibleTypes.add(type);
-                } else {
-                    visibleTypes.delete(type);
-                }
-                filterByType();
-            });
-        });
-
         document.getElementById('export-svg').addEventListener('click', function() {
             const svgBlob = cy.svg({ scale: 1, full: true });
             const url = URL.createObjectURL(svgBlob);
@@ -1685,29 +1755,57 @@
             }
         });
 
+        const detailsPanel = document.getElementById('details-panel');
+
+        detailsPanel.addEventListener('transitionend', function(e) {
+            if (e.propertyName === 'right' && detailsPanel.classList.contains('open')) {
+                const content = document.getElementById('details-content');
+                if (content && typeof customElements !== 'undefined') {
+                    if (customElements.get('pid-component')) {
+                        customElements.upgrade(content);
+                    } else {
+                        customElements.whenDefined('pid-component').then(() => {
+                            customElements.upgrade(content);
+                        });
+                    }
+                }
+            }
+        });
+
         async function initializeGraph() {
             console.log('Building Cytoscape elements from raw JSON...');
             updateLoading(0, 100);
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 updateLoading(1, 0);
+                
+                console.log('Analyzing profile distribution...');
+                window.profileStats = calculateProfileFrequencies();
+                console.log(`Found ${window.profileStats.frequencyMap.size} unique profiles across ${window.profileStats.totalNodes} nodes`);
+                console.log('Profile frequency stats:', {
+                    mean: window.profileStats.mean.toFixed(2),
+                    median: window.profileStats.median,
+                    stddev: window.profileStats.stddev.toFixed(2)
+                });
+                
+                updateLoading(1, 50);
+                
                 const elements = buildCytoscapeElements();
                 updateLoading(1, 100);
 
                 setTimeout(async () => {
                     updateLoading(2, 0);
-                    console.log('Preloading attribute metadata...');
+                    console.log('Collecting all attribute keys...');
 
                     await preloadAttributeMetadata(elements);
 
-                    updateLoading(3, 0);
+                    updateLoading(3, 100);
                     console.log('Initializing Cytoscape...');
                     initCytoscapeWithElements(elements);
 
                     // Initialize filters AFTER metadata resolution
                     updateLoading(4, 0);
-                    console.log('Initializing filters with resolved metadata...');
-                    initTypeFilters();
+                    console.log('Initializing hierarchical profile filters...');
                     initProfileFilters();
                     initRelationshipFilters();
                     updateLoading(4, 100);
@@ -1715,37 +1813,9 @@
             }, 100);
         }
 
+        // Initialize graph when DOM is ready
         document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const { initPidDetection } = await import('https://unpkg.com/@kit-data-manager/pid-component/dist/esm/index.js');
-
-                window.pidDetectionController = initPidDetection({
-                    root: document.getElementById('details-panel'),
-                    darkMode: 'light',
-                    renderers: ['HandleType', 'DOIType', 'ORCIDType', 'RORType', 'URLType'],
-                    observe: true,
-                    levelOfSubcomponents: 3,
-                    emphasizeComponent: true,
-                    showTopLevelCopy: true,
-                    fallbackToAll: true,
-                    exclude: 'script, style, pre, code, .no-pid-detect, pid-component',
-                    settings: JSON.stringify([{
-                        type: 'HandleType',
-                        values: [{name: 'ttl', value: 86400000}]
-                    }])
-                });
-
-                await initializeGraph();
-            } catch (error) {
-                console.error('Failed to load pid-component:', error);
-                document.getElementById('loading-overlay').innerHTML = `
-                    <div style="color: #e74c3c; text-align: center;">
-                        <h2>Error Loading pid-component</h2>
-                        <p>Failed to load from CDN. Please check your internet connection.</p>
-                        <p style="font-size: 12px; margin-top: 10px;">${error.message}</p>
-                    </div>
-                `;
-            }
+            await initializeGraph();
         });
     </script>
 </body>
