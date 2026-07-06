@@ -1,0 +1,104 @@
+{
+  "CMSX-6_md5:chem123": {
+    "record": [
+      {
+        "key": "21.T11969/e32cfb93d7fc61ce3ca5",
+        "value": "md5:chem123"
+      },
+      {
+        "key": "21.T11969/880724416f5857987e70",
+        "value": "Test description"
+      },
+      {
+        "key": "21.T11148/076759916209e5d62bd5",
+        "value": "21.T11969/077fe9c54ed5ed26fa54"
+      },
+      {
+        "key": "21.T11148/076759916209e5d62bd5",
+        "value": "21.T11969/d8169782b57c7a9e9f01"
+      },
+      {
+        "key": "21.T11969/7c67083a5d218e544063",
+        "value": "https://orcid.org/0000-0000-0000-0000"
+      },
+      {
+        "key": "21.T11969/766ae14d72b49cfb5273",
+        "value": "md5:heat456"
+      },
+      {
+        "key": "21.T11969/bd3e9fb9b606d2198c9e",
+        "value": "Material CMSX-6"
+      },
+      {
+        "key": "21.T11969/716805eef0349802dc9a",
+        "value": "CMSX-6"
+      }
+    ],
+    "pid": "CMSX-6_md5:chem123"
+  },
+  "Vh5205_C-78": {
+    "record": [
+      {
+        "key": "21.T11969/4597cf0db467d7e365a9",
+        "value": 6.9
+      },
+      {
+        "key": "21.T11969/1a34a6966f91cc341f58",
+        "value": "Vh5205_C-78"
+      },
+      {
+        "key": "21.T11969/dda596702b20205cba36",
+        "value": "DIN EN ISO 204:2019-4"
+      },
+      {
+        "key": "21.T11148/076759916209e5d62bd5",
+        "value": "21.T11969/6c663a0695a411803d70"
+      },
+      {
+        "key": "21.T11148/076759916209e5d62bd5",
+        "value": "21.T11969/077fe9c54ed5ed26fa54"
+      },
+      {
+        "key": "21.T11969/880724416f5857987e70",
+        "value": "Creep test at 980.0\u00b0C, 230.0 MPa"
+      },
+      {
+        "key": "21.T11969/bd3e9fb9b606d2198c9e",
+        "value": "Creep Test Vh5205_C-78"
+      },
+      {
+        "key": "21.T11969/29f92bd203dd3eaa5a1f",
+        "value": "2023-02-08T09:06:15"
+      },
+      {
+        "key": "21.T11969/7e84faadd49ac88d02b8",
+        "value": "P3DT6H42M"
+      },
+      {
+        "key": "21.T11969/d0773859091aeb451528",
+        "value": "md5:def456"
+      },
+      {
+        "key": "21.T11148/076759916209e5d62bd5",
+        "value": "21.T11969/222fb86c0b3bece35729"
+      },
+      {
+        "key": "21.T11969/ac4a911ffb09772718e3",
+        "value": 980.0
+      },
+      {
+        "key": "21.T11969/cc230f978e8add2e2520",
+        "value": "md5:abc123"
+      },
+      {
+        "key": "21.T11969/2dced98076fda9cbf0ef",
+        "value": "CMSX-6_md5:chem123"
+      },
+      {
+        "key": "21.T11969/8bd53487030550ee2e94",
+        "value": 230.0
+      }
+    ],
+    "pid": "Vh5205_C-78"
+  }
+}
