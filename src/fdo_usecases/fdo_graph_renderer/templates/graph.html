@@ -784,6 +784,26 @@
             invertedIndex: new Map(),
         };
 
+        const CONFIG = {
+            SEARCH: {
+                MIN_TOKEN_LENGTH: 2,
+                DEBOUNCE_MS: 300,
+                HIGHLIGHT_PADDING: 50,
+                ANIMATION_DURATION: 500,
+                EXACT_MATCH_BOOST: 10
+            },
+            FOCUS: {
+                EXPANSION_HIGHLIGHT_DURATION: 2000,
+                FIT_PADDING: 50
+            },
+            STYLES: {
+                HIGHLIGHT_COLOR: '#f39c12',
+                HIGHLIGHT_BORDER: '#e74c3c',
+                HIGHLIGHT_SCALE: 1.2,
+                HIGHLIGHT_BORDER_WIDTH: 4
+            }
+        };
+
         // Cache for resolved attribute metadata
         const attrMetaCache = new Map();
 
@@ -847,11 +867,33 @@
             }, duration);
         }
 
+        /**
+         * Convert text to searchable tokens.
+         * Splits on whitespace/separators, generates sub-tokens from compound words.
+         * @param {string} text - Text to tokenize
+         * @returns {string[]} Lowercase tokens (min 2 chars)
+         */
         function tokenize(text) {
             if (!text) return [];
-            return text.toLowerCase()
-                .split(/[\s\.\-_:\/]+/)
-                .filter(t => t.length >= 3);
+            
+            const tokens = text.toLowerCase()
+                .split(/[\s.:\/]+/)
+                .map(t => t.trim())
+                .filter(t => t.length >= 2);
+            
+            const subTokens = [];
+            tokens.forEach(token => {
+                if (token.includes('-')) {
+                    const parts = token.split('-').filter(p => p.length >= 2);
+                    subTokens.push(...parts);
+                }
+                if (token.includes('_')) {
+                    const parts = token.split('_').filter(p => p.length >= 2);
+                    subTokens.push(...parts);
+                }
+            });
+            
+            return [...new Set([...tokens, ...subTokens])];
         }
 
         function hexToHsl(hex) {
@@ -1258,6 +1300,48 @@
             hideLoadingOverlay();
         }
 
+        /**
+         * Apply highlighting to cytoscape elements.
+         * @param {cytoscape.Collection} elements - Elements to highlight
+         */
+        function highlightElements(elements) {
+            cy.elements().removeClass('highlighted');
+            elements.addClass('highlighted');
+        }
+
+        /**
+         * Animate viewport to fit specified elements.
+         * @param {cytoscape.Collection} elements - Elements to fit in view
+         * @param {number} padding - Padding around elements
+         * @param {number} duration - Animation duration in ms
+         */
+        function fitViewToElements(elements, padding = CONFIG.SEARCH.HIGHLIGHT_PADDING, duration = CONFIG.SEARCH.ANIMATION_DURATION) {
+            cy.animate({
+                fit: { eles: elements, padding },
+                duration
+            });
+        }
+
+        /**
+         * Analyze match types for statistics display.
+         * @param {Map<string, number>} results - nodeId -> score map
+         * @returns {{exact: number, token: number}} Count by match type
+         */
+        function analyzeMatchTypes(results) {
+            let exact = 0, token = 0;
+            results.forEach(score => {
+                if (score >= CONFIG.SEARCH.EXACT_MATCH_BOOST) exact++;
+                else token++;
+            });
+            return { exact, token };
+        }
+
+        /**
+         * Build inverted search index from graph nodes.
+         * Indexes PIDs, profile names, attribute names/values.
+         * Creates both tokenized terms and raw text for matching.
+         * @async
+         */
         async function buildSearchIndex() {
             searchIndex.nodeIndex.clear();
             searchIndex.invertedIndex.clear();
@@ -1273,32 +1357,46 @@
                 }
                 
                 const profiles = data.profiles || [];
+                const profileNames = [];
                 profiles.forEach(pid => {
                     const meta = attrMetaCache.get(pid);
                     if (meta?.name) {
                         tokenize(meta.name).forEach(t => terms.add(t));
+                        profileNames.push(meta.name);
                     }
                 });
                 
                 const attrs = data.attrs || [];
+                const attrNames = [];
+                const attrValues = [];
                 attrs.forEach(attr => {
                     const keyMeta = attrMetaCache.get(attr.k);
                     if (keyMeta?.name) {
                         tokenize(keyMeta.name).forEach(t => terms.add(t));
+                        attrNames.push(keyMeta.name);
                     }
                     
                     const values = Array.isArray(attr.v) ? attr.v : [attr.v];
                     values.forEach(v => {
                         if (typeof v === 'string') {
                             tokenize(v).forEach(t => terms.add(t));
+                            attrValues.push(v);
                         }
                     });
                 });
+                
+                const allText = [
+                    data.full_pid || '',
+                    ...profileNames,
+                    ...attrNames,
+                    ...attrValues
+                ].filter(Boolean);
                 
                 searchIndex.nodeIndex.set(node.id(), {
                     pid: data.full_pid,
                     label: data.label,
                     terms: Array.from(terms),
+                    rawText: allText.join(' ').toLowerCase(),
                     profiles,
                     node: node
                 });
@@ -1461,6 +1559,17 @@
                         style: {
                             'width': 4,
                             'opacity': 1
+                        }
+                    },
+                    {
+                        selector: 'node.highlighted',
+                        style: {
+                            'background-color': '#f39c12',
+                            'border-color': '#e74c3c',
+                            'border-width': 4,
+                            'scale': 1.2,
+                            'shadow-blur': '10px',
+                            'shadow-color': 'rgba(243, 156, 18, 0.6)'
                         }
                     },
                     {
@@ -2323,7 +2432,7 @@
                 nodes.forEach(node => {
                     node.removeClass('newly-added');
                 });
-            }, 2000);
+            }, CONFIG.FOCUS.EXPANSION_HIGHLIGHT_DURATION);
         }
 
         function expandFocusToNeighbors(node) {
@@ -2368,9 +2477,9 @@
                     eles: cy.elements().filter(e => 
                         focusedNodeSet.has(e.id()) || focusedEdgeSet.has(e.id())
                     ),
-                    padding: 50
+                    padding: CONFIG.SEARCH.HIGHLIGHT_PADDING
                 },
-                duration: 500
+                duration: CONFIG.SEARCH.ANIMATION_DURATION
             });
         }
 
@@ -2413,9 +2522,9 @@
                     eles: cy.elements().filter(e => 
                         focusedNodeSet.has(e.id()) || focusedEdgeSet.has(e.id())
                     ),
-                    padding: 50
+                    padding: CONFIG.SEARCH.HIGHLIGHT_PADDING
                 },
-                duration: 500
+                duration: CONFIG.SEARCH.ANIMATION_DURATION
             });
         }
 
@@ -2567,6 +2676,11 @@
             }, 300);
         });
 
+        /**
+         * Execute search query against indexed node content.
+         * Two-phase matching: exact substrings (boosted) + token matches
+         * @param {string} query - Search query string
+         */
         function performSearch(query) {
             if (!query.trim()) {
                 exitSearchMode();
@@ -2577,9 +2691,19 @@
                 enterSearchMode();
             }
 
-            const tokens = tokenize(query);
+            const lowerQuery = query.toLowerCase().trim();
             const results = new Map();
             
+            // Phase 1: Exact substring matches (BOOSTED with score 10)
+            cy.nodes().forEach(node => {
+                const info = searchIndex.nodeIndex.get(node.id());
+                if (info && info.rawText.includes(lowerQuery)) {
+                    results.set(node.id(), 10);
+                }
+            });
+            
+            // Phase 2: Token-based matching
+            const tokens = tokenize(query);
             tokens.forEach(token => {
                 for (const [term, nodeIds] of searchIndex.invertedIndex.entries()) {
                     if (term.includes(token) || token.includes(term)) {
@@ -2590,6 +2714,7 @@
                 }
             });
             
+            // Render results with highlighting
             cy.elements().removeClass('highlighted');
             
             if (results.size === 0) {
@@ -2600,24 +2725,22 @@
             const matchedNodes = cy.nodes().filter(n => results.has(n.id()));
             matchedNodes.addClass('highlighted');
             
-            let byPid = 0, byAttr = 0;
-            results.forEach((count, nodeId) => {
-                const info = searchIndex.nodeIndex.get(nodeId);
-                if (info && info.pid && info.pid.toLowerCase().includes(query.toLowerCase())) {
-                    byPid++;
-                } else {
-                    byAttr++;
-                }
+            // Analyze match types
+            let byExact = 0, byToken = 0;
+            results.forEach((score, nodeId) => {
+                if (score >= 10) byExact++;
+                else byToken++;
             });
             
             showToast(
-                `Found ${results.size} nodes (${byPid} by PID, ${byAttr} by attribute/profile)`,
+                `Found ${results.size} nodes (${byExact} exact, ${byToken} partial)`,
                 'success'
             );
             
+            // Focus AND highlight
             cy.animate({
-                fit: { eles: matchedNodes, padding: 50 },
-                duration: 500
+                fit: { eles: matchedNodes, padding: CONFIG.SEARCH.HIGHLIGHT_PADDING },
+                duration: CONFIG.SEARCH.ANIMATION_DURATION
             });
         }
 
