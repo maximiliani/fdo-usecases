@@ -772,11 +772,17 @@
         let focusedNodeId = null;
         let focusedNodeSet = new Set();
         let focusedEdgeSet = new Set();
+        let originalFocusedNodeSet = new Set();
+        let originalFocusedEdgeSet = new Set();
         let visibleRelationships = new Set();
         let profileGroupVisibility = new Map();
         let profileGroupCustomizations = new Map();
         let searchMode = false;
         let preSearchState = null;
+        let searchIndex = {
+            nodeIndex: new Map(),
+            invertedIndex: new Map(),
+        };
 
         // Cache for resolved attribute metadata
         const attrMetaCache = new Map();
@@ -824,7 +830,7 @@
                 warning: '#f39c12',
                 info: '#3498db'
             };
-
+            
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.style.cssText = `
@@ -832,13 +838,20 @@
                 animation: slideIn 0.3s ease-out;
             `;
             toast.textContent = message;
-
+            
             container.appendChild(toast);
-
+            
             setTimeout(() => {
                 toast.style.animation = 'slideOut 0.3s ease-in';
                 setTimeout(() => toast.remove(), 300);
             }, duration);
+        }
+
+        function tokenize(text) {
+            if (!text) return [];
+            return text.toLowerCase()
+                .split(/[\s\.\-_:\/]+/)
+                .filter(t => t.length >= 3);
         }
 
         function hexToHsl(hex) {
@@ -1017,6 +1030,8 @@
             const elements = [];
             const allPids = Object.keys(RAW_GRAPH_DATA);
 
+            const stats = window.profileStats;
+            
             // Create nodes
             Object.entries(RAW_GRAPH_DATA).forEach(([pid, recordData]) => {
                 const recordArray = recordData.record || [];
@@ -1029,7 +1044,8 @@
                         label: truncatePid(pid),
                         full_pid: pid,
                         profiles: profilePids,
-                        attrs: groupedAttrs
+                        attrs: groupedAttrs,
+                        nodeColor: blendColorsWeighted(profilePids, stats)
                     },
                 };
                 elements.push(node);
@@ -1240,6 +1256,62 @@
             }
 
             hideLoadingOverlay();
+        }
+
+        async function buildSearchIndex() {
+            searchIndex.nodeIndex.clear();
+            searchIndex.invertedIndex.clear();
+            
+            console.log('Building search index...');
+            
+            cy.nodes().forEach(node => {
+                const data = node.data();
+                const terms = new Set();
+                
+                if (data.full_pid) {
+                    tokenize(data.full_pid).forEach(t => terms.add(t));
+                }
+                
+                const profiles = data.profiles || [];
+                profiles.forEach(pid => {
+                    const meta = attrMetaCache.get(pid);
+                    if (meta?.name) {
+                        tokenize(meta.name).forEach(t => terms.add(t));
+                    }
+                });
+                
+                const attrs = data.attrs || [];
+                attrs.forEach(attr => {
+                    const keyMeta = attrMetaCache.get(attr.k);
+                    if (keyMeta?.name) {
+                        tokenize(keyMeta.name).forEach(t => terms.add(t));
+                    }
+                    
+                    const values = Array.isArray(attr.v) ? attr.v : [attr.v];
+                    values.forEach(v => {
+                        if (typeof v === 'string') {
+                            tokenize(v).forEach(t => terms.add(t));
+                        }
+                    });
+                });
+                
+                searchIndex.nodeIndex.set(node.id(), {
+                    pid: data.full_pid,
+                    label: data.label,
+                    terms: Array.from(terms),
+                    profiles,
+                    node: node
+                });
+                
+                terms.forEach(term => {
+                    if (!searchIndex.invertedIndex.has(term)) {
+                        searchIndex.invertedIndex.set(term, new Set());
+                    }
+                    searchIndex.invertedIndex.get(term).add(node.id());
+                });
+            });
+            
+            console.log(`✓ Search index built: ${searchIndex.nodeIndex.size} nodes, ${searchIndex.invertedIndex.size} unique terms`);
         }
 
         function getEdgeColor(edge) {
@@ -1537,11 +1609,7 @@
         }
 
         function getNodeColor(node) {
-            const profiles = node.data('profiles') || [];
-            if (profiles.length === 0) return '#95a5a6';
-
-            const stats = window.profileStats;
-            return blendColorsWeighted(profiles, stats);
+            return node.data('nodeColor') || '#95a5a6';
         }
 
         function updateStatistics() {
@@ -1897,7 +1965,7 @@
         function updateGroupDisplay(groupId) {
             const groupData = profileGroupVisibility.get(groupId);
             const customization = profileGroupCustomizations.get(groupId);
-
+            
             const headerElement = document.querySelector(
                 `.profile-group-header[data-group-id="${groupId}"]`
             );
@@ -1907,19 +1975,34 @@
                     nameElement.textContent = customization?.customName || groupData?.groupName || '';
                 }
             }
-
+            
             if (customization?.customColor) {
                 groupData.customColor = customization.customColor;
             } else {
                 delete groupData.customColor;
             }
-
+            
             cy.nodes().forEach(node => {
                 const profiles = node.data('profiles') || [];
-                if (profiles.some(p => groupData?.allProfiles?.has(p))) {
-                    node.style('background-color', getNodeColor(node));
+                if (profiles.some(p => groupData.allProfiles.has(p))) {
+                    const newColor = blendColorsWeighted(profiles, window.profileStats);
+                    node.data('nodeColor', newColor);
                 }
             });
+            
+            cy.style().update();
+        }
+
+        function applyLoadedConfig() {
+            initProfileFilters();
+            filterByProfile();
+            filterByRelationship();
+            for (const groupId of profileGroupVisibility.keys()) {
+                updateGroupDisplay(groupId);
+            }
+            if (profileGroupCustomizations.size > 0) {
+                showToast(`Loaded ${profileGroupCustomizations.size} customizations`, 'success');
+            }
         }
 
         function escapeHtml(text) {
@@ -2049,31 +2132,20 @@
 
                 const membersContainer = groupDiv.querySelector('.profile-group-members');
 
-                const sortedProfiles = Array.from(group.allProfiles)
-                    .sort((a, b) => {
-                        const freqA = stats.frequencyMap.get(a) || 0;
-                        const freqB = stats.frequencyMap.get(b) || 0;
-                        return freqA - freqB;
-                    });
-
                 const profilesVisibility = new Map();
-                sortedProfiles.forEach(profilePid => {
-                    profilesVisibility.set(profilePid, true);
-                    const meta = attrMetaCache.get(profilePid);
-                    const profileDisplayName = meta?.name || truncatePid(profilePid, 25);
-                    const isPrimary = profilePid === primaryPid;
-
-                    const checkboxDiv = document.createElement('div');
-                    checkboxDiv.className = `filter-checkbox${isPrimary ? ' primary-profile' : ''}`;
-                    checkboxDiv.innerHTML = `
-                        <label>
-                            <input type="checkbox" class="profile-filter"
-                                   data-profile="${escapeHtml(profilePid)}" checked>
-                            <span>${escapeHtml(profileDisplayName)}${isPrimary ? ' ★' : ''}</span>
-                        </label>
-                    `;
-                    membersContainer.appendChild(checkboxDiv);
-                });
+                
+                const isPrimary = true;
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.className = `filter-checkbox primary-profile`;
+                checkboxDiv.innerHTML = `
+                    <label>
+                        <input type="checkbox" class="profile-filter"
+                               data-profile="${escapeHtml(primaryPid)}" checked>
+                        <span>${escapeHtml(displayName)} ★ (Primary)</span>
+                    </label>
+                `;
+                membersContainer.appendChild(checkboxDiv);
+                profilesVisibility.set(primaryPid, true);
 
                 profileGroupVisibility.set(primaryPid, {
                     primaryPid,
@@ -2255,38 +2327,45 @@
         }
 
         function expandFocusToNeighbors(node) {
-            const neighbors = node.connectedNodes();
-            const connectingEdges = node.connectedEdges();
-
+            if (originalFocusedNodeSet.size === 0) {
+                originalFocusedNodeSet = new Set(focusedNodeSet);
+                originalFocusedEdgeSet = new Set(focusedEdgeSet);
+            }
+            
+            const incomingEdges = node.incomingEdges();
+            const outgoingEdges = node.outgoingEdges();
+            const allConnectingEdges = incomingEdges.union(outgoingEdges);
+            const allNeighbors = allConnectingEdges.connectedNodes();
+            
             let newCount = 0;
             const newlyAdded = [];
-
-            neighbors.forEach(n => {
+            
+            allNeighbors.forEach(n => {
                 if (!focusedNodeSet.has(n.id())) {
                     focusedNodeSet.add(n.id());
                     newlyAdded.push(n);
                     newCount++;
                 }
             });
-
-            connectingEdges.forEach(e => {
+            
+            allConnectingEdges.forEach(e => {
                 if (!focusedEdgeSet.has(e.id())) {
                     focusedEdgeSet.add(e.id());
                 }
             });
-
+            
             updateFocusVisibility();
             highlightNewNodes(newlyAdded);
-
+            
             if (newCount > 0) {
                 showToast(`Added ${newCount} neighbor${newCount > 1 ? 's' : ''} to focus`, 'success');
             } else {
                 showToast('No new neighbors to add', 'info');
             }
-
+            
             cy.animate({
                 fit: {
-                    eles: cy.elements().filter(e =>
+                    eles: cy.elements().filter(e => 
                         focusedNodeSet.has(e.id()) || focusedEdgeSet.has(e.id())
                     ),
                     padding: 50
@@ -2298,7 +2377,7 @@
         function updateFocusVisibility() {
             cy.nodes().forEach(n => {
                 if (focusedNodeSet.has(n.id())) {
-                    n.removeClass('hidden-focus');
+                    n.removeClass('hidden-focus hidden-profile hidden-relationship hidden-isolated');
                 } else {
                     n.addClass('hidden-focus');
                 }
@@ -2306,7 +2385,7 @@
 
             cy.edges().forEach(e => {
                 if (focusedEdgeSet.has(e.id())) {
-                    e.removeClass('hidden-focus');
+                    e.removeClass('hidden-focus hidden-profile hidden-relationship');
                 } else {
                     e.addClass('hidden-focus');
                 }
@@ -2317,19 +2396,21 @@
             focusedNodeId = node.id();
             focusedNodeSet = new Set([node.id()]);
             focusedEdgeSet = new Set();
-
+            originalFocusedNodeSet.clear();
+            originalFocusedEdgeSet.clear();
+            
             const connectedEdges = node.connectedEdges();
             const connectedNodes = connectedEdges.connectedNodes();
-
+            
             connectedNodes.forEach(n => focusedNodeSet.add(n.id()));
             connectedEdges.forEach(e => focusedEdgeSet.add(e.id()));
-
+            
             updateFocusVisibility();
             updateFocusButtons();
-
+            
             cy.animate({
                 fit: {
-                    eles: cy.elements().filter(e =>
+                    eles: cy.elements().filter(e => 
                         focusedNodeSet.has(e.id()) || focusedEdgeSet.has(e.id())
                     ),
                     padding: 50
@@ -2349,7 +2430,15 @@
             focusedNodeId = null;
             focusedNodeSet.clear();
             focusedEdgeSet.clear();
-            cy.elements().removeClass('hidden-focus');
+            originalFocusedNodeSet.clear();
+            originalFocusedEdgeSet.clear();
+            
+            cy.nodes().forEach(n => {
+                n.removeClass('hidden-focus hidden-profile hidden-relationship hidden-isolated');
+            });
+            cy.edges().forEach(e => {
+                e.removeClass('hidden-focus hidden-profile hidden-relationship');
+            });
 
             const focusBtn = document.getElementById('focus-node-btn');
             const clearBtn = document.getElementById('clear-focus-btn');
@@ -2488,39 +2577,48 @@
                 enterSearchMode();
             }
 
-            const lowerQuery = query.toLowerCase();
-            cy.elements().removeClass('highlighted');
-
-            const matches = cy.elements().filter(function() {
-                const data = this.data();
-
-                if (this.isNode()) {
-                    return data.full_pid?.toLowerCase().includes(lowerQuery) ||
-                           data.attrs?.some(attr =>
-                               Array.isArray(attr.v)
-                                   ? attr.v.some(v => v.toLowerCase().includes(lowerQuery))
-                                   : attr.v.toLowerCase().includes(lowerQuery)
-                           );
-                } else {
-                    return data.label?.toLowerCase().includes(lowerQuery) ||
-                           data.k?.toLowerCase().includes(lowerQuery);
+            const tokens = tokenize(query);
+            const results = new Map();
+            
+            tokens.forEach(token => {
+                for (const [term, nodeIds] of searchIndex.invertedIndex.entries()) {
+                    if (term.includes(token) || token.includes(term)) {
+                        nodeIds.forEach(id => {
+                            results.set(id, (results.get(id) || 0) + 1);
+                        });
+                    }
                 }
             });
-
-            matches.addClass('highlighted');
-
-            if (matches.length > 0) {
-                cy.animate({
-                    fit: {
-                        eles: matches,
-                        padding: 50
-                    },
-                    duration: 500
-                });
-                showToast(`Found ${matches.length} match${matches.length > 1 ? 'es' : ''}`, 'success');
-            } else {
+            
+            cy.elements().removeClass('highlighted');
+            
+            if (results.size === 0) {
                 showToast('No matches found', 'warning');
+                return;
             }
+            
+            const matchedNodes = cy.nodes().filter(n => results.has(n.id()));
+            matchedNodes.addClass('highlighted');
+            
+            let byPid = 0, byAttr = 0;
+            results.forEach((count, nodeId) => {
+                const info = searchIndex.nodeIndex.get(nodeId);
+                if (info && info.pid && info.pid.toLowerCase().includes(query.toLowerCase())) {
+                    byPid++;
+                } else {
+                    byAttr++;
+                }
+            });
+            
+            showToast(
+                `Found ${results.size} nodes (${byPid} by PID, ${byAttr} by attribute/profile)`,
+                'success'
+            );
+            
+            cy.animate({
+                fit: { eles: matchedNodes, padding: 50 },
+                duration: 500
+            });
         }
 
         document.getElementById('layout-select').addEventListener('change', function() {
@@ -2617,6 +2715,9 @@
             setTimeout(async () => {
                 updateLoading(1, 0);
 
+                // Load customizations FIRST so they're available for color calculation
+                loadCustomizationsFromUrl();
+
                 console.log('Analyzing profile distribution...');
                 window.profileStats = calculateProfileFrequencies();
                 console.log(`Found ${window.profileStats.frequencyMap.size} unique profiles across ${window.profileStats.totalNodes} nodes`);
@@ -2641,13 +2742,17 @@
                     console.log('Initializing Cytoscape...');
                     initCytoscapeWithElements(elements);
 
-                    // Load customizations BEFORE initializing filters
-                    updateLoading(4, 0);
-                    loadCustomizationsFromUrl();
+                    await buildSearchIndex();
 
+                    updateLoading(4, 0);
                     console.log('Initializing hierarchical profile filters...');
                     initProfileFilters();
                     initRelationshipFilters();
+                    
+                    if (profileGroupCustomizations.size > 0) {
+                        setTimeout(applyLoadedConfig, 200);
+                    }
+                    
                     updateLoading(4, 100);
                 }, 100);
             }, 100);
