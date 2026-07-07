@@ -20,6 +20,7 @@ Architecture:
 import logging
 from typing import TYPE_CHECKING, Protocol
 
+from fdo_usecases.designs.zenodo.constants import VERSIONING_RELATIONS
 from fdo_usecases.designs.zenodo.handlers.publication_handler import (
     PublicationReferenceHandler,
 )
@@ -200,10 +201,16 @@ class ReferenceProcessor:
         referencing_concept_doi: str,
         depth: int,
     ) -> None:
-        """Process cross-dataset reference and establish bidirectional links.
+        """Process cross-dataset reference and establish bidirectional links via namedReference.
 
-        This handles ALL DataCite relation types between different datasets (not version chains).
-        Each relation type gets its corresponding InfoType PID.
+        This handles DataCite relation types between different datasets (not version chains).
+        Versioning relations (IsPreviousVersionOf, IsNextVersionOf, etc.) are skipped as they
+        are already handled by the Versionable profile.
+
+        For other relation types, creates a namedReference composite attribute with:
+        - relationshipPredicate: The DataCite relation type
+        - target: The referenced dataset's version DOI
+
         Backward links are inferred by Executor from backlink rules.
 
         Args:
@@ -218,6 +225,14 @@ class ReferenceProcessor:
         logger.info(
             f"Processing cross-dataset {relation_type} link: {referencing_dataset_doi} -> {referenced_doi}"
         )
+
+        # Skip versioning relations - these are already handled by Versionable profile
+        if relation_type in VERSIONING_RELATIONS:
+            logger.debug(
+                f"Skipping namedReference for versioning relation {relation_type}: "
+                f"already handled by Versionable profile"
+            )
+            return
 
         # Check if already processed or currently being processed (avoid cycles)
         should_fetch = True
@@ -300,22 +315,36 @@ class ReferenceProcessor:
                         f"Resolved concept DOI {referenced_doi} to version DOI {target_doi}"
                     )
 
+            #: Skip self-references - do not create namedReference pointing to same node
+            if actual_referencing_doi == target_doi:
+                logger.debug(
+                    f"Skipping self-reference: {actual_referencing_doi} -> {target_doi} "
+                    f"(relation: {relation_type})"
+                )
+                return
+
             named_ref_pid = INFOTYPES.get("namedReference")
             if named_ref_pid:
-                #: Store as JSON string: predicate + target
-                #: PidRecord only supports primitive types (str, int, float, bool)
-                reference_json = json.dumps(
-                    {"relationshipPredicate": relation_type, "target": target_doi}
-                )
-                referencing_record.addAttribute(named_ref_pid, reference_json)
-                logger.debug(
-                    f"Added {relation_type} reference: {referencing_dataset_doi} -> {target_doi}"
-                )
+                try:
+                    #: Store as JSON string: predicate + target
+                    #: PidRecord only supports primitive types (str, int, float, bool)
+                    reference_json = json.dumps(
+                        {"relationshipPredicate": relation_type, "target": target_doi}
+                    )
+                    referencing_record.addAttribute(named_ref_pid, reference_json)
+                    logger.info(
+                        f"Created namedReference ({relation_type}): {actual_referencing_doi} -> {target_doi}"
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"Failed to add namedReference for {relation_type}: {e}",
+                        exc_info=True,
+                    )
             else:
                 logger.error("namedReference InfoType not found in INFOTYPES")
         else:
             logger.warning(
-                f"Referencing record not found for {referencing_dataset_doi}, cannot add link"
+                f"Referencing record not found for {actual_referencing_doi}, cannot add namedReference link"
             )
 
         # If we skipped fetching due to cycle, don't try to get metadata or recurse further
@@ -323,13 +352,17 @@ class ReferenceProcessor:
             return
 
         # Get concept DOI of referenced dataset to confirm it's cross-dataset
-        referenced_dataset = await self.orchestrator._fetch_metadata(referenced_doi)
-        referenced_concept_doi = referenced_dataset.concept_doi
+        try:
+            referenced_dataset = await self.orchestrator._fetch_metadata(referenced_doi)
+            referenced_concept_doi = referenced_dataset.concept_doi
+        except Exception as e:
+            logger.warning(f"Failed to fetch referenced dataset metadata: {e}")
+            return
 
         # Only establish cross-reference if different concept DOIs
         if referenced_concept_doi == referencing_concept_doi:
             logger.debug(
-                f"Skipping cross-reference: same concept DOI ({referenced_concept_doi})"
+                f"Skipping version chain reference: same concept DOI ({referenced_concept_doi}) - handled by Versionable profile"
             )
             return
 

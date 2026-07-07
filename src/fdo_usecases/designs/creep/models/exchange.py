@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 @dataclass
 class CreepExperimentData:
     """Complete data needed to create a CreepExperiment FDO record.
-    
+
     Attributes:
         test_id: Unique test identifier (e.g., "Vh5205_C-78")
         applicable_standard: Test standard (e.g., "DIN EN ISO 204:2019-4")
@@ -27,7 +27,9 @@ class CreepExperimentData:
         creator_affiliations: Combined ROR IDs from Dataset
         keywords: Domain-specific keywords or inherited from Dataset
         referenced_files: List of resolved File FDO PIDs from "See file" references
+
     """
+
     test_id: str
     applicable_standard: str
     specified_temperature: float
@@ -43,12 +45,13 @@ class CreepExperimentData:
     creator_affiliations: list[str] = field(default_factory=list)
     keywords: list[str] = field(default_factory=list)
     referenced_files: list[str] = field(default_factory=list)
+    standalone_metadata_files: list[str] = field(default_factory=list)
 
 
 @dataclass
 class MaterialData:
     """Complete data needed to create a Material FDO record.
-    
+
     Attributes:
         material_id: Unique material identifier (e.g., "CMSX-6")
         pid_composition: Composite PID: material_id + chemical composition FDO handle
@@ -61,7 +64,9 @@ class MaterialData:
         creator_affiliations: Combined ROR IDs from Dataset
         keywords: Domain-specific keywords or inherited from Dataset
         referenced_files: List of resolved File FDO PIDs from "See file" references
+
     """
+
     material_id: str
     pid_composition: str
     has_chemical_composition: str

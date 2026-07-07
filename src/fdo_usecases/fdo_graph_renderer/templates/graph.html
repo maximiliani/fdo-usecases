@@ -274,6 +274,10 @@
             background: #2980b9;
         }
 
+        .legend-edge.named-reference {
+            background: #9b59b6;
+        }
+
         .legend-edge.other {
             background: #95a5a6;
         }
@@ -850,7 +854,7 @@
                 warning: '#f39c12',
                 info: '#3498db'
             };
-            
+
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.style.cssText = `
@@ -858,9 +862,9 @@
                 animation: slideIn 0.3s ease-out;
             `;
             toast.textContent = message;
-            
+
             container.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.style.animation = 'slideOut 0.3s ease-in';
                 setTimeout(() => toast.remove(), 300);
@@ -875,12 +879,12 @@
          */
         function tokenize(text) {
             if (!text) return [];
-            
+
             const tokens = text.toLowerCase()
                 .split(/[\s.:\/]+/)
                 .map(t => t.trim())
                 .filter(t => t.length >= 2);
-            
+
             const subTokens = [];
             tokens.forEach(token => {
                 if (token.includes('-')) {
@@ -892,7 +896,7 @@
                     subTokens.push(...parts);
                 }
             });
-            
+
             return [...new Set([...tokens, ...subTokens])];
         }
 
@@ -1073,7 +1077,7 @@
             const allPids = Object.keys(RAW_GRAPH_DATA);
 
             const stats = window.profileStats;
-            
+
             // Create nodes
             Object.entries(RAW_GRAPH_DATA).forEach(([pid, recordData]) => {
                 const recordArray = recordData.record || [];
@@ -1345,17 +1349,17 @@
         async function buildSearchIndex() {
             searchIndex.nodeIndex.clear();
             searchIndex.invertedIndex.clear();
-            
+
             console.log('Building search index...');
-            
+
             cy.nodes().forEach(node => {
                 const data = node.data();
                 const terms = new Set();
-                
+
                 if (data.full_pid) {
                     tokenize(data.full_pid).forEach(t => terms.add(t));
                 }
-                
+
                 const profiles = data.profiles || [];
                 const profileNames = [];
                 profiles.forEach(pid => {
@@ -1365,7 +1369,7 @@
                         profileNames.push(meta.name);
                     }
                 });
-                
+
                 const attrs = data.attrs || [];
                 const attrNames = [];
                 const attrValues = [];
@@ -1375,7 +1379,7 @@
                         tokenize(keyMeta.name).forEach(t => terms.add(t));
                         attrNames.push(keyMeta.name);
                     }
-                    
+
                     const values = Array.isArray(attr.v) ? attr.v : [attr.v];
                     values.forEach(v => {
                         if (typeof v === 'string') {
@@ -1384,14 +1388,14 @@
                         }
                     });
                 });
-                
+
                 const allText = [
                     data.full_pid || '',
                     ...profileNames,
                     ...attrNames,
                     ...attrValues
                 ].filter(Boolean);
-                
+
                 searchIndex.nodeIndex.set(node.id(), {
                     pid: data.full_pid,
                     label: data.label,
@@ -1400,7 +1404,7 @@
                     profiles,
                     node: node
                 });
-                
+
                 terms.forEach(term => {
                     if (!searchIndex.invertedIndex.has(term)) {
                         searchIndex.invertedIndex.set(term, new Set());
@@ -1408,7 +1412,7 @@
                     searchIndex.invertedIndex.get(term).add(node.id());
                 });
             });
-            
+
             console.log(`✓ Search index built: ${searchIndex.nodeIndex.size} nodes, ${searchIndex.invertedIndex.size} unique terms`);
         }
 
@@ -1416,6 +1420,13 @@
             const key = edge.data('k');
             const meta = attrMetaCache.get(key);
             const name = (meta?.name || '').toLowerCase();
+
+            // Check if this is a namedReference edge (has predicate)
+            const predicate = edge.data('predicate');
+            if (predicate) {
+                // namedReference edges - use purple/indigo to highlight cross-dataset references
+                return '#9b59b6';
+            }
 
             if (name.includes('version')) return '#e74c3c';
             if (name.includes('file') || name.includes('data')) return '#27ae60';
@@ -1459,14 +1470,41 @@
                 Object.values(RAW_GRAPH_DATA).forEach(otherRecord => {
                     const otherArray = otherRecord.record || [];
                     otherArray.forEach(attr => {
-                        if (attr.value === nodeId) {
+                        // Check for namedReference JSON structure
+                        let targetValue = attr.value;
+                        if (typeof attr.value === 'string' && attr.value.startsWith('{')) {
+                            try {
+                                const parsed = JSON.parse(attr.value);
+                                if (parsed.target) {
+                                    targetValue = parsed.target;
+                                }
+                            } catch (e) {
+                                // Not valid JSON, use original value
+                            }
+                        }
+
+                        if (targetValue === nodeId) {
                             inDegree++;
                         }
                     });
                 });
 
                 const allPids = Object.keys(RAW_GRAPH_DATA);
-                const outDegree = recordArray.filter(attr => allPids.includes(attr.value)).length;
+                // Count outgoing edges, handling namedReference JSON structure
+                const outDegree = recordArray.filter(attr => {
+                    let targetValue = attr.value;
+                    if (typeof attr.value === 'string' && attr.value.startsWith('{')) {
+                        try {
+                            const parsed = JSON.parse(attr.value);
+                            if (parsed.target) {
+                                targetValue = parsed.target;
+                            }
+                        } catch (e) {
+                            // Not valid JSON, use original value
+                        }
+                    }
+                    return allPids.includes(targetValue);
+                }).length;
 
                 degreeMap.set(nodeId, {
                     total: inDegree + outDegree,
@@ -2074,7 +2112,7 @@
         function updateGroupDisplay(groupId) {
             const groupData = profileGroupVisibility.get(groupId);
             const customization = profileGroupCustomizations.get(groupId);
-            
+
             const headerElement = document.querySelector(
                 `.profile-group-header[data-group-id="${groupId}"]`
             );
@@ -2084,13 +2122,13 @@
                     nameElement.textContent = customization?.customName || groupData?.groupName || '';
                 }
             }
-            
+
             if (customization?.customColor) {
                 groupData.customColor = customization.customColor;
             } else {
                 delete groupData.customColor;
             }
-            
+
             cy.nodes().forEach(node => {
                 const profiles = node.data('profiles') || [];
                 if (profiles.some(p => groupData.allProfiles.has(p))) {
@@ -2098,7 +2136,7 @@
                     node.data('nodeColor', newColor);
                 }
             });
-            
+
             cy.style().update();
         }
 
@@ -2242,7 +2280,7 @@
                 const membersContainer = groupDiv.querySelector('.profile-group-members');
 
                 const profilesVisibility = new Map();
-                
+
                 const isPrimary = true;
                 const checkboxDiv = document.createElement('div');
                 checkboxDiv.className = `filter-checkbox primary-profile`;
@@ -2440,15 +2478,15 @@
                 originalFocusedNodeSet = new Set(focusedNodeSet);
                 originalFocusedEdgeSet = new Set(focusedEdgeSet);
             }
-            
+
             const incomingEdges = node.incomingEdges();
             const outgoingEdges = node.outgoingEdges();
             const allConnectingEdges = incomingEdges.union(outgoingEdges);
             const allNeighbors = allConnectingEdges.connectedNodes();
-            
+
             let newCount = 0;
             const newlyAdded = [];
-            
+
             allNeighbors.forEach(n => {
                 if (!focusedNodeSet.has(n.id())) {
                     focusedNodeSet.add(n.id());
@@ -2456,25 +2494,25 @@
                     newCount++;
                 }
             });
-            
+
             allConnectingEdges.forEach(e => {
                 if (!focusedEdgeSet.has(e.id())) {
                     focusedEdgeSet.add(e.id());
                 }
             });
-            
+
             updateFocusVisibility();
             highlightNewNodes(newlyAdded);
-            
+
             if (newCount > 0) {
                 showToast(`Added ${newCount} neighbor${newCount > 1 ? 's' : ''} to focus`, 'success');
             } else {
                 showToast('No new neighbors to add', 'info');
             }
-            
+
             cy.animate({
                 fit: {
-                    eles: cy.elements().filter(e => 
+                    eles: cy.elements().filter(e =>
                         focusedNodeSet.has(e.id()) || focusedEdgeSet.has(e.id())
                     ),
                     padding: CONFIG.SEARCH.HIGHLIGHT_PADDING
@@ -2507,19 +2545,19 @@
             focusedEdgeSet = new Set();
             originalFocusedNodeSet.clear();
             originalFocusedEdgeSet.clear();
-            
+
             const connectedEdges = node.connectedEdges();
             const connectedNodes = connectedEdges.connectedNodes();
-            
+
             connectedNodes.forEach(n => focusedNodeSet.add(n.id()));
             connectedEdges.forEach(e => focusedEdgeSet.add(e.id()));
-            
+
             updateFocusVisibility();
             updateFocusButtons();
-            
+
             cy.animate({
                 fit: {
-                    eles: cy.elements().filter(e => 
+                    eles: cy.elements().filter(e =>
                         focusedNodeSet.has(e.id()) || focusedEdgeSet.has(e.id())
                     ),
                     padding: CONFIG.SEARCH.HIGHLIGHT_PADDING
@@ -2541,7 +2579,7 @@
             focusedEdgeSet.clear();
             originalFocusedNodeSet.clear();
             originalFocusedEdgeSet.clear();
-            
+
             cy.nodes().forEach(n => {
                 n.removeClass('hidden-focus hidden-profile hidden-relationship hidden-isolated');
             });
@@ -2693,7 +2731,7 @@
 
             const lowerQuery = query.toLowerCase().trim();
             const results = new Map();
-            
+
             // Phase 1: Exact substring matches (BOOSTED with score 10)
             cy.nodes().forEach(node => {
                 const info = searchIndex.nodeIndex.get(node.id());
@@ -2701,7 +2739,7 @@
                     results.set(node.id(), 10);
                 }
             });
-            
+
             // Phase 2: Token-based matching
             const tokens = tokenize(query);
             tokens.forEach(token => {
@@ -2713,30 +2751,30 @@
                     }
                 }
             });
-            
+
             // Render results with highlighting
             cy.elements().removeClass('highlighted');
-            
+
             if (results.size === 0) {
                 showToast('No matches found', 'warning');
                 return;
             }
-            
+
             const matchedNodes = cy.nodes().filter(n => results.has(n.id()));
             matchedNodes.addClass('highlighted');
-            
+
             // Analyze match types
             let byExact = 0, byToken = 0;
             results.forEach((score, nodeId) => {
                 if (score >= 10) byExact++;
                 else byToken++;
             });
-            
+
             showToast(
                 `Found ${results.size} nodes (${byExact} exact, ${byToken} partial)`,
                 'success'
             );
-            
+
             // Focus AND highlight
             cy.animate({
                 fit: { eles: matchedNodes, padding: CONFIG.SEARCH.HIGHLIGHT_PADDING },
@@ -2871,11 +2909,11 @@
                     console.log('Initializing hierarchical profile filters...');
                     initProfileFilters();
                     initRelationshipFilters();
-                    
+
                     if (profileGroupCustomizations.size > 0) {
                         setTimeout(applyLoadedConfig, 200);
                     }
-                    
+
                     updateLoading(4, 100);
                 }, 100);
             }, 100);

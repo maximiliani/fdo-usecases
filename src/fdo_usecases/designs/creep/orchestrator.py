@@ -249,6 +249,7 @@ class CreepFDOOrchestrator(RecordDesign):
                 creator_affiliations=dataset_affiliations,
                 keywords=keywords,
                 referenced_files=referenced_files,
+                standalone_metadata_files=collection.standalone_lis_files,
             )
             experiment_tasks.append(self.experiment_design.create_fdo(experiment_data))
 

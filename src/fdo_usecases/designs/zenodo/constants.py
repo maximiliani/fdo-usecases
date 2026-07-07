@@ -260,6 +260,19 @@ BACKLINK_FILE_VERSION_CHAIN = ("isNewVersionOf", "isPreviousVersionOf")
 #: Forward predicate stored in relationshipPredicate, backward inferred from DataCite vocabulary
 BACKLINK_NAMED_REFERENCE = ("namedReference", "namedReference")
 
+#: DataCite relation types that indicate version chains (should NOT create namedReference)
+#: These are already handled by the Versionable profile
+VERSIONING_RELATIONS = frozenset(
+    [
+        "IsPreviousVersionOf",
+        "IsNextVersionOf",
+        "HasVersion",
+        "IsNewVersionOf",
+        "IsPreviousVersion",
+        "IsNextVersion",
+    ]
+)
+
 
 __all__ = [
     # Profile identifiers
@@ -280,4 +293,6 @@ __all__ = [
     "BACKLINK_PUBLICATION_REFERENCE",
     "BACKLINK_FILE_VERSION_CHAIN",
     "BACKLINK_NAMED_REFERENCE",
+    # Versioning relations filter
+    "VERSIONING_RELATIONS",
 ]
