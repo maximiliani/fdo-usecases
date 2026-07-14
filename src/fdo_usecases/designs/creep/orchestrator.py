@@ -17,7 +17,7 @@ from .designs.material import MaterialDesign
 from .models.exchange import CreepExperimentData, MaterialData
 
 if TYPE_CHECKING:
-    from ...usecases.BAM_creep_reference.lis_parser import (
+    from ...usecases.bam_creep_reference import (
         LISFileCollection,
         LISParser,
         ParsedTestMetadata,
@@ -65,6 +65,7 @@ class CreepFDOOrchestrator(RecordDesign):
     """
 
     def __init__(self, zenodo_graph: dict):
+        """Initialize orchestrator with Zenodo graph."""
         super().__init__()
         self._record_graph = zenodo_graph  # Shared reference
         self.experiment_design = CreepExperimentDesign(self)
@@ -73,7 +74,7 @@ class CreepFDOOrchestrator(RecordDesign):
         self.INFERENCE_MATCHES_DB: dict = {}
 
     async def execute_async(self, lis_parser: "LISParser") -> None:
-        """Main workflow with async concurrency.
+        """Execute main workflow with async concurrency.
 
         Steps:
         1. Parse LIS files (fetch from Zenodo)
@@ -294,7 +295,7 @@ class CreepFDOOrchestrator(RecordDesign):
         # Merge inference rules from all designs
         for design in [self.experiment_design, self.material_design]:
             if hasattr(design, "_backlinks"):
-                for forward_link_type, backward_link_type in design._backlinks:
+                for _forward_link_type, _backward_link_type in design._backlinks:
                     # Add to inference DB
                     pass  # Rules are applied automatically by RecordDesign.apply()
 

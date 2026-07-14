@@ -27,7 +27,7 @@ def sample_publication_data():
     """Create sample publication FDO data for testing."""
     return PublicationFDOData(
         identifier="10.1016/j.actamat.2025.120735",
-        resource_type="publication-article",
+        resource_type="JournalArticle",
         publisher="Elsevier",
         publication_date="2025-01-15",
         title="Creep reference data for nickel-based superalloys",
@@ -55,7 +55,7 @@ def publication_with_html():
     """Create publication data with HTML in description."""
     return PublicationFDOData(
         identifier="10.1000/html123",
-        resource_type="publication-conferencepaper",
+        resource_type="ConferencePaper",
         publisher="IEEE",
         publication_date="2024-06-01",
         title="Conference Paper",
@@ -170,7 +170,7 @@ async def test_create_fdo_multiple_creators():
     """Test FDO creation with multiple creator ORCIDs."""
     publication = PublicationFDOData(
         identifier="10.1000/multi123",
-        resource_type="publication-article",
+        resource_type="JournalArticle",
         title="Multi-author Paper",
         creator_orcids=[
             "0000-0000-0000-0001",
@@ -203,7 +203,7 @@ async def test_create_fdo_no_creators():
     """Test FDO creation without creators."""
     publication = PublicationFDOData(
         identifier="10.1000/nocreator",
-        resource_type="publication-article",
+        resource_type="JournalArticle",
         title="Anonymous Paper",
         creator_orcids=[],
     )
@@ -224,11 +224,11 @@ async def test_create_fdo_no_creators():
 async def test_different_publication_types():
     """Test FDO creation for different publication types."""
     test_cases = [
-        ("publication-article", "Journal Article"),
-        ("publication-conferencepaper", "Conference Paper"),
-        ("publication-book", "Book"),
-        ("publication-thesis", "Thesis"),
-        ("publication-datapaper", "Data Paper"),
+        ("JournalArticle", "Journal Article"),
+        ("ConferencePaper", "Conference Paper"),
+        ("Book", "Book"),
+        ("Dissertation", "Thesis"),
+        ("DataPaper", "Data Paper"),
     ]
 
     for pub_type, title in test_cases:

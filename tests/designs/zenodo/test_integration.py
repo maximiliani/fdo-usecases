@@ -181,7 +181,7 @@ class TestFDOGraphStructure:
     @pytest.mark.asyncio
     async def test_complete_graph_generation(self, real_world_dataset):
         """Test that complete FDO graph is generated with all record types."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -205,7 +205,7 @@ class TestFDOGraphStructure:
     @pytest.mark.asyncio
     async def test_dataset_profile_compliance(self, real_world_dataset):
         """Test that Dataset FDOs comply with Base + Versionable profiles."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -238,7 +238,7 @@ class TestFDOGraphStructure:
     @pytest.mark.asyncio
     async def test_file_profile_compliance(self, real_world_dataset):
         """Test that File FDOs comply with Base + DataResource profiles."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -271,7 +271,7 @@ class TestFDOGraphStructure:
     @pytest.mark.asyncio
     async def test_publication_profile_compliance(self, real_world_dataset):
         """Test that Publication FDOs comply with Base + Publication profiles."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -300,7 +300,7 @@ class TestFDOGraphStructure:
     @pytest.mark.asyncio
     async def test_version_chain_relationships(self, real_world_dataset):
         """Test that version chain relationships are correctly established."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -371,7 +371,7 @@ class TestCreatorAndAffiliationData:
     @pytest.mark.asyncio
     async def test_creator_orcids_included(self, real_world_dataset):
         """Test that creator ORCIDs are included in Dataset FDOs."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -391,13 +391,13 @@ class TestCreatorAndAffiliationData:
 
         assert INFOTYPES["creator"] in attr_dict
         orcids = attr_dict[INFOTYPES["creator"]]
-        assert "0000-0000-0000-0001" in orcids
-        assert "0000-0000-0000-0002" in orcids
+        assert "https://orcid.org/0000-0000-0000-0001" in orcids
+        assert "https://orcid.org/0000-0000-0000-0002" in orcids
 
     @pytest.mark.asyncio
     async def test_ror_ids_included(self, real_world_dataset):
         """Test that ROR IDs are included when available."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -421,7 +421,7 @@ class TestFileDeduplication:
     @pytest.mark.asyncio
     async def test_shared_file_single_record(self, real_world_dataset):
         """Test that files appearing in multiple versions get single FDO record."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -445,7 +445,7 @@ class TestFileDeduplication:
     @pytest.mark.asyncio
     async def test_unique_files_per_version(self, real_world_dataset):
         """Test that unique files get their own FDO records."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -473,7 +473,7 @@ class TestLicenseHandling:
     @pytest.mark.asyncio
     async def test_file_license_from_parent_dataset(self, real_world_dataset):
         """Test that files inherit license URL from parent dataset."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -497,7 +497,7 @@ class TestKeywordsAndMetadata:
     @pytest.mark.asyncio
     async def test_keywords_included(self, real_world_dataset):
         """Test that keywords are included in Dataset FDOs."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -537,7 +537,7 @@ class TestRecordIdentity:
     @pytest.mark.asyncio
     async def test_dataset_identity_is_doi(self, real_world_dataset):
         """Test that Dataset FDOs use DOI as record ID."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -554,7 +554,7 @@ class TestRecordIdentity:
     @pytest.mark.asyncio
     async def test_file_identity_is_checksum(self, real_world_dataset):
         """Test that File FDOs use checksum as record ID."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,
@@ -571,7 +571,7 @@ class TestRecordIdentity:
     @pytest.mark.asyncio
     async def test_publication_identity_is_identifier(self, real_world_dataset):
         """Test that Publication FDOs use identifier as record ID."""
-        design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+        design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
         with patch.object(
             design,

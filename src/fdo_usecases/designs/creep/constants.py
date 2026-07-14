@@ -23,14 +23,12 @@ INFOTYPES = {
     "testDuration": "21.T11969/7e84faadd49ac88d02b8",
     "percentageCreepExtension": "21.T11969/4be978cac878da94105e",
     "SingleCrystalOrientation": "21.T11969/4597cf0db467d7e365a9",
-    
     # Material specific
     "materialID": "21.T11969/716805eef0349802dc9a",
     "previewImage": "21.T11969/925e3f9925a88476ffba",
     "semImage": "21.T11969/19a94f596420bb274408",
     "hasChemicalComposition": "21.T11969/e32cfb93d7fc61ce3ca5",
     "hasHeatTreatment": "21.T11969/766ae14d72b49cfb5273",
-    
     # Relationships
     "hasData": "21.T11969/cc230f978e8add2e2520",
     "hasMetadata": "21.T11969/d0773859091aeb451528",
@@ -38,7 +36,6 @@ INFOTYPES = {
     "isPartOf": "21.T11969/30f4a1f8aacab81faf38",
     "isReferencedBy": "21.T11969/e5945ef3ff07f314a146",
     "references": "21.T11969/f4c9a69f715c3c60aa2f",
-    
     # Base profile
     "name": "21.T11969/bd3e9fb9b606d2198c9e",
     "description": "21.T11969/880724416f5857987e70",

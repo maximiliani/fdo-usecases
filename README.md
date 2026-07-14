@@ -12,31 +12,26 @@
 <!-- --8<-- [start:abstract] -->
 # fdo-usecases
 
-----
-**:warning: TODO: Complete project setup :construction:**
-
-This is a Python project generated from the
-[fair-python-cookiecutter](https://github.com/Materials-Data-Science-and-Informatics/fair-python-cookiecutter)
-template.
-
-**TODO:** To finalize the project setup, please carefully read and follow the instructions in the
-[developer guide](https://materials-data-science-and-informatics.github.io/fair-python-cookiecutter/latest/dev_guide).
-A copy of the guide is included in your project in `docs/dev_guide.md`.
+A collection of FAIR Digital Object (FDO) usecases for materials science data management.
 
 ----
 
-This repo contains a collection of FDO use-cases that create or consume FDOs.
+This repository implements practical applications of the FDO concept for managing
+materials science experimental data. Each usecase demonstrates different aspects of
+FDO creation, enrichment, and linking.
 
-**:construction: TODO: Write a paragraph summarizing what this project is about.**
+## Overview
+
+This project provides:
+- **LIS file parsing** for BAM creep test datasets
+- **FDO generation** from Zenodo records
+- **Materials science metadata extraction** following FAIR principles
+- **Bidirectional linking** between experiments, materials, and publications
 
 <!-- --8<-- [end:abstract] -->
 <!-- --8<-- [start:quickstart] -->
 
 ## Installation
-
-**TODO: check that the installation instructions work**
-
-This project works with Python > 3.9.
 
 ```bash
 pip install git+ssh://git@github.com/maximiliani/fdo-usecases.git
@@ -44,20 +39,95 @@ pip install git+ssh://git@github.com/maximiliani/fdo-usecases.git
 
 ## Getting Started
 
-**TODO: provide a minimal working example**
+### Example: Parse BAM Creep Data
+
+```python
+import asyncio
+from fdo_usecases.usecases.bam_creep_reference import LISParser
+from fdo_usecases.designs.zenodo import ZenodoFDODesign
+
+async def main():
+    # Step 1: Fetch Zenodo records
+    zenodo = ZenodoFDODesign(dois=["10.5281/zenodo.20132712"])
+    await zenodo.execute_async()
+
+    # Step 2: Parse LIS files
+    async with LISParser() as parser:
+        parser.load_from_zenodo_graph(zenodo._record_graph)
+
+        # Get first test collection
+        collections = parser.group_files_by_test_id()
+        first_test = list(collections.keys())[0]
+
+        # Parse metadata
+        checksum = collections[first_test].md_tr_checksum
+        metadata = await parser.parse_md_tr_file(checksum)
+
+        print(f"Test: {metadata.test_id}")
+        print(f"Material: {metadata.material_id}")
+        print(f"Temperature: {metadata.specified_temperature}°C")
+        print(f"Stress: {metadata.initial_stress} MPa")
+
+asyncio.run(main())
+```
+
+### Run Complete Workflow
+
+```bash
+cd src/fdo_usecases/usecases/bam_creep_reference
+python run.py
+```
 
 <!-- --8<-- [end:quickstart] -->
 
+## Implemented Usecases
+
+| Usecase | Description | Status |
+|---------|-------------|--------|
+| **[BAM Creep-Reference](src/fdo_usecases/usecases/bam_creep_reference/)** | Parse LIS files from BAM creep tests, create Material & Experiment FDOs | ✅ Complete |
+| **[Zenodo FDO Generator](src/fdo_usecases/designs/zenodo/)** | Convert Zenodo records into FDO-compliant metadata graphs | ✅ Complete |
+
+## Documentation
+
+Detailed documentation available at: https://maximiliani.github.io/fdo-usecases
+
+- [Developer Guide](docs/dev_guide.md)
+- [API Reference](https://maximiliani.github.io/fdo-usecases/api)
+- [Usecase Details](src/fdo_usecases/usecases/)
+
+## Testing
+
+```bash
+# Run all tests
+pytest
+
+# With coverage
+pytest --cov=fdo_usecases
+
+# Specific test module
+pytest tests/usecases/bam_creep_reference/
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+
 ## Troubleshooting
 
-### When I try installing the package, I get an `IndexError: list index out of range`
+### Common Issues
 
-Make sure you have `pip` > 21.2 (see `pip --version`), older versions have a bug causing
-this problem. If the installed version is older, you can upgrade it with
-`pip install --upgrade pip` and then try again to install the package.
+**Installation fails with `IndexError: list index out of range`**
+Make sure you have `pip` > 21.2 (check with `pip --version`). Older versions have a bug causing this problem. Upgrade with:
+```bash
+pip install --upgrade pip
+```
 
-**You can find more information on using and contributing to this repository in the
-[documentation](https://maximiliani.github.io/fdo-usecases/main).**
+**Rate limiting when fetching files**
+The HTTP client automatically handles rate limits with exponential backoff. Cached responses reduce repeated requests.
+
+## License
+
+Apache-2.0 - see [LICENSE](LICENSE) for details.
 
 <!-- --8<-- [start:citation] -->
 
@@ -72,9 +142,8 @@ in the [repository](https://github.com/maximiliani/fdo-usecases/blob/main/CITATI
 
 ## Acknowledgements
 
-We kindly thank all
-[authors and contributors](https://maximiliani.github.io/fdo-usecases/latest/credits).
+We kindly thank all [authors and contributors](AUTHORS.md).
 
-**TODO: relevant organizational acknowledgements (employers, funders)**
+This work is funded by [TODO: Add funding information].
 
 <!-- --8<-- [end:acknowledgements] -->

@@ -2,10 +2,14 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-"""Utility functions for Zenodo FDO generation."""
+"""Utility functions for Zenodo FDO generation.
 
-from fdo_usecases.designs.zenodo.utils.orcid_utils import normalize_orcid
-from fdo_usecases.designs.zenodo.utils.text_utils import strip_html_and_truncate
+This module re-exports utilities from the central fdo_usecases.utils package
+to maintain backward compatibility for existing imports.
+
+"""
+
+from fdo_usecases.utils import normalize_orcid, strip_html_and_truncate
 
 __all__ = [
     "strip_html_and_truncate",

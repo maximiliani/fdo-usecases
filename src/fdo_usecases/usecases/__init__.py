@@ -7,13 +7,17 @@
 This package contains use case implementations for creating and consuming FDOs.
 """
 
-from fdo_usecases.designer_lib.executor import Executor
-from fdo_usecases.designs.creep.design import CreepDesign
-from fdo_usecases.designs.zenodo import ZenodoFDODesign
+import os
 
-EXECUTOR: Executor = Executor()
+# Skip executor during testing
+if os.environ.get("SKIP_EXECUTOR") != "1":
+    from fdo_usecases.designer_lib.executor import Executor
+    from fdo_usecases.designs.creep.design import CreepDesign
+    from fdo_usecases.designs.zenodo import ZenodoFDODesign
 
-EXECUTOR.addDesign(ZenodoFDODesign(dois=["10.5281/zenodo.20132712"]))
-EXECUTOR.addDesign(CreepDesign())
+    EXECUTOR: Executor = Executor()
 
-EXECUTOR.execute()
+    EXECUTOR.addDesign(ZenodoFDODesign(dois=["10.5281/zenodo.20132712"]))
+    EXECUTOR.addDesign(CreepDesign())
+
+    EXECUTOR.execute()

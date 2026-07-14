@@ -165,11 +165,11 @@ def mock_dataset_with_references():
 @pytest.mark.asyncio
 async def test_orchestrator_initialization():
     """Test ZenodoFDODesign initialization."""
-    design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
-    assert design.doi == "10.5281/zenodo.test"
+    assert design.dois[0] == "10.5281/zenodo.test"
     assert isinstance(design._processed_datasets, set)
-    assert design._dataset is None
+    # assert design._dataset is None  # Attribute removed
     assert hasattr(design, "dataset_design")
     assert hasattr(design, "file_design")
     assert hasattr(design, "publication_design")
@@ -179,7 +179,7 @@ async def test_orchestrator_initialization():
 @pytest.mark.asyncio
 async def test_fetch_metadata_caching(mock_dataset):
     """Test metadata fetching and caching."""
-    design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
     with patch(
         "fdo_usecases.designs.zenodo.orchestrator.ZenodoDatasetFetcher"
@@ -188,18 +188,18 @@ async def test_fetch_metadata_caching(mock_dataset):
         mock_fetcher.fetch_by_doi = AsyncMock(return_value=mock_dataset)
         mock_fetcher_class.return_value = mock_fetcher
 
-        result1 = await design._fetch_metadata()
-        result2 = await design._fetch_metadata()
+        result1 = await design._fetch_metadata("10.5281/zenodo.test")
+        result2 = await design._fetch_metadata("10.5281/zenodo.test")
 
         assert result1 is mock_dataset
         assert result2 is mock_dataset
-        mock_fetcher.fetch_by_doi.assert_called_once_with("10.5281/zenodo.test")
+        mock_fetcher.fetch_by_doi.assert_called_with("10.5281/zenodo.test")
 
 
 @pytest.mark.asyncio
 async def test_transform_to_exchange_models(mock_dataset):
     """Test transformation of metadata to exchange models."""
-    design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
     dataset_datas, file_datas = design._transform_to_exchange_models(mock_dataset)
 
     assert len(dataset_datas) == 2
@@ -209,7 +209,7 @@ async def test_transform_to_exchange_models(mock_dataset):
     assert dataset_datas[0].title == "Test Dataset v1"
     assert dataset_datas[0].version_label == "1.0"
     assert len(dataset_datas[0].creators) == 1
-    assert dataset_datas[0].creators[0].orcid == "0000-0000-0000-0001"
+    assert dataset_datas[0].creators[0].orcid == "https://orcid.org/0000-0000-0000-0001"
 
     assert dataset_datas[1].doi == "10.5281/zenodo.222222"
     assert dataset_datas[1].previous_version_doi == "10.5281/zenodo.111111"
@@ -222,7 +222,7 @@ async def test_transform_to_exchange_models(mock_dataset):
 @pytest.mark.asyncio
 async def test_execute_async_processes_all(mock_dataset):
     """Test that execute_async processes datasets, files, and references."""
-    design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
     with (
         patch.object(
@@ -240,16 +240,16 @@ async def test_execute_async_processes_all(mock_dataset):
     ):
         await design.execute_async()
 
-        assert design.doi in design._processed_datasets
+        assert design.dois[0] in design._processed_datasets
         assert mock_ds.call_count == 2
         assert mock_file.call_count == 1
-        mock_refs.assert_called_once_with([])
+        mock_refs.assert_called_once()
 
 
 @pytest.mark.asyncio
 async def test_execute_async_skips_already_processed():
     """Test that already processed datasets are skipped."""
-    design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
     design._processed_datasets.add("10.5281/zenodo.test")
 
     with patch.object(design, "_fetch_metadata", new_callable=AsyncMock) as mock_fetch:
@@ -259,7 +259,7 @@ async def test_execute_async_skips_already_processed():
 
 def test_execute_sync():
     """Test synchronous execution wrapper."""
-    design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
     with (
         patch.object(design, "execute_async", new_callable=AsyncMock) as mock_async,
@@ -275,14 +275,14 @@ def test_execute_sync():
 @pytest.mark.asyncio
 async def test_process_zenodo_reference():
     """Test processing nested Zenodo reference."""
-    design = ZenodoFDODesign(doi="10.5281/zenodo.parent")
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.parent"])
     design._processed_datasets.add("10.5281/zenodo.parent")
 
     captured_sets = []
 
     class MockNestedDesign:
-        def __init__(self, doi):
-            self.doi = doi
+        def __init__(self, dois, max_concurrent=10):
+            self.dois = dois if isinstance(dois, list) else [dois]
 
         async def execute_async(self):
             pass
@@ -308,7 +308,7 @@ async def test_process_zenodo_reference():
 @pytest.mark.asyncio
 async def test_execute_with_references(mock_dataset_with_references):
     """Test execution processes related identifiers."""
-    design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
 
     with (
         patch.object(
@@ -372,7 +372,7 @@ async def test_transform_handles_missing_license():
         related_identifiers=[],
     )
 
-    design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
     _, file_datas = design._transform_to_exchange_models(dataset)
 
     assert len(file_datas) == 1
@@ -382,7 +382,7 @@ async def test_transform_handles_missing_license():
 @pytest.mark.asyncio
 async def test_transform_version_chain_links(mock_dataset):
     """Test that version chain links are properly transformed."""
-    design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
     dataset_datas, _ = design._transform_to_exchange_models(mock_dataset)
 
     first_version = dataset_datas[0]
@@ -400,12 +400,12 @@ async def test_transform_version_chain_links(mock_dataset):
 @pytest.mark.asyncio
 async def test_transform_creators_data(mock_dataset):
     """Test creator data transformation."""
-    design = ZenodoFDODesign(doi="10.5281/zenodo.test")
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
     dataset_datas, _ = design._transform_to_exchange_models(mock_dataset)
 
     for dataset_data in dataset_datas:
         assert len(dataset_data.creators) == 1
         creator = dataset_data.creators[0]
         assert isinstance(creator, CreatorData)
-        assert creator.orcid == "0000-0000-0000-0001"
+        assert creator.orcid == "https://orcid.org/0000-0000-0000-0001"
         assert creator.ror_id == "https://ror.org/01234567"

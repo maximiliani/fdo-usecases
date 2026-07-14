@@ -39,6 +39,7 @@ class CreepExperimentDesign(RecordDesign):
     """
 
     def __init__(self, orchestrator: "CreepFDOOrchestrator | None" = None):
+        """Initialize experiment design with orchestrator reference."""
         super().__init__()
         self.orchestrator = orchestrator
         self._local_records: dict[str, PidRecord] = {}
