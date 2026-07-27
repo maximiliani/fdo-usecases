@@ -13,6 +13,7 @@ from pathlib import Path
 from fdo_usecases.designs.creep import CreepFDOOrchestrator
 from fdo_usecases.designs.zenodo import ZenodoFDODesign
 from fdo_usecases.usecases.bam_creep_reference import LISParser
+from fdo_usecases.usecases.bam_creep_reference.nfdi_enricher import NFDIEnricher
 from fdo_usecases.utils.logging_config import setup_logging
 
 
@@ -56,7 +57,13 @@ async def main() -> int:
             logger.info("Applying inference rules...")
             creep_orchestrator._apply_inference_rules()
 
-            # Step 5: Export unified graph
+            # Step 5: Add NFDI profile to all FDOs (post-processing)
+            logger.info("Adding NFDI profile to all FDOs...")
+            enricher = NFDIEnricher()
+            enriched_count = enricher.enrich_graph(zenodo_design._record_graph)
+            logger.info(f"Added NFDI profile to {enriched_count} FDOs")
+
+            # Step 6: Export unified graph (now with NFDI profiles)
             output_path = Path(__file__).parent / "fdo_graph_merged.json"
             graph_dict = {
                 k: v.toSimpleJSON() for k, v in zenodo_design._record_graph.items()
@@ -70,6 +77,7 @@ async def main() -> int:
             # Step 6: Report statistics
             print("\n📊 Statistics:")
             print(f"  Total FDOs: {len(graph_dict)}")
+            print(f"  NFDI-enriched FDOs: {enriched_count}")
 
             # Count by profile type
             from fdo_usecases.designs.creep.constants import (
