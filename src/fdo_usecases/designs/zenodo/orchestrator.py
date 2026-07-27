@@ -256,6 +256,10 @@ class ZenodoFDODesign(RecordDesign):
                         license_url = str(ver.license.url)
                         break
 
+            # Get date_created from first dataset version containing this file
+            first_version_doi = file_obj.first_dataset_version
+            date_created = dataset.versions[first_version_doi].publication_date
+
             # Landing page points to the first dataset version where this file appeared
             landing_page_url = f"https://doi.org/{file_obj.first_dataset_version}"
 
@@ -267,7 +271,9 @@ class ZenodoFDODesign(RecordDesign):
                 license_url=license_url,
                 previous_version_checksum=file_obj.previous_version_checksum,
                 next_version_checksum=file_obj.next_version_checksum,
+                latest_version_checksum=file_obj.latest_version_checksum,
                 dataset_versions=file_obj.present_in_versions.copy(),
+                date_created=date_created,
                 landing_page_url=landing_page_url,
             )
             file_datas.append(file_data)

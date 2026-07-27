@@ -69,6 +69,7 @@ class ZenodoFile(BaseModel):
     # NEW: Checksum references for FDO version chain creation
     previous_version_checksum: str | None = None
     next_version_checksum: str | None = None
+    latest_version_checksum: str | None = None  # Points to final version in chain
 
     # Tracks all dataset versions containing this exact file (by checksum)
     present_in_versions: list[str] = Field(default_factory=list)

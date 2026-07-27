@@ -90,6 +90,18 @@ class ZenodoFileDesign(RecordDesign):
 
         # Base profile
         record.addAttribute(INFOTYPES["name"], data.filename)
+        record.addAttribute(INFOTYPES["dateCreated"], data.date_created.isoformat())
+
+        # Keywords for FDO type identification
+        keywords: list[str] = ["file", "data resource", "digital object"]
+        if "." in data.filename:
+            ext = data.filename.split(".")[-1].lower()
+            keywords.append(ext)
+            keywords.append(f"{ext}-file")
+        if data.mimetype:
+            keywords.append(data.mimetype.split("/")[0])  # main type
+            keywords.append(data.mimetype)  # full mimetype
+        record.addAttribute(INFOTYPES["keyword"], keywords)  # type: ignore[arg-type]
 
         # DataResource profile
         if data.mimetype:
@@ -101,7 +113,7 @@ class ZenodoFileDesign(RecordDesign):
         if data.license_url:
             record.addAttribute(INFOTYPES["spdxLicense"], data.license_url)
 
-        # NEW: File version chain attributes (Option A: checksums as IDs)
+        # Versionable profile - file version chain
         if data.previous_version_checksum:
             record.addAttribute(
                 INFOTYPES["previousVersion"], data.previous_version_checksum
@@ -109,6 +121,11 @@ class ZenodoFileDesign(RecordDesign):
 
         if data.next_version_checksum:
             record.addAttribute(INFOTYPES["nextVersion"], data.next_version_checksum)
+
+        if data.latest_version_checksum:
+            record.addAttribute(
+                INFOTYPES["latestVersion"], data.latest_version_checksum
+            )
 
         # Forward links: isPartOf - link this file to all dataset versions it belongs to
         if data.dataset_versions:

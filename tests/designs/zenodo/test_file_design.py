@@ -24,36 +24,45 @@ from fdo_usecases.designs.zenodo.models.exchange import FileFDOData
 @pytest.fixture
 def sample_file_data():
     """Create sample file FDO data for testing."""
+    from datetime import date
+
     return FileFDOData(
         checksum="md5:abc123def456789012345678901234ab",
         filename="data.csv",
         mimetype="text/csv",
         download_url="https://zenodo.org/api/records/123/files/data.csv",
         license_url="https://spdx.org/licenses/CC-BY-4.0",
+        date_created=date(2024, 1, 1),
     )
 
 
 @pytest.fixture
 def file_without_license():
     """Create file data without license."""
+    from datetime import date
+
     return FileFDOData(
         checksum="md5:def456abc789012345678901234cd",
         filename="readme.txt",
         mimetype="text/plain",
         download_url="https://zenodo.org/api/records/456/files/readme.txt",
         license_url=None,
+        date_created=date(2024, 1, 1),
     )
 
 
 @pytest.fixture
 def file_without_mimetype():
     """Create file data without MIME type."""
+    from datetime import date
+
     return FileFDOData(
         checksum="md5:789abc012def345678901234ef",
         filename="unknown_file",
         mimetype=None,
         download_url="https://zenodo.org/api/records/789/files/unknown_file",
         license_url=None,
+        date_created=date(2024, 1, 1),
     )
 
 
@@ -132,12 +141,15 @@ async def test_create_fdo_without_mimetype(file_without_mimetype):
 @pytest.mark.asyncio
 async def test_create_fdo_required_fields_only():
     """Test FDO creation with only required fields."""
+    from datetime import date
+
     minimal_file = FileFDOData(
         checksum="md5:minimal123456789012345678901234",
         filename="minimal.dat",
         mimetype=None,
         download_url="https://zenodo.org/api/records/999/files/minimal.dat",
         license_url=None,
+        date_created=date(2024, 1, 1),
     )
 
     design = ZenodoFileDesign()
@@ -173,6 +185,8 @@ async def test_different_file_types():
     ]
 
     for filename, mimetype, checksum in test_cases:
+        from datetime import date
+
         design = ZenodoFileDesign()
         file_data = FileFDOData(
             checksum=checksum,
@@ -180,6 +194,7 @@ async def test_different_file_types():
             mimetype=mimetype,
             download_url=f"https://zenodo.org/api/records/123/files/{filename}",
             license_url="https://spdx.org/licenses/MIT",
+            date_created=date(2024, 1, 1),
         )
 
         await design.create_fdo(file_data)
@@ -213,12 +228,15 @@ async def test_design_initialization():
 @pytest.mark.asyncio
 async def test_checksum_as_record_id():
     """Verify that checksum is used as record ID for deduplication."""
+    from datetime import date
+
     file_v1 = FileFDOData(
         checksum="md5:same123456789012345678901234",
         filename="data_v1.csv",
         mimetype="text/csv",
         download_url="https://zenodo.org/api/records/123/files/data.csv",
         license_url="https://spdx.org/licenses/CC-BY-4.0",
+        date_created=date(2024, 1, 1),
     )
 
     file_v2 = FileFDOData(
@@ -227,6 +245,7 @@ async def test_checksum_as_record_id():
         mimetype="text/csv",
         download_url="https://zenodo.org/api/records/456/files/data.csv",
         license_url="https://spdx.org/licenses/CC-BY-4.0",
+        date_created=date(2024, 1, 1),
     )
 
     design = ZenodoFileDesign()

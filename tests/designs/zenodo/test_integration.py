@@ -350,6 +350,7 @@ class TestFDOGraphStructure:
             checksum="md5:1234567890abcdef1234567890abcdef",
             filename="test.txt",
             download_url="https://example.com/test.txt",
+            date_created=date(2024, 1, 1),
         )
         await file_design.create_fdo(file_data)
 

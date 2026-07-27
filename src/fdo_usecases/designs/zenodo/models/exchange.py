@@ -92,7 +92,9 @@ class FileFDOData(BaseModel):
         license_url: SPDX license URL from parent dataset (optional)
         previous_version_checksum: Checksum of previous file version (optional)
         next_version_checksum: Checksum of next file version (optional)
+        latest_version_checksum: Checksum of the latest file version (optional)
         dataset_versions: List of dataset version DOIs containing this file
+        date_created: Date when file first appeared in any dataset version
         landing_page_url: URL to the Zenodo landing page for the file's dataset
 
     """
@@ -104,7 +106,9 @@ class FileFDOData(BaseModel):
     license_url: str | None = None
     previous_version_checksum: str | None = None
     next_version_checksum: str | None = None
+    latest_version_checksum: str | None = None
     dataset_versions: list[str] = Field(default_factory=list)
+    date_created: date
     landing_page_url: str | None = None
 
 

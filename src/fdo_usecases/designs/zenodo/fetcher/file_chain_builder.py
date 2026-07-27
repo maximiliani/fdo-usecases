@@ -4,10 +4,13 @@
 
 """File version chain building logic."""
 
+import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from fdo_usecases.designs.zenodo.models import DatasetVersion, ZenodoFile
+
+logger = logging.getLogger(__name__)
 
 
 class FileChainBuilder:
@@ -26,6 +29,7 @@ class FileChainBuilder:
         Algorithm:
         Step 1: Build Filename History - Group all files by filename
         Step 2: Create Bidirectional Links - Link consecutive versions chronologically
+        Step 3: Set Latest Version Pointers - All non-latest versions point to final version
 
         Result:
         Files can be navigated like: v1 → v2 → v3 via next_version pointers
@@ -74,10 +78,30 @@ class FileChainBuilder:
                 file_current = all_files[checksum_current]
                 file_next = all_files[checksum_next]
 
+                # VALIDATION: Ensure identical filenames
+                if file_current.filename != file_next.filename:
+                    logger.warning(
+                        f"Version chain mismatch: '{file_current.filename}' → '{file_next.filename}' "
+                        f"(checksums: {checksum_current} → {checksum_next})"
+                    )
+                    continue  # Skip invalid links
+
                 # Set object references for metadata model navigation
                 file_current.next_version = file_next
                 file_next.previous_version = file_current
 
-                # NEW: Also set checksum references for FDO creation
+                # Set checksum references for FDO creation
                 file_current.next_version_checksum = file_next.checksum
                 file_next.previous_version_checksum = file_current.checksum
+
+        # Step 3: Set latest_version_checksum for all non-final versions
+        for occurrences in filename_history.values():
+            if len(occurrences) <= 1:
+                continue
+
+            sorted_occurrences = sorted(occurrences, key=lambda x: x[0])
+            latest_checksum = sorted_occurrences[-1][1]  # Last version in chain
+
+            # Set latest on all previous versions (skip the last one)
+            for _, checksum in sorted_occurrences[:-1]:
+                all_files[checksum].latest_version_checksum = latest_checksum
