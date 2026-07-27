@@ -122,7 +122,31 @@ class FileLoader:
 
             filename = name_attrs[0]
 
-            # Skip non-LIS files (JSON translations, etc.)
+            # Extract download URL from dataObjectLocation attribute
+            url_attrs = [
+                attr["value"]
+                for attr in record_dict["record"]
+                if attr["key"] == "21.T11969/479febb2bbe8400da547"
+            ]
+            download_url = url_attrs[0] if url_attrs else None
+
+            # Check for translated JSON files: <projectID>_<testID>-MD-TR.translated.json
+            json_match = re.match(
+                r"(Vh\d+)_(C-\d+)-MD-TR\.translated\.json", filename, re.IGNORECASE
+            )
+            if json_match:
+                project_id = json_match.group(1)
+                test_num = json_match.group(2)
+                test_id = f"{project_id}_{test_num}"
+
+                if test_id in self._file_collections:
+                    self._file_collections[test_id].translated_json_checksum = record_id
+                    if download_url:
+                        self._file_urls[record_id] = download_url
+                    logger.debug(f"Found translated JSON {filename} for test {test_id}")
+                continue
+
+            # Skip non-LIS files (except translated JSON which we just handled)
             if not filename.lower().endswith(".lis"):
                 continue
 
