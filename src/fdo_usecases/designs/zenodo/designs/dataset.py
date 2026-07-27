@@ -114,9 +114,11 @@ class ZenodoDatasetDesign(RecordDesign):
             logger.debug(f"Adding {len(creator_ror_ids)} ROR IDs")
             record.addAttribute(INFOTYPES["creatorAffiliation"], creator_ror_ids)  # type: ignore[arg-type]
 
-        # Keywords
+        # Keywords - multiple useful keywords for discoverability
+        keywords = ["dataset", "zenodo", "research data"]
         if data.keywords:
-            record.addAttribute(INFOTYPES["keyword"], data.keywords)  # type: ignore[arg-type]
+            keywords.extend(data.keywords)
+        record.addAttribute(INFOTYPES["keyword"], keywords)  # type: ignore[arg-type]
 
         # Versionable profile attributes
         record.addAttribute(INFOTYPES["version"], data.version_label)

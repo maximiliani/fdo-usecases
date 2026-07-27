@@ -301,9 +301,6 @@ class ReferenceProcessor:
 
             from fdo_usecases.designs.zenodo.constants import INFOTYPES
 
-            #: Use composite namedReference with relationshipPredicate and target
-            #: This allows storing any DataCite relation type without needing separate InfoTypes
-
             #: Resolve concept DOI to version DOI if needed
             #: Zenodo related identifiers often use concept DOIs, but we create FDOs for version DOIs
             target_doi = referenced_doi
@@ -323,6 +320,21 @@ class ReferenceProcessor:
                 )
                 return
 
+            #: Add simple references/isReferencedBy links for bidirectional navigation
+            #: These are easier to query than namedReference composite types
+            references_pid = INFOTYPES.get("references")
+            is_referenced_by_pid = INFOTYPES.get("isReferencedBy")
+
+            if references_pid:
+                referencing_record.addAttribute(references_pid, target_doi)
+                logger.info(
+                    f"Added references link: {actual_referencing_doi} -> {target_doi}"
+                )
+
+            # NOTE: Backreference will be added AFTER recursive processing completes
+            # to ensure target dataset exists in graph
+
+            #: Also keep namedReference for compatibility
             named_ref_pid = INFOTYPES.get("namedReference")
             if named_ref_pid:
                 try:
@@ -373,9 +385,6 @@ class ReferenceProcessor:
             referencing_dataset_doi
         )
 
-        # Backward link will be inferred by Executor from backlink rules
-        # No need to explicitly add it
-
         # Recursively process referenced dataset's references
         if referenced_dataset.related_identifiers:
             await self.process_all(
@@ -383,6 +392,29 @@ class ReferenceProcessor:
                 referenced_doi,
                 referenced_concept_doi,
                 depth,
+            )
+
+        # AFTER recursive processing: Ensure bidirectional links exist
+        # At this point, both datasets should exist in graph
+        if target_doi in self.orchestrator._record_graph:
+            target_record = self.orchestrator._record_graph[target_doi]
+            if is_referenced_by_pid:
+                # Check if backlink already exists to avoid duplicates
+                existing_backlinks = [
+                    attr[1]
+                    for attr in target_record._tuples
+                    if attr[0] == is_referenced_by_pid
+                ]
+                if actual_referencing_doi not in existing_backlinks:
+                    target_record.addAttribute(
+                        is_referenced_by_pid, actual_referencing_doi
+                    )
+                    logger.info(
+                        f"Added isReferencedBy backlink: {target_doi} <- {actual_referencing_doi}"
+                    )
+        else:
+            logger.warning(
+                f"Target dataset {target_doi} not found in graph after recursive processing"
             )
 
 
