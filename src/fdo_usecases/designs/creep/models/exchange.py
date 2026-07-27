@@ -46,6 +46,9 @@ class CreepExperimentData:
     keywords: list[str] = field(default_factory=list)
     referenced_files: list[str] = field(default_factory=list)
     standalone_metadata_files: list[str] = field(default_factory=list)
+    dataset_dois: list[str] = field(
+        default_factory=list
+    )  # NEW: Datasets containing this experiment's files
 
 
 @dataclass

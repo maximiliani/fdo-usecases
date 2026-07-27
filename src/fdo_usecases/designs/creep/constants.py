@@ -32,6 +32,7 @@ INFOTYPES = {
     # Relationships
     "hasData": "21.T11969/cc230f978e8add2e2520",
     "hasMetadata": "21.T11969/d0773859091aeb451528",
+    "hasPart": "21.T11969/39c056d0cc63e2d0ff17",  # NEW: For dataset→experiment links
     "usesMaterial": "21.T11969/2dced98076fda9cbf0ef",
     "isPartOf": "21.T11969/30f4a1f8aacab81faf38",
     "isReferencedBy": "21.T11969/e5945ef3ff07f314a146",
@@ -52,3 +53,7 @@ BACKLINK_MATERIAL_FILE_CHEMICAL = ("hasChemicalComposition", "isReferencedBy")
 BACKLINK_MATERIAL_FILE_HEAT = ("hasHeatTreatment", "isReferencedBy")
 BACKLINK_EXPERIMENT_REFERENCES_FILE = ("references", "isReferencedBy")
 BACKLINK_MATERIAL_REFERENCES_FILE = ("references", "isReferencedBy")
+BACKLINK_DATASET_EXPERIMENT = (
+    "hasPart",
+    "isPartOf",
+)  # NEW: Dataset↔Experiment bidirectional

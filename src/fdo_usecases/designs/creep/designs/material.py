@@ -98,17 +98,25 @@ class MaterialDesign(RecordDesign):
 
         # Creators (combined from Dataset)
         if data.creators:
-            record.addAttribute(INFOTYPES["creator"], data.creators)
+            record.addAttribute(INFOTYPES["creator"], data.creators)  # type: ignore[arg-type]
 
         # Creator affiliations (combined from Dataset)
         if data.creator_affiliations:
             record.addAttribute(
-                INFOTYPES["creatorAffiliation"], data.creator_affiliations
+                INFOTYPES["creatorAffiliation"],
+                data.creator_affiliations,  # type: ignore[arg-type]
             )
 
-        # Keywords
+        # Keywords - multiple useful keywords for discoverability
+        keywords: list[str] = [
+            "material",
+            "specimen",
+            "alloy",
+            data.material_id.lower().replace(" ", "-"),
+        ]
         if data.keywords:
-            record.addAttribute(INFOTYPES["keyword"], data.keywords)
+            keywords.extend(data.keywords)
+        record.addAttribute(INFOTYPES["keyword"], keywords)  # type: ignore[arg-type]
 
         # Backlinks for inference
         self.addBacklink(*BACKLINK_MATERIAL_EXPERIMENT)

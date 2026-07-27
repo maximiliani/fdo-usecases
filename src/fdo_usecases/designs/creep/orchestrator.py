@@ -6,7 +6,7 @@
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import TYPE_CHECKING, Optional
 
 from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign
@@ -196,23 +196,43 @@ class CreepFDOOrchestrator(RecordDesign):
         for test_id, metadata in test_metadata_map.items():
             collection = file_collections[test_id]
 
-            # Calculate ISO 8601 duration (default PT0S if invalid)
-            try:
-                start = datetime.fromisoformat(
-                    metadata.date_test_start.replace(" ", "T")
-                )
-                end = datetime.fromisoformat(metadata.date_test_end.replace(" ", "T"))
-                duration_td = end - start
-                duration_iso = _timedelta_to_iso8601(duration_td)
-            except (ValueError, TypeError):
-                duration_iso = "PT0S"
+            # Use parsed test duration from .LIS file (ISO 8601)
+            duration_iso = metadata.test_duration
+            if duration_iso == "PT0S":
                 logger.warning(
-                    f"Invalid dates for {test_id}, using default duration PT0S"
+                    f"{test_id}: No test duration found in .LIS file, using PT0S"
                 )
+            else:
+                logger.debug(f"{test_id}: Duration → {duration_iso}")
 
             # Extract keywords from LIS
             lis_keywords = lis_parser.extract_keywords(metadata)
             keywords = lis_keywords if lis_keywords else dataset_keywords
+
+            # Build list of all files for this experiment (including translated JSON)
+            all_experiment_files = [
+                collection.md_tr_checksum,
+                collection.creep_checksum,
+                collection.loading_checksum,
+            ]
+            if collection.translated_json_checksum:
+                all_experiment_files.append(collection.translated_json_checksum)
+            all_experiment_files.extend(collection.standalone_lis_files)
+
+            # Find which datasets contain these experiment files
+            dataset_dois_for_test = set()
+            for doi, dataset_record in self._record_graph.items():
+                if "zenodo" not in doi:
+                    continue
+                dataset_has_parts = [
+                    a[1]
+                    for a in dataset_record._tuples
+                    if a[0] == INFOTYPES.get("hasPart", "")
+                ]
+                if any(
+                    checksum in dataset_has_parts for checksum in all_experiment_files
+                ):
+                    dataset_dois_for_test.add(doi)
 
             # Resolve file references
             referenced_files = []
@@ -236,11 +256,7 @@ class CreepFDOOrchestrator(RecordDesign):
                     "project": metadata.project,
                     "testID": test_id,
                 },
-                has_data=[
-                    collection.md_tr_checksum,
-                    collection.creep_checksum,
-                    collection.loading_checksum,
-                ],
+                has_data=all_experiment_files,
                 has_metadata=[
                     complementary_files.data_acquisition,
                     complementary_files.primary_processed_data,
@@ -251,10 +267,14 @@ class CreepFDOOrchestrator(RecordDesign):
                 keywords=keywords,
                 referenced_files=referenced_files,
                 standalone_metadata_files=collection.standalone_lis_files,
+                dataset_dois=list(dataset_dois_for_test),  # NEW
             )
             experiment_tasks.append(self.experiment_design.create_fdo(experiment_data))
 
         await asyncio.gather(*experiment_tasks)
+
+        # Add hasPart backreferences to datasets
+        self._add_dataset_experiment_links()
 
         logger.info("Creep FDO creation completed")
 
@@ -286,6 +306,35 @@ class CreepFDOOrchestrator(RecordDesign):
             f"File reference '{filename}' not found in graph (context: {context})"
         )
         return None
+
+    def _add_dataset_experiment_links(self) -> None:
+        """Add hasPart backreferences from datasets to experiments."""
+        logger.info("Adding hasPart backreferences to datasets...")
+        count = 0
+
+        for experiment_id, experiment_record in self._record_graph.items():
+            # Check if this is an experiment (has testID attribute)
+            test_id_attr = [
+                a for a in experiment_record._tuples if a[0] == INFOTYPES.get("testID")
+            ]
+            if not test_id_attr:
+                continue
+
+            # Get dataset_dois from experiment's isPartOf attributes
+            dataset_dois = [
+                a[1]
+                for a in experiment_record._tuples
+                if a[0] == INFOTYPES.get("isPartOf")
+            ]
+
+            # Add hasPart to each dataset
+            for dataset_doi in dataset_dois:
+                if dataset_doi in self._record_graph:
+                    dataset_record = self._record_graph[dataset_doi]
+                    dataset_record.addAttribute(INFOTYPES["hasPart"], experiment_id)
+                    count += 1
+
+        logger.info(f"Added {count} hasPart backreferences to datasets")
 
     def _apply_inference_rules(self) -> None:
         """Apply backlink inference to establish bidirectional links.

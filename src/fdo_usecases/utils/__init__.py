@@ -4,6 +4,7 @@
 
 """Shared utilities for FDO use cases package."""
 
+from .duration import to_iso8601_duration, to_timedelta
 from .logging_config import ColoredFormatter, setup_logging
 from .orcid_utils import normalize_orcid
 from .text_utils import strip_html_and_truncate
@@ -13,4 +14,6 @@ __all__ = [
     "ColoredFormatter",
     "normalize_orcid",
     "strip_html_and_truncate",
+    "to_iso8601_duration",
+    "to_timedelta",
 ]

@@ -33,6 +33,7 @@ import re
 from datetime import datetime
 from typing import Optional
 
+from ...utils.duration import to_iso8601_duration
 from .models import ParsedTestMetadata
 
 logger = logging.getLogger(__name__)
@@ -145,6 +146,7 @@ class LISContentParser:
             "material_id": "",
             "single_crystal_orientation": 0.0,
             "percentage_creep_extension": 0.0,
+            "test_duration": "PT0S",
             "manufacturing_as_manufactured": None,
             "manufacturing_as_tested": None,
             "file_references": [],
@@ -160,6 +162,7 @@ class LISContentParser:
 
             categorization = cols[0].strip()
             entry = cols[1].strip()
+            unit = cols[4].strip()
             # Strip whitespace including Windows line endings (\r\n)
             information = cols[6].strip().rstrip("\r\n")
 
@@ -260,6 +263,20 @@ class LISContentParser:
                         "Manufacturing process description as-tested material" in entry
                     ):
                         metadata["manufacturing_as_tested"] = information
+                elif (
+                    "Primary data --> Test result --> Values recorded during test run"
+                    in categorization
+                ):
+                    if "Test duration" in entry:
+                        try:
+                            metadata["test_duration"] = to_iso8601_duration(
+                                float(information), unit
+                            )
+                        except ValueError as e:
+                            parse_errors.append(
+                                f"Line {line_num}: Invalid test duration "
+                                f"{information!r} {unit!r}: {e}"
+                            )
 
                 # Extract file references from any field
                 file_refs = self.FILE_REF_PATTERN.findall(information)

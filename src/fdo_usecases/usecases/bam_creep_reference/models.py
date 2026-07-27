@@ -42,6 +42,7 @@ class LISFileCollection:
         creep_checksum: Checksum for Creep file (Vh5205_C-XX-Creep.LIS)
         loading_checksum: Checksum for Loading file (Vh5205_C-XX-Loading.LIS)
         standalone_lis_files: List of checksums for standalone metadata files
+        translated_json_checksum: Checksum for MD-TR.translated.json file (optional)
 
     """
 
@@ -50,6 +51,9 @@ class LISFileCollection:
     creep_checksum: str
     loading_checksum: str
     standalone_lis_files: list[str] = field(default_factory=list)
+    translated_json_checksum: str | None = (
+        None  # NEW: For <projectID>_<testID>-MD-TR.translated.json
+    )
 
 
 @dataclass
@@ -142,6 +146,9 @@ class ParsedTestMetadata:
     material_id: str
     single_crystal_orientation: float
     percentage_creep_extension: float = 0.0
+    test_duration: str = (
+        "PT0S"  # ISO 8601 duration parsed from "Test duration" field in .LIS
+    )
     manufacturing_as_manufactured: Optional[str] = None
     manufacturing_as_tested: Optional[str] = None
     file_references: list[str] = field(default_factory=list)

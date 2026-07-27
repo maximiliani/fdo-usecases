@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign
 
 from ..constants import (
+    BACKLINK_DATASET_EXPERIMENT,
     BACKLINK_EXPERIMENT_FILE,
     BACKLINK_EXPERIMENT_REFERENCES_FILE,
     BACKLINK_MATERIAL_EXPERIMENT,
@@ -125,22 +126,37 @@ class CreepExperimentDesign(RecordDesign):
 
         # Creators (combined from Dataset)
         if data.creators:
-            record.addAttribute(INFOTYPES["creator"], data.creators)
+            record.addAttribute(INFOTYPES["creator"], data.creators)  # type: ignore[arg-type]
 
         # Creator affiliations (combined from Dataset)
         if data.creator_affiliations:
             record.addAttribute(
-                INFOTYPES["creatorAffiliation"], data.creator_affiliations
+                INFOTYPES["creatorAffiliation"],
+                data.creator_affiliations,  # type: ignore[arg-type]
             )
 
-        # Keywords
+        # Keywords - multiple useful keywords for discoverability
+        keywords: list[str] = [
+            "experiment",
+            "creep test",
+            "materials testing",
+            "high-temperature",
+        ]
         if data.keywords:
-            record.addAttribute(INFOTYPES["keyword"], data.keywords)
+            keywords.extend(data.keywords)
+        record.addAttribute(INFOTYPES["keyword"], keywords)  # type: ignore[arg-type]
+
+        # Link to datasets containing this experiment's files (isPartOf)
+        for dataset_doi in data.dataset_dois:
+            record.addAttribute(INFOTYPES["isPartOf"], dataset_doi)
 
         # Backlinks for inference
         self.addBacklink(*BACKLINK_EXPERIMENT_FILE)
         self.addBacklink(*BACKLINK_MATERIAL_EXPERIMENT)
         self.addBacklink(*BACKLINK_EXPERIMENT_REFERENCES_FILE)
+        self.addBacklink(
+            *BACKLINK_DATASET_EXPERIMENT
+        )  # NEW: For dataset↔experiment bidirectional
 
         # Store in graph
         self._local_records[data.test_id] = record
