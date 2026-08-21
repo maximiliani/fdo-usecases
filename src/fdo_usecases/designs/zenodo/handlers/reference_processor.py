@@ -221,8 +221,12 @@ class ReferenceProcessor:
         are already handled by the Versionable profile.
 
         Creates two types of links:
-        - Forward link (immediate): references attribute on source dataset
+        - Forward link (immediate): references attribute on the specific version DOI
         - Backward link (deferred): isReferencedBy attribute on target dataset
+
+        The forward link is created on the specific version DOI that contains the
+        related identifier in its metadata (referencing_dataset_doi), NOT on the
+        resolved latest version. This preserves version-specific relationship info.
 
         Backlinks are created AFTER all recursive processing completes to ensure both
         datasets exist in the graph. This prevents race conditions where the target
@@ -230,7 +234,7 @@ class ReferenceProcessor:
 
         Args:
             identifier: Related identifier pointing to referenced dataset
-            referencing_dataset_doi: DOI of dataset making the reference
+            referencing_dataset_doi: DOI of dataset making the reference (version-specific)
             referencing_concept_doi: Concept DOI of referencing dataset
             depth: Current recursion depth
 
@@ -261,45 +265,26 @@ class ReferenceProcessor:
                 f"Cycle detected! Skipping recursive fetch for: {referenced_doi}"
             )
 
-        # Get the dataset metadata for DOI resolution (needed for version DOI mapping)
-        # Try to fetch even if cycle was detected - we need concept DOI for cross-dataset check
+        # Get the dataset metadata for DOI resolution (from cache - no re-fetching)
         referenced_dataset = None
         try:
             referenced_dataset = await self.orchestrator._fetch_metadata(referenced_doi)
         except Exception as e:
             logger.warning(f"Failed to fetch metadata for {referenced_doi}: {e}")
-            # Don't return here - still create forward reference and register backlink
-            # Use referenced_doi directly as target if metadata unavailable
 
-        # Create forward reference link immediately
-        # Resolve referencing DOI to version DOI if it's a concept DOI
-        # Use the referencing dataset's OWN metadata, NOT the referenced dataset's
+        # Use the specific version DOI as the source of the forward link.
+        # This is the version that contains the related identifier in its metadata.
         actual_referencing_doi = referencing_dataset_doi
-        try:
-            referencing_metadata = await self.orchestrator._fetch_metadata(
-                referencing_dataset_doi
-            )
-            if hasattr(referencing_metadata, "latest_version_doi"):
-                actual_referencing_doi = referencing_metadata.latest_version_doi
-                logger.debug(
-                    f"Resolved referencing DOI {referencing_dataset_doi} to version {actual_referencing_doi}"
-                )
-        except Exception as e:
-            logger.warning(
-                f"Failed to resolve referencing DOI {referencing_dataset_doi}: {e}"
-            )
 
-        referencing_record = self.orchestrator._record_graph.get(actual_referencing_doi)
-
-        # Resolve concept DOI to version DOI if needed
-        # Zenodo related identifiers often use concept DOIs, but we create FDOs for version DOIs
-        # This must happen BEFORE checking for self-references
+        # Resolve target DOI: prefer the specific version DOI from the related
+        # identifier. If it's a concept DOI (not in graph), resolve to latest version.
         target_doi = referenced_doi
         if referenced_dataset and hasattr(referenced_dataset, "latest_version_doi"):
-            target_doi = referenced_dataset.latest_version_doi
-            logger.debug(
-                f"Resolved concept DOI {referenced_doi} to version DOI {target_doi}"
-            )
+            if referenced_doi not in self.orchestrator._record_graph:
+                target_doi = referenced_dataset.latest_version_doi
+                logger.debug(
+                    f"Resolved concept DOI {referenced_doi} to version DOI {target_doi}"
+                )
 
         # Skip self-references
         if actual_referencing_doi == target_doi:
@@ -309,34 +294,43 @@ class ReferenceProcessor:
             )
             return
 
-        # Create forward reference link
+        # Create forward reference link on the specific version DOI
+        referencing_record = self.orchestrator._record_graph.get(actual_referencing_doi)
+
         if referencing_record:
             from fdo_usecases.designs.zenodo.constants import INFOTYPES
 
             references_pid = INFOTYPES.get("references")
             if references_pid:
-                referencing_record.addAttribute(references_pid, target_doi)
-                logger.info(
-                    f"Added references link: {actual_referencing_doi} -> {target_doi}"
-                )
+                # Check for duplicate forward link before adding
+                existing_refs = [
+                    attr[1]
+                    for attr in referencing_record._tuples
+                    if attr[0] == references_pid
+                ]
+                if target_doi not in existing_refs:
+                    referencing_record.addAttribute(references_pid, target_doi)
+                    logger.info(
+                        f"Added references link: {actual_referencing_doi} -> {target_doi}"
+                    )
+                else:
+                    logger.debug(
+                        f"References link already exists: {actual_referencing_doi} -> {target_doi}"
+                    )
         else:
             logger.warning(
                 f"Referencing record not found for {actual_referencing_doi}, cannot add references link"
             )
 
         # Get concept DOI of referenced dataset to confirm it's cross-dataset
-        # If cycle was detected or metadata unavailable, use fallback logic
         referenced_concept_doi = None
 
         if referenced_dataset is None:
             # Cycle detected or fetch failed - still create backlink
-            # For cycle-detected cases, assume it's cross-dataset (different from current)
-            # since we wouldn't have a circular reference within same concept
             logger.info(
                 f"Registering backlink despite cycle detection or missing metadata: "
                 f"{target_doi} <- {actual_referencing_doi}"
             )
-            # Use target_doi as-is (may be concept DOI if metadata unavailable)
             self.orchestrator._backlink_manager.add_pending_backlink(
                 target_doi=target_doi,
                 referencing_doi=actual_referencing_doi,
@@ -345,15 +339,14 @@ class ReferenceProcessor:
 
         referenced_concept_doi = referenced_dataset.concept_doi
 
-        # Only establish cross-reference if different concept DOIs
+        # Only establish cross-reference backlink if different concept DOIs
         if referenced_concept_doi == referencing_concept_doi:
             logger.debug(
-                f"Skipping version chain reference: same concept DOI ({referenced_concept_doi}) - handled by Versionable profile"
+                f"Skipping backlink for version chain reference: same concept DOI ({referenced_concept_doi}) - handled by Versionable profile"
             )
             return
 
         # Register backlink for deferred creation
-        # Both datasets will exist when backlinks are flushed after all processing completes
         self.orchestrator._backlink_manager.add_pending_backlink(
             target_doi=target_doi,
             referencing_doi=actual_referencing_doi,
@@ -361,15 +354,6 @@ class ReferenceProcessor:
         logger.debug(
             f"Registered pending backlink: {target_doi} <- {actual_referencing_doi}"
         )
-
-        # Recursively process referenced dataset's references
-        if referenced_dataset.related_identifiers:
-            await self.process_all(
-                referenced_dataset.related_identifiers,
-                referenced_doi,
-                referenced_concept_doi,
-                depth,
-            )
 
 
 __all__ = [

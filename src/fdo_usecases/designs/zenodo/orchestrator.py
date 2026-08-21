@@ -147,6 +147,7 @@ class ZenodoFDODesign(RecordDesign):
         )  # Currently being processed (cycle detection)
         self._record_graph: dict[str, PidRecord] = {}
         self._backlink_manager = BacklinkManager(self._record_graph)
+        self._metadata_cache: dict[str, Dataset] = {}  # Cache fetched Dataset objects
         self._is_nested_execution = (
             False  # True when called via _process_zenodo_reference
         )
@@ -178,6 +179,9 @@ class ZenodoFDODesign(RecordDesign):
     async def _fetch_metadata(self, doi: str) -> Dataset:
         """Fetch Zenodo metadata for a specific DOI.
 
+        Uses an in-memory cache to avoid rebuilding Dataset objects
+        that have already been fetched during this session.
+
         Args:
             doi: DOI to fetch metadata for
 
@@ -185,9 +189,14 @@ class ZenodoFDODesign(RecordDesign):
             Complete Dataset object with all versions and files
 
         """
+        if doi in self._metadata_cache:
+            logger.debug(f"Metadata cache hit for DOI: {doi}")
+            return self._metadata_cache[doi]
+
         logger.info(f"Fetching metadata for DOI: {doi}")
         fetcher = ZenodoDatasetFetcher(cache_enabled=True)
         dataset = await fetcher.fetch_by_doi(doi)
+        self._metadata_cache[doi] = dataset
         logger.info(
             f"Fetched {len(dataset.versions)} versions "
             f"with {len(dataset.all_files)} unique files"
@@ -300,9 +309,9 @@ class ZenodoFDODesign(RecordDesign):
         """
         logger.info(f"Processing nested Zenodo reference: {doi}")
 
-        # Skip if already fully processed
-        if doi in self._processed_datasets and doi not in self._processing_datasets:
-            logger.debug(f"Nested reference already processed: {doi}")
+        # Skip if already fully processed or currently being processed
+        if doi in self._processed_datasets or doi in self._processing_datasets:
+            logger.debug(f"Nested reference already processed or processing: {doi}")
             return
 
         nested_design = ZenodoFDODesign(dois=doi, max_concurrent=self._max_concurrent)
@@ -314,6 +323,9 @@ class ZenodoFDODesign(RecordDesign):
         nested_design._backlink_manager = (
             self._backlink_manager
         )  # Share same backlink manager
+        nested_design._metadata_cache = (
+            self._metadata_cache
+        )  # Share metadata cache to avoid re-fetching
         nested_design._is_nested_execution = (
             True  # Mark as nested - don't flush backlinks yet
         )
@@ -383,6 +395,11 @@ class ZenodoFDODesign(RecordDesign):
     async def _process_doi(self, doi: str, depth: int = 0) -> None:
         """Process a single DOI.
 
+        Tracks both version DOIs and concept DOIs to avoid duplicate FDO
+        creation. When a concept is already processed, FDO creation is
+        skipped but the specific version's related identifiers are still
+        processed (different versions may have different references).
+
         Args:
             doi: Digital Object Identifier to process
             depth: Current recursion depth (for reference processing)
@@ -401,30 +418,60 @@ class ZenodoFDODesign(RecordDesign):
             return
 
         # Mark as currently being processed (cycle detection)
-        # Note: Don't add to _processed_datasets yet - that happens after FDO creation completes
         self._processing_datasets.add(doi)
         logger.info(f"Starting FDO creation for DOI: {doi}")
 
         dataset = await self._fetch_metadata(doi)
 
-        dataset_datas, file_datas = self._transform_to_exchange_models(dataset)
-
-        logger.info(f"Creating {len(dataset_datas)} Dataset FDOs")
-        await asyncio.gather(
-            *[self.dataset_design.create_fdo(data) for data in dataset_datas]
+        # Check if concept is already processed or being processed.
+        # If so, skip FDO creation (all versions already have FDOs)
+        # but still process this version's related identifiers.
+        # Exclude the current DOI from the check: when doi == concept_doi,
+        # the concept was just added to _processing_datasets above and should
+        # not count as "already processed" for this call.
+        concept_already_processed = dataset.concept_doi in self._processed_datasets or (
+            dataset.concept_doi in self._processing_datasets
+            and dataset.concept_doi != doi
         )
 
-        logger.info(f"Creating {len(file_datas)} File FDOs")
-        await asyncio.gather(
-            *[self.file_design.create_fdo(data) for data in file_datas]
-        )
+        concept_owned_by_us = False
 
-        # Process references with context of which dataset is referencing them
-        # Pass concept DOI to detect cross-dataset references
-        # Keep in _processing_datasets until after links are added
+        if not concept_already_processed:
+            # Mark concept as being processed by this call
+            self._processing_datasets.add(dataset.concept_doi)
+            concept_owned_by_us = True
+
+            dataset_datas, file_datas = self._transform_to_exchange_models(dataset)
+
+            logger.info(f"Creating {len(dataset_datas)} Dataset FDOs")
+            await asyncio.gather(
+                *[self.dataset_design.create_fdo(data) for data in dataset_datas]
+            )
+
+            logger.info(f"Creating {len(file_datas)} File FDOs")
+            await asyncio.gather(
+                *[self.file_design.create_fdo(data) for data in file_datas]
+            )
+        else:
+            logger.info(
+                f"Concept {dataset.concept_doi} already processed, "
+                f"skipping FDO creation for {doi}"
+            )
+
+        # Always process references - different versions may have different
+        # related identifiers that need to be handled.
+        # If doi is a concept DOI (not in graph as a version), use the latest
+        # version DOI as the referencing DOI so forward links can be created.
+        referencing_doi = doi
+        if doi not in self._record_graph:
+            referencing_doi = dataset.latest_version_doi
+            logger.debug(
+                f"DOI {doi} not in graph, using latest version {referencing_doi} for references"
+            )
+
         await self.reference_processor.process_all(
             dataset.related_identifiers,
-            doi,
+            referencing_doi,
             dataset.concept_doi,
             depth,
         )
@@ -432,6 +479,10 @@ class ZenodoFDODesign(RecordDesign):
         # Mark as fully processed - remove from processing set and add to processed set
         self._processing_datasets.discard(doi)
         self._processed_datasets.add(doi)
+
+        if concept_owned_by_us:
+            self._processing_datasets.discard(dataset.concept_doi)
+            self._processed_datasets.add(dataset.concept_doi)
 
         logger.info(f"Completed FDO creation for DOI: {doi}")
 

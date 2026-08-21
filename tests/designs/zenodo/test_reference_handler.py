@@ -49,7 +49,9 @@ def mock_orchestrator():
 
     mock = MagicMock()
     mock._processed_datasets = set()
+    mock._processing_datasets = set()
     mock._process_zenodo_reference = AsyncMock()
+    mock._fetch_metadata = AsyncMock(return_value=None)
     mock._reference_recursion_depth = 3
     mock._record_graph = {}
     mock._backlink_manager = BacklinkManager(mock._record_graph)

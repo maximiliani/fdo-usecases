@@ -4,7 +4,7 @@
 
 """Unit tests for BacklinkManager and cross-dataset reference handling."""
 
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -325,6 +325,8 @@ class TestReferenceProcessorRefactored:
         orchestrator = MagicMock()
         orchestrator._record_graph = {}
         orchestrator._processed_datasets = set()
+        orchestrator._processing_datasets = set()
+        orchestrator._fetch_metadata = AsyncMock(return_value=None)
         orchestrator._reference_recursion_depth = 3
         orchestrator._backlink_manager = MagicMock()
         orchestrator._backlink_manager.add_pending_backlink = MagicMock()
