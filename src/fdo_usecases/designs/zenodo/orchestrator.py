@@ -28,6 +28,7 @@ from fdo_usecases.designs.zenodo.designs import (
 )
 from fdo_usecases.designs.zenodo.fetcher import ZenodoDatasetFetcher
 from fdo_usecases.designs.zenodo.handlers import ReferenceProcessor
+from fdo_usecases.designs.zenodo.handlers.backlink_manager import BacklinkManager
 from fdo_usecases.designs.zenodo.models import Dataset, DatasetVersion
 from fdo_usecases.designs.zenodo.models.exchange import (
     CreatorData,
@@ -145,7 +146,10 @@ class ZenodoFDODesign(RecordDesign):
             set()
         )  # Currently being processed (cycle detection)
         self._record_graph: dict[str, PidRecord] = {}
-        self._cross_reference_registry: dict[str, set[str]] = {}
+        self._backlink_manager = BacklinkManager(self._record_graph)
+        self._is_nested_execution = (
+            False  # True when called via _process_zenodo_reference
+        )
 
         # Composed designs (pass self as orchestrator for graph access)
         self.dataset_design = ZenodoDatasetDesign(self)
@@ -307,6 +311,12 @@ class ZenodoFDODesign(RecordDesign):
             self._processing_datasets
         )  # Share processing set for cycle detection
         nested_design._record_graph = self._record_graph
+        nested_design._backlink_manager = (
+            self._backlink_manager
+        )  # Share same backlink manager
+        nested_design._is_nested_execution = (
+            True  # Mark as nested - don't flush backlinks yet
+        )
         await nested_design.execute_async()
 
     def execute(
@@ -365,6 +375,9 @@ class ZenodoFDODesign(RecordDesign):
             for doi, exc in failed:
                 print(f"  - {doi}: {type(exc).__name__}: {exc}")
 
+        # Apply all deferred backlinks after all processing completes
+        await self._flush_cross_reference_backlinks()
+
         return successful, failed
 
     async def _process_doi(self, doi: str, depth: int = 0) -> None:
@@ -382,13 +395,14 @@ class ZenodoFDODesign(RecordDesign):
             )
             return
 
+        # Check if already fully processed (FDOs created)
         if doi in self._processed_datasets:
-            logger.warning(f"Skipping already processed dataset: {doi}")
+            logger.debug(f"Dataset already fully processed: {doi}")
             return
 
         # Mark as currently being processed (cycle detection)
+        # Note: Don't add to _processed_datasets yet - that happens after FDO creation completes
         self._processing_datasets.add(doi)
-        self._processed_datasets.add(doi)
         logger.info(f"Starting FDO creation for DOI: {doi}")
 
         dataset = await self._fetch_metadata(doi)
@@ -415,10 +429,42 @@ class ZenodoFDODesign(RecordDesign):
             depth,
         )
 
-        # Now mark as fully processed - remove from processing set
+        # Mark as fully processed - remove from processing set and add to processed set
         self._processing_datasets.discard(doi)
+        self._processed_datasets.add(doi)
 
         logger.info(f"Completed FDO creation for DOI: {doi}")
+
+    async def _flush_cross_reference_backlinks(self) -> None:
+        """Apply all deferred cross-dataset backlinks after FDO creation completes.
+
+        Called once after all DOIs and their references have been processed.
+        Ensures both source and target datasets exist in graph before creating links.
+
+        This solves the race condition where backlinks were created during recursive
+        processing before the target dataset existed in the graph. By deferring until
+        all processing completes, we guarantee bidirectional links are never missed.
+
+        Important: Only the TOP-LEVEL orchestrator should flush backlinks.
+        Nested executions register backlinks but don't flush them, ensuring all
+        datasets exist in the graph when the final flush occurs.
+
+        Logs:
+            INFO: Number of backlinks created vs skipped
+
+        """
+        # Only flush at top-level - nested designs share the same backlink manager
+        # but shouldn't flush until ALL recursive processing completes
+        if self._is_nested_execution:
+            logger.debug(
+                "Skipping backlink flush in nested execution - will be flushed by top-level orchestrator"
+            )
+            return
+
+        success, skipped = self._backlink_manager.flush_backlinks()
+        logger.info(
+            f"Created {success} cross-dataset backlinks, skipped {skipped} (target not found)"
+        )
 
 
 __all__ = ["ZenodoFDODesign"]

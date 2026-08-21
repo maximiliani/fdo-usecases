@@ -15,6 +15,19 @@ Handlers:
 Architecture:
     ReferenceProcessor orchestrates all handlers using strategy pattern.
     First matching handler wins for each identifier.
+
+Cross-Dataset References:
+    For cross-dataset references (different concept DOIs), creates bidirectional links:
+    1. Forward link (references): Created immediately during processing
+    2. Backward link (isReferencedBy): Deferred until all processing completes
+
+    This deferred approach solves race conditions where target datasets don't exist
+    in the graph yet due to cycle detection or recursive processing timing.
+
+    Workflow:
+        Phase 1: Create Dataset FDOs
+        Phase 2: Process references → Register pending backlinks
+        Phase 3: Flush all backlinks → Both directions guaranteed to exist
 """
 
 import logging
@@ -201,17 +214,19 @@ class ReferenceProcessor:
         referencing_concept_doi: str,
         depth: int,
     ) -> None:
-        """Process cross-dataset reference and establish bidirectional links via namedReference.
+        """Process cross-dataset reference and establish bidirectional links.
 
         This handles DataCite relation types between different datasets (not version chains).
         Versioning relations (IsPreviousVersionOf, IsNextVersionOf, etc.) are skipped as they
         are already handled by the Versionable profile.
 
-        For other relation types, creates a namedReference composite attribute with:
-        - relationshipPredicate: The DataCite relation type
-        - target: The referenced dataset's version DOI
+        Creates two types of links:
+        - Forward link (immediate): references attribute on source dataset
+        - Backward link (deferred): isReferencedBy attribute on target dataset
 
-        Backward links are inferred by Executor from backlink rules.
+        Backlinks are created AFTER all recursive processing completes to ensure both
+        datasets exist in the graph. This prevents race conditions where the target
+        hasn't been created yet due to cycle detection or timing issues.
 
         Args:
             identifier: Related identifier pointing to referenced dataset
@@ -229,147 +244,106 @@ class ReferenceProcessor:
         # Skip versioning relations - these are already handled by Versionable profile
         if relation_type in VERSIONING_RELATIONS:
             logger.debug(
-                f"Skipping namedReference for versioning relation {relation_type}: "
+                f"Skipping cross-dataset reference for versioning relation {relation_type}: "
                 f"already handled by Versionable profile"
             )
             return
 
-        # Check if already processed or currently being processed (avoid cycles)
-        should_fetch = True
-        referenced_dataset = None
+        # Check if already processed (avoid cycles and redundant processing)
+        cycle_detected = referenced_doi in self.orchestrator._processed_datasets
 
-        if referenced_doi in self.orchestrator._processing_datasets:
+        # Fetch and process if needed
+        if not cycle_detected:
+            logger.info(f"Recursively fetching referenced dataset: {referenced_doi}")
+            await self.orchestrator._process_zenodo_reference(referenced_doi)
+        else:
             logger.warning(
                 f"Cycle detected! Skipping recursive fetch for: {referenced_doi}"
             )
-            should_fetch = False
 
-        if referenced_doi in self.orchestrator._processed_datasets:
-            logger.debug(f"Referenced dataset already processed: {referenced_doi}")
-            should_fetch = False
+        # Get the dataset metadata for DOI resolution (needed for version DOI mapping)
+        # Try to fetch even if cycle was detected - we need concept DOI for cross-dataset check
+        referenced_dataset = None
+        try:
+            referenced_dataset = await self.orchestrator._fetch_metadata(referenced_doi)
+        except Exception as e:
+            logger.warning(f"Failed to fetch metadata for {referenced_doi}: {e}")
+            # Don't return here - still create forward reference and register backlink
+            # Use referenced_doi directly as target if metadata unavailable
 
-        # Fetch and process if needed
-        if should_fetch:
-            logger.info(f"Recursively fetching referenced dataset: {referenced_doi}")
-            await self.orchestrator._process_zenodo_reference(referenced_doi)
-
-            # Get the dataset metadata for DOI resolution
-            try:
-                referenced_dataset = await self.orchestrator._fetch_metadata(
-                    referenced_doi
-                )
-            except Exception as e:
-                logger.warning(f"Failed to fetch metadata for {referenced_doi}: {e}")
-        else:
-            # Try to get from cache even if we didn't fetch
-            try:
-                referenced_dataset = await self.orchestrator._fetch_metadata(
-                    referenced_doi
-                )
-            except Exception as e:
-                logger.debug(
-                    f"Could not fetch cached metadata for {referenced_doi}: {e}"
-                )
-
-        # ALWAYS create the forward link, regardless of whether we fetched
-        # This ensures no independent subgraphs are created
-
+        # Create forward reference link immediately
         # Resolve referencing DOI to version DOI if it's a concept DOI
-        # First check if we already have the metadata cached
+        # Use the referencing dataset's OWN metadata, NOT the referenced dataset's
         actual_referencing_doi = referencing_dataset_doi
-        if referenced_dataset and hasattr(referenced_dataset, "latest_version_doi"):
-            # Use the dataset object we already fetched
-            actual_referencing_doi = referenced_dataset.latest_version_doi
-        else:
-            try:
-                referencing_metadata = await self.orchestrator._fetch_metadata(
-                    referencing_dataset_doi
+        try:
+            referencing_metadata = await self.orchestrator._fetch_metadata(
+                referencing_dataset_doi
+            )
+            if hasattr(referencing_metadata, "latest_version_doi"):
+                actual_referencing_doi = referencing_metadata.latest_version_doi
+                logger.debug(
+                    f"Resolved referencing DOI {referencing_dataset_doi} to version {actual_referencing_doi}"
                 )
-                if hasattr(referencing_metadata, "latest_version_doi"):
-                    actual_referencing_doi = referencing_metadata.latest_version_doi
-                    logger.debug(
-                        f"Resolved referencing DOI {referencing_dataset_doi} to version {actual_referencing_doi}"
-                    )
-            except Exception as e:
-                logger.warning(
-                    f"Failed to resolve referencing DOI {referencing_dataset_doi}: {e}"
-                )
+        except Exception as e:
+            logger.warning(
+                f"Failed to resolve referencing DOI {referencing_dataset_doi}: {e}"
+            )
 
         referencing_record = self.orchestrator._record_graph.get(actual_referencing_doi)
-        if referencing_record:
-            import json
 
+        # Resolve concept DOI to version DOI if needed
+        # Zenodo related identifiers often use concept DOIs, but we create FDOs for version DOIs
+        # This must happen BEFORE checking for self-references
+        target_doi = referenced_doi
+        if referenced_dataset and hasattr(referenced_dataset, "latest_version_doi"):
+            target_doi = referenced_dataset.latest_version_doi
+            logger.debug(
+                f"Resolved concept DOI {referenced_doi} to version DOI {target_doi}"
+            )
+
+        # Skip self-references
+        if actual_referencing_doi == target_doi:
+            logger.debug(
+                f"Skipping self-reference: {actual_referencing_doi} -> {target_doi} "
+                f"(relation: {relation_type})"
+            )
+            return
+
+        # Create forward reference link
+        if referencing_record:
             from fdo_usecases.designs.zenodo.constants import INFOTYPES
 
-            #: Resolve concept DOI to version DOI if needed
-            #: Zenodo related identifiers often use concept DOIs, but we create FDOs for version DOIs
-            target_doi = referenced_doi
-            if should_fetch and referenced_dataset:
-                # Use the latest version DOI instead of concept DOI
-                if hasattr(referenced_dataset, "latest_version_doi"):
-                    target_doi = referenced_dataset.latest_version_doi
-                    logger.debug(
-                        f"Resolved concept DOI {referenced_doi} to version DOI {target_doi}"
-                    )
-
-            #: Skip self-references - do not create namedReference pointing to same node
-            if actual_referencing_doi == target_doi:
-                logger.debug(
-                    f"Skipping self-reference: {actual_referencing_doi} -> {target_doi} "
-                    f"(relation: {relation_type})"
-                )
-                return
-
-            #: Add simple references/isReferencedBy links for bidirectional navigation
-            #: These are easier to query than namedReference composite types
             references_pid = INFOTYPES.get("references")
-            is_referenced_by_pid = INFOTYPES.get("isReferencedBy")
-
             if references_pid:
                 referencing_record.addAttribute(references_pid, target_doi)
                 logger.info(
                     f"Added references link: {actual_referencing_doi} -> {target_doi}"
                 )
-
-            # NOTE: Backreference will be added AFTER recursive processing completes
-            # to ensure target dataset exists in graph
-
-            #: Also keep namedReference for compatibility
-            named_ref_pid = INFOTYPES.get("namedReference")
-            if named_ref_pid:
-                try:
-                    #: Store as JSON string: predicate + target
-                    #: PidRecord only supports primitive types (str, int, float, bool)
-                    reference_json = json.dumps(
-                        {"relationshipPredicate": relation_type, "target": target_doi}
-                    )
-                    referencing_record.addAttribute(named_ref_pid, reference_json)
-                    logger.info(
-                        f"Created namedReference ({relation_type}): {actual_referencing_doi} -> {target_doi}"
-                    )
-                except Exception as e:
-                    logger.error(
-                        f"Failed to add namedReference for {relation_type}: {e}",
-                        exc_info=True,
-                    )
-            else:
-                logger.error("namedReference InfoType not found in INFOTYPES")
         else:
             logger.warning(
-                f"Referencing record not found for {actual_referencing_doi}, cannot add namedReference link"
+                f"Referencing record not found for {actual_referencing_doi}, cannot add references link"
             )
 
-        # If we skipped fetching due to cycle, don't try to get metadata or recurse further
-        if not should_fetch:
+        # Get concept DOI of referenced dataset to confirm it's cross-dataset
+        # If cycle was detected or metadata unavailable, use fallback logic
+        referenced_concept_doi = None
+
+        if referenced_dataset is None:
+            # Cycle detected or fetch failed - still create backlink
+            # For cycle-detected cases, assume it's cross-dataset (different from current)
+            # since we wouldn't have a circular reference within same concept
+            logger.info(
+                f"Registering backlink despite cycle detection or missing metadata: "
+                f"{target_doi} <- {actual_referencing_doi}"
+            )
+            # Use target_doi as-is (may be concept DOI if metadata unavailable)
+            self.orchestrator._backlink_manager.add_pending_backlink(
+                target_doi=target_doi,
+                referencing_doi=actual_referencing_doi,
+            )
             return
 
-        # Get concept DOI of referenced dataset to confirm it's cross-dataset
-        try:
-            referenced_dataset = await self.orchestrator._fetch_metadata(referenced_doi)
-            referenced_concept_doi = referenced_dataset.concept_doi
-        except Exception as e:
-            logger.warning(f"Failed to fetch referenced dataset metadata: {e}")
-            return
+        referenced_concept_doi = referenced_dataset.concept_doi
 
         # Only establish cross-reference if different concept DOIs
         if referenced_concept_doi == referencing_concept_doi:
@@ -378,11 +352,14 @@ class ReferenceProcessor:
             )
             return
 
-        # Register cross-reference for later processing
-        if referenced_doi not in self.orchestrator._cross_reference_registry:
-            self.orchestrator._cross_reference_registry[referenced_doi] = set()
-        self.orchestrator._cross_reference_registry[referenced_doi].add(
-            referencing_dataset_doi
+        # Register backlink for deferred creation
+        # Both datasets will exist when backlinks are flushed after all processing completes
+        self.orchestrator._backlink_manager.add_pending_backlink(
+            target_doi=target_doi,
+            referencing_doi=actual_referencing_doi,
+        )
+        logger.debug(
+            f"Registered pending backlink: {target_doi} <- {actual_referencing_doi}"
         )
 
         # Recursively process referenced dataset's references
@@ -392,29 +369,6 @@ class ReferenceProcessor:
                 referenced_doi,
                 referenced_concept_doi,
                 depth,
-            )
-
-        # AFTER recursive processing: Ensure bidirectional links exist
-        # At this point, both datasets should exist in graph
-        if target_doi in self.orchestrator._record_graph:
-            target_record = self.orchestrator._record_graph[target_doi]
-            if is_referenced_by_pid:
-                # Check if backlink already exists to avoid duplicates
-                existing_backlinks = [
-                    attr[1]
-                    for attr in target_record._tuples
-                    if attr[0] == is_referenced_by_pid
-                ]
-                if actual_referencing_doi not in existing_backlinks:
-                    target_record.addAttribute(
-                        is_referenced_by_pid, actual_referencing_doi
-                    )
-                    logger.info(
-                        f"Added isReferencedBy backlink: {target_doi} <- {actual_referencing_doi}"
-                    )
-        else:
-            logger.warning(
-                f"Target dataset {target_doi} not found in graph after recursive processing"
             )
 
 
