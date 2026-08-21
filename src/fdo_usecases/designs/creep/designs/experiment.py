@@ -68,7 +68,9 @@ class CreepExperimentDesign(RecordDesign):
 
         # CreepExperiment attributes
         record.addAttribute(INFOTYPES["applicableStandard"], data.applicable_standard)
-        record.addAttribute(INFOTYPES["testID"], data.test_id)
+        record.addAttribute(
+            INFOTYPES["testID"], data.test_id, allow_self_reference=True
+        )
         record.addAttribute(
             INFOTYPES["specifiedTemperature"], data.specified_temperature
         )

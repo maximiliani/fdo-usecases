@@ -104,4 +104,8 @@ class FileChainBuilder:
 
             # Set latest on all previous versions (skip the last one)
             for _, checksum in sorted_occurrences[:-1]:
+                # Skip if latest version is the same file (unchanged across versions)
+                # This prevents self-referencing latestVersion attributes
+                if checksum == latest_checksum:
+                    continue
                 all_files[checksum].latest_version_checksum = latest_checksum

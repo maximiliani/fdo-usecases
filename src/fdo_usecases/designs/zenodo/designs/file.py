@@ -108,7 +108,9 @@ class ZenodoFileDesign(RecordDesign):
             record.addAttribute(INFOTYPES["mimeType"], data.mimetype)
 
         record.addAttribute(INFOTYPES["dataObjectLocation"], data.download_url)
-        record.addAttribute(INFOTYPES["checksum"], data.checksum)
+        record.addAttribute(
+            INFOTYPES["checksum"], data.checksum, allow_self_reference=True
+        )
 
         if data.license_url:
             record.addAttribute(INFOTYPES["spdxLicense"], data.license_url)

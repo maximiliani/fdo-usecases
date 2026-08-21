@@ -9,6 +9,7 @@ processing JSON input files, and creating PIDs via the Typed PID Maker API.
 """
 
 import json
+import logging
 import sys
 from typing import (
     Any,
@@ -35,6 +36,8 @@ from pytypid_generated_client import (
 from pytypid_generated_client.models.pid_record import PIDRecord
 
 from .conditionals import is_emptyish
+
+logger = logging.getLogger(__name__)
 
 Primitive = str | bool | int | float
 # ---Types-for-designs------------------------------------------- #
@@ -146,14 +149,39 @@ class PidRecord:
     def getId(self) -> str:
         return self._id
 
-    def addAttribute(self, a: str, b: Primitive | List[Primitive] | None) -> Self:
+    def addAttribute(
+        self,
+        a: str,
+        b: Primitive | List[Primitive] | None,
+        allow_self_reference: bool = False,
+    ) -> Self:
+        """Add an attribute to the record.
+
+        Args:
+            a: The attribute key (InfoType PID).
+            b: The attribute value, or a list of values.
+            allow_self_reference: If False (default), skip values that would
+                create a self-reference (value == record ID). This prevents
+                erroneous links like a record's ``latestVersion`` pointing to
+                itself. Set to True for literal data attributes whose value
+                is intentionally identical to the record ID (e.g. a file FDO
+                whose ID is its checksum and whose ``checksum`` attribute
+                stores that same checksum).
+
+        """
         if b is None:
             return self
         if isinstance(b, List):
             for item in b:
-                self.addAttribute(a, item)
+                self.addAttribute(a, item, allow_self_reference)
             return self
         else:
+            if not allow_self_reference and b == self._id and self._id != "":
+                logger.info(
+                    f"Skipping self-referencing attribute '{a}' "
+                    f"on record '{self._id}' (value == record ID)"
+                )
+                return self
             self._tuples.add((a, b))
         return self
 

@@ -89,7 +89,9 @@ class PublicationDesign(RecordDesign):
         record.addAttribute(PROFILE_KEY, [BASE_PROFILE, PUBLICATION_PROFILE])
 
         # Publication profile
-        record.addAttribute(INFOTYPES["doi"], data.identifier)
+        record.addAttribute(
+            INFOTYPES["doi"], data.identifier, allow_self_reference=True
+        )
 
         if data.resource_type:
             record.addAttribute(

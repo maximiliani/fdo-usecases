@@ -257,3 +257,31 @@ async def test_checksum_as_record_id():
     assert id1 == file_v1.checksum
     assert id2 == file_v2.checksum
     assert id1 == id2
+
+
+@pytest.mark.asyncio
+async def test_no_self_referencing_latest_version():
+    """Test that latestVersion never points to the record itself."""
+    from datetime import date
+
+    file_data = FileFDOData(
+        checksum="md5:d59a1be8f22264cebe5abfd11ee7ce62",
+        filename="data.csv",
+        mimetype="text/csv",
+        download_url="https://zenodo.org/api/records/123/files/data.csv",
+        license_url="https://spdx.org/licenses/CC-BY-4.0",
+        date_created=date(2024, 1, 1),
+        latest_version_checksum="md5:d59a1be8f22264cebe5abfd11ee7ce62",  # Self-reference!
+    )
+
+    design = ZenodoFileDesign()
+    await design.create_fdo(file_data)
+
+    record = design._local_records[file_data.checksum]
+    latest_version_pid = INFOTYPES["latestVersion"]
+
+    # No latestVersion attribute should exist (self-reference blocked)
+    latest_values = [v for k, v in record._tuples if k == latest_version_pid]
+    assert len(latest_values) == 0, (
+        f"latestVersion should not contain self-reference, got: {latest_values}"
+    )
