@@ -1,0 +1,40 @@
+{
+  "Identifier": "21.T11969/project0000000000001",
+  "name": "projectName",
+  "description": "Official title or name of a funded research project.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-08-25T00:00:00.000Z",
+    "lastModificationDate": "2026-08-25T00:00:00.000Z"
+  },
+  "ExpectedUse": "Identification and display of funded research project names in acknowledgments, reports, and metadata contexts.",
+  "References": [],
+  "Aliases": [
+    "Project Title",
+    "Funded Project Name",
+    "Grant Project Title"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "projectName",
+        "Title": "Project Name",
+        "Description": "Official title or name of a funded research project.",
+        "Type": "21.T11969/3df63b7acb0522da685d",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  }
+}

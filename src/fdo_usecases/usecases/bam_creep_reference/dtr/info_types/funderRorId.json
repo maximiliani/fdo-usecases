@@ -1,0 +1,42 @@
+{
+  "Identifier": "21.T11969/4b9e95b6d60f47c5620f",
+  "name": "funderRorId",
+  "description": "ROR (Research Organization Registry) identifier URL for the funding organization that supports a research project or grant.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-08-26T11:22:10.204Z",
+    "lastModificationDate": "2026-08-26T11:22:10.204Z"
+  },
+  "ExpectedUse": "Unambiguous identification of funding organizations using ROR identifiers in grant and funding metadata contexts.",
+  "References": [
+    "https://ror.org"
+  ],
+  "Aliases": [
+    "Funder ROR Identifier",
+    "Funding Organization ROR",
+    "Sponsor ROR ID"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "funderRorId",
+        "Title": "Funder ROR ID",
+        "Description": "ROR (Research Organization Registry) identifier URL for the funding organization that supports a research project or grant.",
+        "Type": "21.T11969/9810c562f8a6deb1f22c",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  }
+}

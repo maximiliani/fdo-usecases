@@ -1,0 +1,43 @@
+{
+  "Identifier": "21.T11969/8555b1635c61d2339700",
+  "name": "funderDOI",
+  "description": "DOI (Digital Object Identifier) for a funding organization, providing a persistent, resolvable identifier for the funder.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-08-26T11:24:50.260Z",
+    "lastModificationDate": "2026-08-26T11:24:50.260Z"
+  },
+  "ExpectedUse": "Persistent identification of funding organizations using DOI identifiers in grant and funding metadata contexts. Commonly used with CrossRef Funder Registry DOIs (e.g., 10.13039/501100001659 for DFG), but applicable to any DOI-based funder identifier system.",
+  "References": [
+    "https://www.doi.org/",
+    "https://www.crossref.org/services/funder-registry/"
+  ],
+  "Aliases": [
+    "Funder DOI",
+    "Funding Organization DOI",
+    "Sponsor DOI"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "funderDOI",
+        "Title": "Funder DOI",
+        "Description": "DOI (Digital Object Identifier) for a funding organization, providing a persistent, resolvable identifier for the funder.",
+        "Type": "21.T11969/48ba02e08f1185e3f854",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  }
+}

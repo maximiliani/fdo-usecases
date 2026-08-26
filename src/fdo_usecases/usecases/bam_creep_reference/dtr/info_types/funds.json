@@ -1,0 +1,40 @@
+{
+  "Identifier": "21.T11969/67b90082413e5e3547ff",
+  "name": "funds",
+  "description": "Handle identifier pointing to a research output (dataset, experiment, material, etc.) that is funded by this grant.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-08-26T11:21:18.185Z",
+    "lastModificationDate": "2026-08-26T11:21:18.185Z"
+  },
+  "ExpectedUse": "Expressing inverse funding relationships from Grant FDOs to the research outputs they support.",
+  "References": [],
+  "Aliases": [
+    "Funds Relation",
+    "Funded Output",
+    "Grant Supports"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "funds",
+        "Title": "Funds",
+        "Description": "Handle identifier pointing to a research output (dataset, experiment, material, etc.) that is funded by this grant.",
+        "Type": "21.T11969/3bbedeeb04fa80daf501",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  }
+}

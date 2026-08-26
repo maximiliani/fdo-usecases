@@ -1,0 +1,40 @@
+{
+  "Identifier": "21.T11969/project0000000000002",
+  "name": "projectWebsite",
+  "description": "URL to the official website or landing page of a funded research project.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-08-25T00:00:00.000Z",
+    "lastModificationDate": "2026-08-25T00:00:00.000Z"
+  },
+  "ExpectedUse": "Providing access to project information, deliverables, and additional resources through the project's official web presence.",
+  "References": [],
+  "Aliases": [
+    "Project URL",
+    "Project Landing Page",
+    "Grant Website"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "projectWebsite",
+        "Title": "Project Website",
+        "Description": "URL to the official website or landing page of a funded research project.",
+        "Type": "21.T11969/e0efc41346cda4ba84ca",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  }
+}

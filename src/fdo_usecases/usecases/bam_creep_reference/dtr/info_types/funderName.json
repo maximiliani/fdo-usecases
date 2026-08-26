@@ -1,0 +1,40 @@
+{
+  "Identifier": "21.T11969/f3c36b0db75e669a57fa",
+  "name": "funderName",
+  "description": "Human-readable name of the funding organization that supports a research project or grant.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-08-26T11:22:41.487Z",
+    "lastModificationDate": "2026-08-26T11:22:41.488Z"
+  },
+  "ExpectedUse": "Display and acknowledgment of funding sources in human-readable form across all types of research outputs.",
+  "References": [],
+  "Aliases": [
+    "Funder Name",
+    "Funding Organization Name",
+    "Sponsor Name"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "funderName",
+        "Title": "Funder Name",
+        "Description": "Human-readable name of the funding organization that supports a research project or grant.",
+        "Type": "21.T11969/3df63b7acb0522da685d",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  }
+}

@@ -3,7 +3,7 @@
   "name": "grantNumber",
   "description": "Grant award number or identifier assigned by a funding organization to a research project.",
   "versioning": {
-    "version": "0.0.1"
+    "version": "0.0.2"
   },
   "provenance": {
     "contributors": [
@@ -13,15 +13,14 @@
       }
     ],
     "creationDate": "2026-06-22T15:51:20.104Z",
-    "lastModificationDate": "2026-06-22T15:51:20.104Z"
+    "lastModificationDate": "2026-08-26T11:18:54.033Z"
   },
   "ExpectedUse": "Acknowledgment of funding sources, tracking of grant-funded outputs, compliance with funder requirements, and research impact assessment.",
   "References": [],
   "Aliases": [
     "Funding Number",
     "Award Number",
-    "Project Grant ID",
-    "Sponsor Reference"
+    "Project Grant ID"
   ],
   "Schema": {
     "Type": "Object",

@@ -1,0 +1,40 @@
+{
+  "Identifier": "21.T11969/28ca0d5c50678433e5a8",
+  "name": "fundedBy",
+  "description": "Handle identifier pointing to a Grant FDO that provides funding for this resource.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-08-26T11:25:31.603Z",
+    "lastModificationDate": "2026-08-26T11:25:31.603Z"
+  },
+  "ExpectedUse": "Expressing funding relationships, from e.g., datasets, experiments, materials, or other research outputs, to funding grants.",
+  "References": [],
+  "Aliases": [
+    "Funding Relation",
+    "Funded By Grant",
+    "Financial Support"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "Properties": [
+      {
+        "Name": "fundedBy",
+        "Title": "Funded By",
+        "Description": "Handle identifier pointing to a Grant FDO that provides funding for this resource.",
+        "Type": "21.T11969/3bbedeeb04fa80daf501",
+        "Properties": {
+          "Cardinality": "1",
+          "extractProperties": true
+        }
+      }
+    ]
+  }
+}
