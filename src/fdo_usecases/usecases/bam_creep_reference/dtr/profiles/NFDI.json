@@ -1,9 +1,9 @@
 {
   "Identifier": "21.T11969/175a75397933f1b370af",
   "name": "NFDI",
-  "description": "National Research Data Infrastructure (NFDI) profile for recording consortium affiliations and grant funding information.",
+  "description": "National Research Data Infrastructure (NFDI) profile for recording consortium affiliations and funding relationships.",
   "versioning": {
-    "version": "0.0.1"
+    "version": "0.0.2"
   },
   "provenance": {
     "contributors": [
@@ -13,7 +13,7 @@
       }
     ],
     "creationDate": "2026-06-22T16:42:43.726Z",
-    "lastModificationDate": "2026-06-22T16:42:43.726Z"
+    "lastModificationDate": "2026-08-26T11:42:12.088Z"
   },
   "ExpectedUse": "Documentation of NFDI consortium involvement and funding acknowledgments for German research data infrastructure initiatives.",
   "References": [
@@ -24,6 +24,7 @@
   ],
   "Schema": {
     "Type": "Object",
+    "addProps": true,
     "Properties": [
       {
         "Name": "nfdiConsortia",
@@ -35,12 +36,12 @@
         }
       },
       {
-        "Name": "grantNumber",
-        "Title": "Grant Number",
-        "Description": "Grant award number or identifier assigned by a funding organization to a research project.",
-        "Type": "21.T11969/1c25f48eb6a47b22a9cc",
+        "Name": "fundedBy",
+        "Title": "Funded By",
+        "Description": "Handle identifiers of Grant FDOs that provide funding for this resource.",
+        "Type": "21.T11969/28ca0d5c50678433e5a8",
         "Properties": {
-          "Cardinality": "1 - n"
+          "Cardinality": "0 - n"
         }
       }
     ]

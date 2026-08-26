@@ -1,5 +1,5 @@
 {
-  "Identifier": "21.T11969/project0000000000001",
+  "Identifier": "21.T11969/112427d2da588bf46e53",
   "name": "projectName",
   "description": "Official title or name of a funded research project.",
   "versioning": {
@@ -12,8 +12,8 @@
         "ORCID": "https://orcid.org/0009-0005-2800-4833"
       }
     ],
-    "creationDate": "2026-08-25T00:00:00.000Z",
-    "lastModificationDate": "2026-08-25T00:00:00.000Z"
+    "creationDate": "2026-08-26T11:37:49.220Z",
+    "lastModificationDate": "2026-08-26T11:37:49.220Z"
   },
   "ExpectedUse": "Identification and display of funded research project names in acknowledgments, reports, and metadata contexts.",
   "References": [],

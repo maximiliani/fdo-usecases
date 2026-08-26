@@ -1,0 +1,93 @@
+{
+  "Identifier": "21.T11969/c02329c48f348eb63368",
+  "name": "Grant",
+  "description": "Profile for documenting research funding grants with funder information (ROR or DOI), grant codes, and project details.",
+  "versioning": {
+    "version": "0.0.1"
+  },
+  "provenance": {
+    "contributors": [
+      {
+        "Name": "Maximilian Inckmann",
+        "ORCID": "https://orcid.org/0009-0005-2800-4833"
+      }
+    ],
+    "creationDate": "2026-08-26T11:40:16.438Z",
+    "lastModificationDate": "2026-08-26T11:42:38.838Z"
+  },
+  "ExpectedUse": "Documentation of funding sources, grant tracking, compliance with funder requirements, and research impact assessment.",
+  "Aliases": [
+    "Funding Grant",
+    "Research Grant",
+    "Award"
+  ],
+  "Schema": {
+    "Type": "Object",
+    "addProps": true,
+    "Properties": [
+      {
+        "Name": "funderRorId",
+        "Title": "Funder ROR ID",
+        "Description": "ROR identifier URL for the funding organization.",
+        "Type": "21.T11969/4b9e95b6d60f47c5620f",
+        "Properties": {
+          "Cardinality": "0 - 1"
+        }
+      },
+      {
+        "Name": "funderDOI",
+        "Title": "Funder DOI",
+        "Description": "DOI for the funding organization.",
+        "Type": "21.T11969/8555b1635c61d2339700",
+        "Properties": {
+          "Cardinality": "0 - 1"
+        }
+      },
+      {
+        "Name": "funderName",
+        "Title": "Funder Name",
+        "Description": "Human-readable name of the funding organization.",
+        "Type": "21.T11969/f3c36b0db75e669a57fa",
+        "Properties": {
+          "Cardinality": "1 - n"
+        }
+      },
+      {
+        "Name": "grantCode",
+        "Title": "Grant Code",
+        "Description": "Grant award number or identifier assigned by the funding organization.",
+        "Type": "21.T11969/1c25f48eb6a47b22a9cc",
+        "Properties": {
+          "Cardinality": "1"
+        }
+      },
+      {
+        "Name": "projectName",
+        "Title": "Project Name",
+        "Description": "Official title of the funded research project.",
+        "Type": "21.T11969/112427d2da588bf46e53",
+        "Properties": {
+          "Cardinality": "0 - n"
+        }
+      },
+      {
+        "Name": "projectWebsite",
+        "Title": "Project Website",
+        "Description": "URL to the project's official website or landing page.",
+        "Type": "21.T11969/e9fbabb0285ca091838e",
+        "Properties": {
+          "Cardinality": "0 - n"
+        }
+      },
+      {
+        "Name": "funds",
+        "Title": "Funds",
+        "Description": "Handle identifiers of FDOs (datasets, experiments, materials) funded by this grant.",
+        "Type": "21.T11969/67b90082413e5e3547ff",
+        "Properties": {
+          "Cardinality": "0 - n"
+        }
+      }
+    ]
+  }
+}
