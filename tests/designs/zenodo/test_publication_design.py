@@ -265,6 +265,32 @@ async def test_design_initialization():
 
 
 @pytest.mark.asyncio
+async def test_create_fdo_accumulates_referencing_datasets():
+    """Referencing datasets accumulate across create_fdo calls."""
+    from fdo_usecases.designs.zenodo.orchestrator import ZenodoFDODesign
+
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
+    pub_design = design.publication_design
+
+    first = PublicationFDOData(
+        identifier="10.1016/j.actamat.2025.120735",
+        referenced_by_datasets=["10.5281/zenodo.111111"],
+    )
+    second = PublicationFDOData(
+        identifier="10.1016/j.actamat.2025.120735",
+        referenced_by_datasets=["10.5281/zenodo.222222"],
+    )
+
+    await pub_design.create_fdo(first)
+    await pub_design.create_fdo(second)
+
+    record = design._record_graph["10.1016/j.actamat.2025.120735"]
+    referencing = [v for k, v in record._tuples if k == INFOTYPES["isReferencedBy"]]
+    assert "10.5281/zenodo.111111" in referencing
+    assert "10.5281/zenodo.222222" in referencing
+
+
+@pytest.mark.asyncio
 async def test_identifier_as_record_id():
     """Verify that identifier is used as record ID."""
     pub_data = PublicationFDOData(

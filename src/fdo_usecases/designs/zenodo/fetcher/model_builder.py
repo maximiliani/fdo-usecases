@@ -106,18 +106,29 @@ class ModelBuilder:
         # Get latest version for top-level metadata
         latest_version = version_objects[-1]
 
+        # Concept-level metadata (grants, communities) is read from the LATEST
+        # version, not the record used to enter the concept. Entry can be any
+        # version DOI (older versions may carry incomplete/empty metadata), so
+        # parsing from the entry record would produce non-deterministic results
+        # depending on which version triggered the fetch.
+        latest_version_metadata = sorted_versions[-1].get("metadata", {})
+
         # Parse relationship metadata from latest version
         related_ids = [
             self._parse_related_identifier(rel)
-            for rel in metadata.get("related_identifiers", [])
+            for rel in latest_version_metadata.get("related_identifiers", [])
         ]
 
         # Parse funding information
-        grants = [self._parse_grant(grant) for grant in metadata.get("grants", [])]
+        grants = [
+            self._parse_grant(grant)
+            for grant in latest_version_metadata.get("grants", [])
+        ]
 
         # Parse community memberships
         communities = [
-            self._parse_community(comm) for comm in metadata.get("communities", [])
+            self._parse_community(comm)
+            for comm in latest_version_metadata.get("communities", [])
         ]
 
         # PASS 3 & 4: Assemble final Dataset object
@@ -224,6 +235,12 @@ class ModelBuilder:
         # Extract version label with default
         version_label = metadata.get("version", "1.0")
 
+        # Parse version-specific relationship metadata
+        version_related_ids = [
+            self._parse_related_identifier(rel)
+            for rel in metadata.get("related_identifiers", [])
+        ]
+
         # Construct and return DatasetVersion
         version = DatasetVersion(
             doi=version_data["metadata"]["doi"],
@@ -237,6 +254,7 @@ class ModelBuilder:
             license=license_info,
             keywords=metadata.get("keywords", []),
             files=files_dict,
+            related_identifiers=version_related_ids,
             metadata_raw=version_data,
         )
 

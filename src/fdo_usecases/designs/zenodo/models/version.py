@@ -15,7 +15,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
 
-from .base import Creator, LicenseInfo
+from .base import Creator, LicenseInfo, RelatedIdentifier
 from .file import ZenodoFile
 
 
@@ -42,6 +42,7 @@ class DatasetVersion(BaseModel):
         keywords: List of keywords/tags
 
         files: Dict mapping checksum → ZenodoFile for this version
+        related_identifiers: Links to related works specific to this version
         previous_version: Previous DatasetVersion in chronological order (excluded from serialization)
         next_version: Next DatasetVersion in chronological order (excluded from serialization)
         metadata_raw: Complete raw API response for reference/debugging
@@ -63,6 +64,9 @@ class DatasetVersion(BaseModel):
 
     # Files in this version, keyed by checksum for O(1) lookup
     files: dict[str, ZenodoFile]
+
+    # Relationship metadata specific to this version
+    related_identifiers: list[RelatedIdentifier] = Field(default_factory=list)
 
     # Bidirectional version navigation (excluded from serialization)
     previous_version: Optional["DatasetVersion"] = Field(default=None, exclude=True)

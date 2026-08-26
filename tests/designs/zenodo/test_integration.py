@@ -52,6 +52,15 @@ from fdo_usecases.designs.zenodo.orchestrator import ZenodoFDODesign
 @pytest.fixture
 def real_world_dataset():
     """Create a realistic dataset with multiple versions, files, and references."""
+    related_ids = [
+        RelatedIdentifier(
+            identifier="10.1016/j.actamat.2025.120735",
+            relation="cites",
+            scheme="doi",
+            resource_type="publication-article",
+        ),
+    ]
+
     version1 = DatasetVersion(
         doi="10.5281/zenodo.111111",
         concept_doi="10.5281/zenodo.999999",
@@ -82,6 +91,7 @@ def real_world_dataset():
             url="https://creativecommons.org/licenses/by/4.0/",
         ),
         files={},
+        related_identifiers=related_ids,
         metadata_raw={"doi": "10.5281/zenodo.111111"},
     )
 
@@ -169,7 +179,6 @@ def real_world_dataset():
             "md5:abcdef12345678901234567890abcdef": file2,
             "md5:1234567890abcdef1234567890abcdef": file3,
         },
-        related_identifiers=related_ids,
     )
 
     return dataset

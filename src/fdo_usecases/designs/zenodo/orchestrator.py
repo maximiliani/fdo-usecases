@@ -147,6 +147,9 @@ class ZenodoFDODesign(RecordDesign):
         self._processing_datasets: set[str] = (
             set()
         )  # Currently being processed (cycle detection)
+        self._processed_reference_versions: set[str] = (
+            set()
+        )  # Versions whose related identifiers have been processed
         self._record_graph: dict[str, PidRecord] = {}
         self._backlink_manager = BacklinkManager(self._record_graph)
         self._metadata_cache: dict[str, Dataset] = {}  # Cache fetched Dataset objects
@@ -390,6 +393,7 @@ class ZenodoFDODesign(RecordDesign):
         nested_design._processing_datasets = (
             self._processing_datasets
         )  # Share processing set for cycle detection
+        nested_design._processed_reference_versions = self._processed_reference_versions
         nested_design._record_graph = self._record_graph
         nested_design._backlink_manager = (
             self._backlink_manager
@@ -545,23 +549,42 @@ class ZenodoFDODesign(RecordDesign):
             for grant_id in grant_ids:
                 record.addAttribute("21.T11969/funded0000000000001", grant_id)
 
-        # Always process references - different versions may have different
-        # related identifiers that need to be handled.
-        # If doi is a concept DOI (not in graph as a version), use the latest
-        # version DOI as the referencing DOI so forward links can be created.
-        referencing_doi = doi
-        if doi not in self._record_graph:
-            referencing_doi = dataset.latest_version_doi
-            logger.debug(
-                f"DOI {doi} not in graph, using latest version {referencing_doi} for references"
-            )
+        # Always process references - each version may carry its own related
+        # identifiers that need to be handled (e.g. a new version citing a work
+        # that older versions did not reference). FDO records exist for every
+        # version of the concept, so process each version individually.
+        for version_doi, version in dataset.versions.items():
+            # Skip versions already handled (shared across nested designs)
+            if version_doi in self._processed_reference_versions:
+                logger.debug(
+                    f"Related identifiers already processed for version {version_doi}"
+                )
+                continue
 
-        await self.reference_processor.process_all(
-            dataset.related_identifiers,
-            referencing_doi,
-            dataset.concept_doi,
-            depth,
-        )
+            # Mark as processed before processing to avoid re-entry via cycles
+            self._processed_reference_versions.add(version_doi)
+
+            if not version.related_identifiers:
+                continue
+
+            # Only create forward links on versions that exist in the graph
+            if version_doi not in self._record_graph:
+                logger.warning(
+                    f"Skipping reference processing for {version_doi}: "
+                    f"version FDO not found in graph"
+                )
+                continue
+
+            logger.info(
+                f"Processing {len(version.related_identifiers)} related "
+                f"identifiers for version {version_doi}"
+            )
+            await self.reference_processor.process_all(
+                version.related_identifiers,
+                version_doi,
+                dataset.concept_doi,
+                depth,
+            )
 
         # Mark as fully processed - remove from processing set and add to processed set
         self._processing_datasets.discard(doi)

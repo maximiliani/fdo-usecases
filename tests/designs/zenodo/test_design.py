@@ -11,6 +11,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+from fdo_usecases.designer_lib.executor import PidRecord
 from fdo_usecases.designs.zenodo.models import (
     Creator,
     Dataset,
@@ -104,35 +105,7 @@ def mock_dataset():
 
 @pytest.fixture
 def mock_dataset_with_references():
-    """Create a mock Dataset with related identifiers."""
-    version1 = DatasetVersion(
-        doi="10.5281/zenodo.111111",
-        concept_doi="10.5281/zenodo.999999",
-        recid=111111,
-        title="Dataset with References",
-        description="Has references",
-        publication_date=date(2024, 1, 1),
-        version_label="1.0",
-        creators=[],
-        keywords=[],
-        previous_version=None,
-        next_version=None,
-        license=None,
-        files={},
-        metadata_raw={"doi": "10.5281/zenodo.111111"},
-    )
-
-    file1 = ZenodoFile(
-        checksum="md5:abcdef12345678901234567890abcdef",
-        filename="file.txt",
-        size=512,
-        mimetype="text/plain",
-        first_dataset_version="10.5281/zenodo.111111",
-        first_dataset_recid=111111,
-        present_in_versions=["10.5281/zenodo.111111"],
-        download_url="https://zenodo.org/api/records/1/files/file.txt",
-    )
-
+    """Create a mock Dataset with related identifiers on a version."""
     related_ids = [
         RelatedIdentifier(
             identifier="10.5281/zenodo.999999",
@@ -148,6 +121,35 @@ def mock_dataset_with_references():
         ),
     ]
 
+    version1 = DatasetVersion(
+        doi="10.5281/zenodo.111111",
+        concept_doi="10.5281/zenodo.999999",
+        recid=111111,
+        title="Dataset with References",
+        description="Has references",
+        publication_date=date(2024, 1, 1),
+        version_label="1.0",
+        creators=[],
+        keywords=[],
+        previous_version=None,
+        next_version=None,
+        license=None,
+        files={},
+        related_identifiers=related_ids,
+        metadata_raw={"doi": "10.5281/zenodo.111111"},
+    )
+
+    file1 = ZenodoFile(
+        checksum="md5:abcdef12345678901234567890abcdef",
+        filename="file.txt",
+        size=512,
+        mimetype="text/plain",
+        first_dataset_version="10.5281/zenodo.111111",
+        first_dataset_recid=111111,
+        present_in_versions=["10.5281/zenodo.111111"],
+        download_url="https://zenodo.org/api/records/1/files/file.txt",
+    )
+
     dataset = Dataset(
         concept_doi="10.5281/zenodo.999999",
         concept_recid=999999,
@@ -156,7 +158,6 @@ def mock_dataset_with_references():
         latest_version_doi="10.5281/zenodo.111111",
         versions={"10.5281/zenodo.111111": version1},
         all_files={"md5:abcdef12345678901234567890abcdef": file1},
-        related_identifiers=related_ids,
     )
 
     return dataset
@@ -200,7 +201,7 @@ async def test_fetch_metadata_caching(mock_dataset):
 async def test_transform_to_exchange_models(mock_dataset):
     """Test transformation of metadata to exchange models."""
     design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
-    dataset_datas, file_datas = design._transform_to_exchange_models(mock_dataset)
+    dataset_datas, file_datas, _ = design._transform_to_exchange_models(mock_dataset)
 
     assert len(dataset_datas) == 2
     assert len(file_datas) == 1
@@ -238,12 +239,21 @@ async def test_execute_async_processes_all(mock_dataset):
             design.reference_processor, "process_all", new_callable=AsyncMock
         ) as mock_refs,
     ):
+        # Pre-populate graph with version FDOs (create_fdo is mocked)
+        for version_doi in ["10.5281/zenodo.111111", "10.5281/zenodo.222222"]:
+            design._record_graph[version_doi] = PidRecord().setId(version_doi)
+
         await design.execute_async()
 
         assert design.dois[0] in design._processed_datasets
         assert mock_ds.call_count == 2
         assert mock_file.call_count == 1
-        mock_refs.assert_called_once()
+        # Versions carry no related identifiers -> no reference processing
+        mock_refs.assert_not_called()
+        assert design._processed_reference_versions == {
+            "10.5281/zenodo.111111",
+            "10.5281/zenodo.222222",
+        }
 
 
 @pytest.mark.asyncio
@@ -323,11 +333,125 @@ async def test_execute_with_references(mock_dataset_with_references):
             design.reference_processor, "process_all", new_callable=AsyncMock
         ) as mock_proc,
     ):
+        # Pre-populate graph with version FDOs (create_fdo is mocked)
+        design._record_graph["10.5281/zenodo.111111"] = PidRecord().setId(
+            "10.5281/zenodo.111111"
+        )
         await design.execute_async()
 
-        mock_proc.assert_called_once()
-        called_ids = mock_proc.call_args[0][0]
-        assert len(called_ids) == 2
+    mock_proc.assert_called_once()
+    called_ids, referencing_doi, concept_doi, depth = mock_proc.call_args[0]
+    assert len(called_ids) == 2
+    assert referencing_doi == "10.5281/zenodo.111111"
+    assert concept_doi == "10.5281/zenodo.999999"
+    assert depth == 0
+
+
+@pytest.mark.asyncio
+async def test_processes_references_for_each_version():
+    """Each version's related identifiers are processed with its own DOI."""
+    related_ids = [
+        RelatedIdentifier(
+            identifier="10.1016/j.actamat.2025.120735",
+            relation="cites",
+            scheme="doi",
+            resource_type="publication-article",
+        )
+    ]
+    version1 = DatasetVersion(
+        doi="10.5281/zenodo.111111",
+        concept_doi="10.5281/zenodo.999999",
+        recid=111111,
+        title="Dataset v1",
+        publication_date=date(2024, 1, 1),
+        version_label="1.0",
+        creators=[],
+        keywords=[],
+        files={},
+        related_identifiers=related_ids,
+        metadata_raw={"doi": "10.5281/zenodo.111111"},
+    )
+    version2 = DatasetVersion(
+        doi="10.5281/zenodo.222222",
+        concept_doi="10.5281/zenodo.999999",
+        recid=222222,
+        title="Dataset v2",
+        publication_date=date(2024, 6, 1),
+        version_label="2.0",
+        creators=[],
+        keywords=[],
+        files={},
+        related_identifiers=[],
+        metadata_raw={"doi": "10.5281/zenodo.222222"},
+    )
+
+    dataset = Dataset(
+        concept_doi="10.5281/zenodo.999999",
+        concept_recid=999999,
+        title="Dataset",
+        latest_version_doi="10.5281/zenodo.222222",
+        versions={
+            "10.5281/zenodo.111111": version1,
+            "10.5281/zenodo.222222": version2,
+        },
+        all_files={},
+    )
+
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.222222"])
+
+    with (
+        patch.object(
+            design,
+            "_fetch_metadata",
+            new_callable=AsyncMock,
+            return_value=dataset,
+        ),
+        patch.object(design.dataset_design, "create_fdo", new_callable=AsyncMock),
+        patch.object(design.file_design, "create_fdo", new_callable=AsyncMock),
+        patch.object(
+            design.reference_processor, "process_all", new_callable=AsyncMock
+        ) as mock_proc,
+    ):
+        # Pre-populate graph with version FDOs (create_fdo is mocked)
+        for version_doi in ["10.5281/zenodo.111111", "10.5281/zenodo.222222"]:
+            design._record_graph[version_doi] = PidRecord().setId(version_doi)
+
+        await design.execute_async()
+
+    # Only the old version carries a reference -> processed exactly once
+    mock_proc.assert_called_once()
+    called_ids, referencing_doi, concept_doi, depth = mock_proc.call_args[0]
+    assert called_ids == related_ids
+    assert referencing_doi == "10.5281/zenodo.111111"
+    assert concept_doi == "10.5281/zenodo.999999"
+    assert depth == 0
+
+
+@pytest.mark.asyncio
+async def test_skips_already_processed_reference_versions(mock_dataset_with_references):
+    """Versions already marked as reference-processed are skipped."""
+    design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
+    design._processed_reference_versions.add("10.5281/zenodo.111111")
+
+    with (
+        patch.object(
+            design,
+            "_fetch_metadata",
+            new_callable=AsyncMock,
+            return_value=mock_dataset_with_references,
+        ),
+        patch.object(design.dataset_design, "create_fdo", new_callable=AsyncMock),
+        patch.object(design.file_design, "create_fdo", new_callable=AsyncMock),
+        patch.object(
+            design.reference_processor, "process_all", new_callable=AsyncMock
+        ) as mock_proc,
+    ):
+        design._record_graph["10.5281/zenodo.111111"] = PidRecord().setId(
+            "10.5281/zenodo.111111"
+        )
+        await design.execute_async()
+
+    mock_proc.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -373,7 +497,7 @@ async def test_transform_handles_missing_license():
     )
 
     design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
-    _, file_datas = design._transform_to_exchange_models(dataset)
+    _, file_datas, _ = design._transform_to_exchange_models(dataset)
 
     assert len(file_datas) == 1
     assert file_datas[0].license_url is None
@@ -383,7 +507,7 @@ async def test_transform_handles_missing_license():
 async def test_transform_version_chain_links(mock_dataset):
     """Test that version chain links are properly transformed."""
     design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
-    dataset_datas, _ = design._transform_to_exchange_models(mock_dataset)
+    dataset_datas, _, _ = design._transform_to_exchange_models(mock_dataset)
 
     first_version = dataset_datas[0]
     second_version = dataset_datas[1]
@@ -401,7 +525,7 @@ async def test_transform_version_chain_links(mock_dataset):
 async def test_transform_creators_data(mock_dataset):
     """Test creator data transformation."""
     design = ZenodoFDODesign(dois=["10.5281/zenodo.test"])
-    dataset_datas, _ = design._transform_to_exchange_models(mock_dataset)
+    dataset_datas, _, _ = design._transform_to_exchange_models(mock_dataset)
 
     for dataset_data in dataset_datas:
         assert len(dataset_data.creators) == 1

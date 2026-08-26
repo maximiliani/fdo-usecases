@@ -71,6 +71,12 @@ class PublicationDesign(RecordDesign):
     async def create_fdo(self, data: PublicationFDOData) -> str:
         """Create FDO record and add to executor graph.
 
+        If a record for the same publication already exists (e.g. it is
+        referenced by multiple datasets processed in sequence), the new
+        attributes are merged into the existing record instead of replacing
+        it. This preserves every ``isReferencedBy`` edge regardless of the
+        order in which the referencing datasets are processed.
+
         Args:
             data: Structured publication data from exchange model
 
@@ -122,6 +128,23 @@ class PublicationDesign(RecordDesign):
         # Landing page location
         if data.landing_page_url:
             record.addAttribute(INFOTYPES["landingPageLocation"], data.landing_page_url)
+
+        # Merge into an existing record if this publication was already created
+        # (e.g. referenced by a different dataset earlier in the run).
+        existing = None
+        if self.orchestrator:
+            existing = self.orchestrator._record_graph.get(data.identifier)
+        else:
+            existing = self._local_records.get(data.identifier)
+
+        if existing is not None:
+            for key, value in record._tuples:
+                if not existing.contains((key, value)):
+                    existing.addAttribute(key, value)
+            record = existing
+            logger.debug(
+                f"Merged attributes into existing Publication FDO for {data.identifier}"
+            )
 
         # Backlinks for inference
         self.addBacklink(*BACKLINK_PUBLICATION_CITATION)
