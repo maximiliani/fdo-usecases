@@ -33,6 +33,9 @@ DATARESOURCE_PROFILE = "21.T11969/0738c2ef35faef0fb552"
 #: Publication profile - for scholarly publications
 PUBLICATION_PROFILE = "21.T11969/e00441c49bf6cb62a4a5"
 
+#: Grant profile - for funding grant metadata
+GRANT_PROFILE = "21.T11969/c02329c48f348eb63368"
+
 
 # =============================================================================
 # InfoType PID Mappings
@@ -254,6 +257,9 @@ BACKLINK_PUBLICATION_REFERENCE = ("references", "isReferencedBy")
 #: File version chain relationship (forward: isNewVersionOf, backward: isPreviousVersionOf)
 BACKLINK_FILE_VERSION_CHAIN = ("isNewVersionOf", "isPreviousVersionOf")
 
+#: Funding relationship (forward: fundedBy, backward: funds)
+BACKLINK_FUNDING = ("fundedBy", "funds")
+
 #: DataCite relation types that indicate version chains (already handled by Versionable profile)
 #: These are already handled by the Versionable profile
 VERSIONING_RELATIONS = frozenset(
@@ -275,6 +281,7 @@ __all__ = [
     "VERSIONABLE_PROFILE",
     "DATARESOURCE_PROFILE",
     "PUBLICATION_PROFILE",
+    "GRANT_PROFILE",
     # InfoTypes
     "INFOTYPES",
     # DataCite resource type mapping
@@ -286,6 +293,7 @@ __all__ = [
     "BACKLINK_PUBLICATION_CITATION",
     "BACKLINK_PUBLICATION_REFERENCE",
     "BACKLINK_FILE_VERSION_CHAIN",
+    "BACKLINK_FUNDING",
     # Versioning relations filter
     "VERSIONING_RELATIONS",
 ]

@@ -17,7 +17,7 @@ Models:
 
 from datetime import date
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from fdo_usecases.designs.zenodo.constants import VALID_RESOURCE_TYPES
 
@@ -36,6 +36,51 @@ class CreatorData(BaseModel):
 
     orcid: str | None = None
     ror_id: str | None = None
+
+
+class GrantFDOData(BaseModel):
+    """Complete data needed to create a Grant FDO record.
+
+    This model represents all information required to create a Grant FDO
+    compliant with the Grant profile. Each unique (funder, grant_code) pair
+    gets exactly one Grant FDO record.
+
+    Attributes:
+        funder_ror_id: ROR identifier URL for funding organization (optional)
+        funder_crossref_doi: CrossRef Funder Registry DOI (optional)
+        funder_name: Human-readable name of funding organization
+        grant_code: Grant award number/code
+        project_name: Official project title (optional)
+        project_website: Project website URL (optional)
+
+    """
+
+    funder_ror_id: str | None = None
+    funder_crossref_doi: str | None = None
+    funder_name: str
+    grant_code: str
+    project_name: str | None = None
+    project_website: str | None = None
+
+    @property
+    def unique_key(self) -> str:
+        """Generate unique identifier for deduplication."""
+        funder_id = self.funder_ror_id or self.funder_crossref_doi or "unknown"
+        return f"{funder_id}::{self.grant_code}"
+
+    @property
+    def grant_fdo_id(self) -> str:
+        """Generate Grant FDO record ID."""
+        return f"grant:{self.unique_key}"
+
+    @model_validator(mode="after")
+    def validate_funder_id_present(self) -> "GrantFDOData":
+        """Ensure at least one funder ID is provided."""
+        if not self.funder_ror_id and not self.funder_crossref_doi:
+            raise ValueError(
+                "At least one funder ID (ROR or CrossRef DOI) must be provided"
+            )
+        return self
 
 
 class DatasetFDOData(BaseModel):
@@ -75,6 +120,7 @@ class DatasetFDOData(BaseModel):
     files: list[str] = Field(default_factory=list)
     landing_page_url: str | None = None
     preview_images: list[str] = Field(default_factory=list)
+    grants: list[GrantFDOData] = Field(default_factory=list)
 
 
 class FileFDOData(BaseModel):
@@ -160,6 +206,7 @@ class PublicationFDOData(BaseModel):
 
 __all__ = [
     "CreatorData",
+    "GrantFDOData",
     "DatasetFDOData",
     "FileFDOData",
     "PublicationFDOData",

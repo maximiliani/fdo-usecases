@@ -14,7 +14,7 @@ This module contains foundational models used across multiple Zenodo record type
 
 import re
 
-from pydantic import BaseModel, HttpUrl, field_validator
+from pydantic import BaseModel, HttpUrl, field_validator, model_validator
 
 
 class Creator(BaseModel):
@@ -177,6 +177,8 @@ class GrantInfo(BaseModel):
         title: Grant title (optional)
         funder_name: Name of funding organization (optional)
         internal_id: Internal grant identifier (optional)
+        funder_ror_id: ROR identifier URL for funding organization (optional, auto-extracted)
+        funder_crossref_doi: CrossRef Funder Registry DOI (optional)
 
     """
 
@@ -184,6 +186,20 @@ class GrantInfo(BaseModel):
     title: str | None = None
     funder_name: str | None = None
     internal_id: str | None = None
+    funder_ror_id: str | None = None
+    funder_crossref_doi: str | None = None
+
+    @model_validator(mode="after")
+    def extract_funder_ids(self) -> "GrantInfo":
+        """Extract ROR from internal_id if not provided directly."""
+        if self.funder_ror_id is None and self.internal_id:
+            # Pattern: "018mejw64::460247524" or similar
+            ror_part = self.internal_id.split("::")[0]
+            # ROR IDs are typically 9 characters starting with 0
+            # Use flexible validation - just check it looks like a ROR ID
+            if re.match(r"^0[a-z0-9]{6,8}$", ror_part):
+                self.funder_ror_id = f"https://ror.org/{ror_part}"
+        return self
 
 
 class CommunityInfo(BaseModel):

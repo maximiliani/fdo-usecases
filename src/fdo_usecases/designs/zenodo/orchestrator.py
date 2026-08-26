@@ -21,6 +21,7 @@ import asyncio
 import logging
 
 from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign
+from fdo_usecases.designs.grant import GrantDesign
 from fdo_usecases.designs.zenodo.designs import (
     PublicationDesign,
     ZenodoDatasetDesign,
@@ -34,6 +35,7 @@ from fdo_usecases.designs.zenodo.models.exchange import (
     CreatorData,
     DatasetFDOData,
     FileFDOData,
+    GrantFDOData,
 )
 
 logger = logging.getLogger(__name__)
@@ -156,6 +158,8 @@ class ZenodoFDODesign(RecordDesign):
         self.dataset_design = ZenodoDatasetDesign(self)
         self.file_design = ZenodoFileDesign(self)
         self.publication_design = PublicationDesign(self)
+        self.grant_design = GrantDesign()
+        self.grant_design._graph = self._record_graph  # Share same graph reference
 
         # Reference processing service
         self.reference_processor = ReferenceProcessor(self)
@@ -205,7 +209,7 @@ class ZenodoFDODesign(RecordDesign):
 
     def _transform_to_exchange_models(
         self, dataset: Dataset
-    ) -> tuple[list[DatasetFDOData], list[FileFDOData]]:
+    ) -> tuple[list[DatasetFDOData], list[FileFDOData], list[GrantFDOData]]:
         """Convert Pydantic metadata models to exchange models.
 
         Transforms the fetched metadata into clean data contracts that decouple
@@ -215,7 +219,7 @@ class ZenodoFDODesign(RecordDesign):
             dataset: Complete dataset with all versions
 
         Returns:
-            Tuple of (dataset_datas, file_datas)
+            Tuple of (dataset_datas, file_datas, grant_datas)
 
         """
         logger.debug("Transforming metadata to exchange models")
@@ -291,11 +295,78 @@ class ZenodoFDODesign(RecordDesign):
             )
             file_datas.append(file_data)
 
+        # Transform grants (deduplicate by unique_key)
+        grants_dict: dict[str, GrantFDOData] = {}
+        for grant in dataset.grants:
+            # Skip grants without valid funder IDs
+            if not grant.funder_ror_id and not grant.funder_crossref_doi:
+                logger.debug(
+                    f"Skipping grant {grant.code} - no valid funder ID "
+                    f"(internal_id: {grant.internal_id})"
+                )
+                continue
+
+            try:
+                grant_data = GrantFDOData(
+                    funder_ror_id=grant.funder_ror_id,
+                    funder_crossref_doi=grant.funder_crossref_doi,
+                    funder_name=grant.funder_name or "Unknown",
+                    grant_code=grant.code,
+                    project_name=grant.title,
+                    project_website=None,  # Zenodo doesn't provide this
+                )
+
+                if grant_data.unique_key not in grants_dict:
+                    grants_dict[grant_data.unique_key] = grant_data
+            except ValueError as e:
+                logger.warning(f"Skipping invalid grant data: {e}")
+                continue
+
+        # Check against pre-registered grants (priority)
+        from fdo_usecases.designs.grant import PRE_REGISTERED_GRANTS
+
+        for key, grant_data in list(grants_dict.items()):
+            # Find matching pre-registered grant by unique_key
+            matching_entry = None
+            for entry in PRE_REGISTERED_GRANTS.values():
+                if entry.unique_key == key:
+                    matching_entry = entry
+                    break
+
+            if matching_entry:
+                static = matching_entry
+
+                # Log conflict if Zenodo data differs
+                if (
+                    grant_data.funder_name != static.funder_name
+                    or grant_data.project_name != static.project_name
+                    or (
+                        grant_data.project_website
+                        and grant_data.project_website != static.project_website
+                    )
+                ):
+                    logger.warning(
+                        f"Grant conflict for {key}: "
+                        f"Zenodo={grant_data}, Static={static}. Using static."
+                    )
+
+                # Override with static data
+                grants_dict[key] = GrantFDOData(
+                    funder_ror_id=static.funder_ror_id,
+                    funder_crossref_doi=static.funder_crossref_doi,
+                    funder_name=static.funder_name,
+                    grant_code=static.grant_code,
+                    project_name=static.project_name,
+                    project_website=static.project_website,
+                )
+
+        grant_datas = list(grants_dict.values())
+
         logger.debug(
-            f"Transformed to {len(dataset_datas)} dataset models "
-            f"and {len(file_datas)} file models"
+            f"Transformed to {len(dataset_datas)} dataset models, "
+            f"{len(file_datas)} file models, and {len(grant_datas)} grant models"
         )
-        return dataset_datas, file_datas
+        return dataset_datas, file_datas, grant_datas
 
     async def _process_zenodo_reference(self, doi: str) -> None:
         """Recursively process a nested Zenodo dataset reference.
@@ -435,13 +506,17 @@ class ZenodoFDODesign(RecordDesign):
         )
 
         concept_owned_by_us = False
+        dataset_datas: list[DatasetFDOData] = []
+        grant_ids = []
 
         if not concept_already_processed:
             # Mark concept as being processed by this call
             self._processing_datasets.add(dataset.concept_doi)
             concept_owned_by_us = True
 
-            dataset_datas, file_datas = self._transform_to_exchange_models(dataset)
+            dataset_datas, file_datas, grant_datas = self._transform_to_exchange_models(
+                dataset
+            )
 
             logger.info(f"Creating {len(dataset_datas)} Dataset FDOs")
             await asyncio.gather(
@@ -452,11 +527,23 @@ class ZenodoFDODesign(RecordDesign):
             await asyncio.gather(
                 *[self.file_design.create_fdo(data) for data in file_datas]
             )
+
+            logger.info(f"Creating {len(grant_datas)} Grant FDOs")
+            grant_ids = await asyncio.gather(
+                *[self.grant_design.create_fdo(data) for data in grant_datas]
+            )
+            grant_ids = [gid for gid in grant_ids if gid is not None]
         else:
             logger.info(
                 f"Concept {dataset.concept_doi} already processed, "
                 f"skipping FDO creation for {doi}"
             )
+
+        # Link datasets to grants via fundedBy relation
+        for dataset_data in dataset_datas:
+            record = self._record_graph[dataset_data.doi]
+            for grant_id in grant_ids:
+                record.addAttribute("21.T11969/funded0000000000001", grant_id)
 
         # Always process references - different versions may have different
         # related identifiers that need to be handled.

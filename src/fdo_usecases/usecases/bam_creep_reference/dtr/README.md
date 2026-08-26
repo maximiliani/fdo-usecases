@@ -92,8 +92,45 @@ Cardinality is defined at the Profile level.
 | datePublished            | `21.T11969/0c9b86e828976a85d4f2` | [`datePublished.json`](info_types/datePublished.json)                       | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/0c9b86e828976a85d4f2) | DateTime                  |
 | description              | `21.T11969/880724416f5857987e70` | [`description.json`](info_types/description.json)                           | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/880724416f5857987e70) | String                    |
 | doi                      | `21.T11969/48e563f148dc04d8b31c` | [`doi.json`](info_types/doi.json)                                           | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/48e563f148dc04d8b31c) | doi_identifier            |
+| funderDOI                | `21.T11969/8555b1635c61d2339700` | [`funderDOI.json`](info_types/funderDOI.json)                               | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/8555b1635c61d2339700) | doi_identifier            |
+| funderName               | `21.T11969/f3c36b0db75e669a57fa` | [`funderName.json`](info_types/funderName.json)                             | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/f3c36b0db75e669a57fa) | String                    |
+| funderRorId              | `21.T11969/4b9e95b6d60f47c5620f` | [`funderRorId.json`](info_types/funderRorId.json)                           | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/4b9e95b6d60f47c5620f) | ror                       |
+| fundedBy                 | `21.T11969/28ca0d5c50678433e5a8` | [`fundedBy.json`](info_types/fundedBy.json)                                 | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/28ca0d5c50678433e5a8) | handle_identifier         |
+| funds                    | `21.T11969/67b90082413e5e3547ff` | [`funds.json`](info_types/funds.json)                                       | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/67b90082413e5e3547ff) | handle_identifier         |
 | grantNumber              | `21.T11969/1c25f48eb6a47b22a9cc` | [`grantNumber.json`](info_types/grantNumber.json)                           | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/1c25f48eb6a47b22a9cc) | String                    |
 | hasChemicalComposition   | `21.T11969/e32cfb93d7fc61ce3ca5` | [`hasChemicalComposition.json`](info_types/hasChemicalComposition.json)     | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/e32cfb93d7fc61ce3ca5) | handle_identifier         |
+| hasData                  | `21.T11969/cc230f978e8add2e2520` | [`hasData.json`](info_types/hasData.json)                                   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/cc230f978e8add2e2520) | handle_identifier         |
+| hasHeatTreatment         | `21.T11969/766ae14d72b49cfb5273` | [`hasHeatTreatment.json`](info_types/hasHeatTreatment.json)                 | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/766ae14d72b49cfb5273) | handle_identifier         |
+| hasPart                  | `21.T11969/39c056d0cc63e2d0ff17` | [`hasPart.json`](info_types/hasPart.json)                                   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/39c056d0cc63e2d0ff17) | handle_identifier         |
+| hasMetadata              | `21.T11969/d0773859091aeb451528` | [`hasMetadata.json`](info_types/hasMetadata.json)                           | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/d0773859091aeb451528) | handle_identifier         |
+| helmholtzPoFStructure    | `21.T11969/e5cb2389246c17ee0503` | [`helmholtzPoFStructure.json`](info_types/helmholtzPoFStructure.json)       | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/e5cb2389246c17ee0503) | String                    |
+| helmholtzResearchArea    | `21.T11969/ed4732b6dc70be0f1b22` | [`helmholtzResearchArea.json`](info_types/helmholtzResearchArea.json)       | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/ed4732b6dc70be0f1b22) | HelmholtzResearchAreaEnum |
+| initialStress            | `21.T11969/8bd53487030550ee2e94` | [`initialStress.json`](info_types/initialStress.json)                       | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/8bd53487030550ee2e94) | DecimalNumber             |
+| isCitedBy                | `21.T11969/520bb71b795d8573f533` | [`isCitedBy.json`](info_types/isCitedBy.json)                               | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/520bb71b795d8573f533) | handle_identifier         |
+| isPartOf                 | `21.T11969/30f4a1f8aacab81faf38` | [`isPartOf.json`](info_types/isPartOf.json)                                 | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/30f4a1f8aacab81faf38) | handle_identifier         |
+| isReferencedBy           | `21.T11969/e5945ef3ff07f314a146` | [`isReferencedBy.json`](info_types/isReferencedBy.json)                     | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/e5945ef3ff07f314a146) | handle_identifier         |
+| keyword                  | `21.T11969/793ff5c33c3aeb32907a` | [`keyword.json`](info_types/keyword.json)                                   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/793ff5c33c3aeb32907a) | String                    |
+| latestVersion            | `21.T11969/2b4d6ceda80ddd63f7a9` | [`latestVersion.json`](info_types/latestVersion.json)                       | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/2b4d6ceda80ddd63f7a9) | handle_identifier         |
+| landingPageLocation      | `21.T11969/8710d753ad10f371189b` | external                                                                    | [view](https://hdl.handle.net/21.T11969/8710d753ad10f371189b)                             | URL                       |
+| materialID               | `21.T11969/716805eef0349802dc9a` | [`materialID.json`](info_types/materialID.json)                             | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/716805eef0349802dc9a) | String                    |
+| mimeType                 | `21.T11969/3313b863118ed5eb0ded` | [`mimeType.json`](info_types/mimeType.json)                                 | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/3313b863118ed5eb0ded) | String                    |
+| name                     | `21.T11969/bd3e9fb9b606d2198c9e` | [`name.json`](info_types/name.json)                                         | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/bd3e9fb9b606d2198c9e) | String                    |
+| nextVersion              | `21.T11969/7f1a6afddcfeefbf195b` | [`nextVersion.json`](info_types/nextVersion.json)                           | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/7f1a6afddcfeefbf195b) | handle_identifier         |
+| nfdiConsortia            | `21.T11969/3b01aa9a09f0fab04265` | [`nfdiConsortia.json`](info_types/nfdiConsortia.json)                       | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/3b01aa9a09f0fab04265) | String                    |
+| percentageCreepExtension | `21.T11969/4be978cac878da94105e` | [`percentageCreepExtension.json`](info_types/percentageCreepExtension.json) | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/4be978cac878da94105e) | Percentage                |
+| previewImage             | `21.T11969/925e3f9925a88476ffba` | [`previewImage.json`](info_types/previewImage.json)                         | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/925e3f9925a88476ffba) | URL                       |
+| previousVersion          | `21.T11969/7c97f00a2a95826c1a8f` | [`previousVersion.json`](info_types/previousVersion.json)                   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/7c97f00a2a95826c1a8f) | handle_identifier         |
+| projectName              | `21.T11969/112427d2da588bf46e53` | [`projectName.json`](info_types/projectName.json)                           | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/112427d2da588bf46e53) | String                    |
+| projectWebsite           | `21.T11969/e9fbabb0285ca091838e` | [`projectWebsite.json`](info_types/projectWebsite.json)                     | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/e9fbabb0285ca091838e) | URL                       |
+| publisher                | `21.T11969/cdd96207a7dfbcc0db93` | [`publisher.json`](info_types/publisher.json)                               | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/cdd96207a7dfbcc0db93) | String                    |
+| references               | `21.T11969/f4c9a69f715c3c60aa2f` | [`references.json`](info_types/references.json)                             | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/f4c9a69f715c3c60aa2f) | handle_identifier         |
+| semImage                 | `21.T11969/19a94f596420bb274408` | [`semImage.json`](info_types/semImage.json)                                 | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/19a94f596420bb274408) | handle_identifier         |
+| spdxLicense              | `21.T11969/623654b1072ae7b88202` | [`spdxLicense.json`](info_types/spdxLicense.json)                           | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/623654b1072ae7b88202) | SPDX_URL                  |
+| specifiedTemperature     | `21.T11969/ac4a911ffb09772718e3` | [`specifiedTemperature.json`](info_types/specifiedTemperature.json)         | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/ac4a911ffb09772718e3) | DecimalNumber             |
+| testDuration             | `21.T11969/7e84faadd49ac88d02b8` | [`testDuration.json`](info_types/testDuration.json)                         | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/7e84faadd49ac88d02b8) | Duration                  |
+| testID                   | `21.T11969/1a34a6966f91cc341f58` | [`testID.json`](info_types/testID.json)                                     | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/1a34a6966f91cc341f58) | String                    |
+| usesMaterial             | `21.T11969/2dced98076fda9cbf0ef` | [`usesMaterial.json`](info_types/usesMaterial.json)                         | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/2dced98076fda9cbf0ef) | handle_identifier         |
+| version                  | `21.T11969/be1ae3492b235faad933` | [`version.json`](info_types/version.json)                                   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/be1ae3492b235faad933) | SemVerVersion             |
 | hasData                  | `21.T11969/cc230f978e8add2e2520` | [`hasData.json`](info_types/hasData.json)                                   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/cc230f978e8add2e2520) | handle_identifier         |
 | hasHeatTreatment         | `21.T11969/766ae14d72b49cfb5273` | [`hasHeatTreatment.json`](info_types/hasHeatTreatment.json)                 | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/766ae14d72b49cfb5273) | handle_identifier         |
 | hasPart                  | `21.T11969/39c056d0cc63e2d0ff17` | [`hasPart.json`](info_types/hasPart.json)                                   | [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/39c056d0cc63e2d0ff17) | handle_identifier         |
@@ -169,6 +206,22 @@ Profiles combine InfoTypes with specific cardinalities. Property names match Inf
 |---------------|---------------|-------------|
 | nfdiConsortia | nfdiConsortia | 1..n        |
 | grantNumber   | grantNumber   | 1..n        |
+
+### Grant
+
+**PID**: `21.T11969/c02329c48f348eb63368`
+**Local File**: [`Grant.json`](profiles/Grant.json)
+**DTR Entry**: [View](https://typeregistry.lab.pidconsortium.net/objects/21.T11969/c02329c48f348eb63368)
+
+| Property        | InfoType        | Cardinality |
+|-----------------|-----------------|-------------|
+| funderRorId     | funderRorId     | 0..1        |
+| funderDOI       | funderDOI       | 0..1        |
+| funderName      | funderName      | 1..n        |
+| grantCode       | grantCode       | 1           |
+| projectName     | projectName     | 0..n        |
+| projectWebsite  | projectWebsite  | 0..n        |
+| funds           | funds           | 0..n        |
 
 ### Versionable
 
