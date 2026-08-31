@@ -103,3 +103,21 @@ class TestPidRecordSelfReference:
         record.addAttribute("some_key", None)
 
         assert len(record._tuples) == 0
+
+    def test_to_simple_json_coerces_values_to_strings(self):
+        """Test that toSimpleJSON serializes numeric values as strings."""
+        record = PidRecord()
+        record.setId("PID_md5:abc123")
+        record.setPid("")
+
+        record.addAttribute("temperature", 230.0)
+        record.addAttribute("orientation", 6.2)
+        record.addAttribute("count", 5)
+        record.addAttribute("enabled", True)
+
+        simple = record.toSimpleJSON()
+        values = {pair["key"]: pair["value"] for pair in simple["record"]}
+        assert values["temperature"] == "230.0"
+        assert values["orientation"] == "6.2"
+        assert values["count"] == "5"
+        assert values["enabled"] == "True"

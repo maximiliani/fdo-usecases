@@ -229,8 +229,12 @@ class PidRecord:
         return tuple in self._tuples
 
     def toSimpleJSON(self) -> Dict[str, Any]:
+        # SimpleJSON attribute values must be strings (the Typed PID Maker
+        # requires them), so numeric/bool values are serialized as strings.
         result: Dict[str, Any] = {
-            "record": [{"key": key, "value": value} for (key, value) in self._tuples]
+            "record": [
+                {"key": key, "value": str(value)} for (key, value) in self._tuples
+            ]
         }
         if self._pid and self._pid != "":
             result["pid"] = self._pid
@@ -417,7 +421,9 @@ class Executor:
 
             try:
                 api_response: BatchRecordResponse = api.create_pids(
-                    pid_record=graph_for_api, dryrun=dryrun
+                    pid_record=graph_for_api,
+                    dryrun=dryrun,
+                    _request_timeout=3600,
                 )
                 print("------ Successful response from API ---")
 
