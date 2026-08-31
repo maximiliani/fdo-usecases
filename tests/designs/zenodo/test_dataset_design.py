@@ -11,6 +11,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from fdo_usecases.designer_lib.executor import placeholder_pid
 from fdo_usecases.designs.zenodo.constants import (
     BACKLINK_DATASET_FILE,
     BACKLINK_VERSION_CHAIN,
@@ -72,14 +73,14 @@ async def test_create_fdo_basic(sample_dataset_data):
     record_id = await design.create_fdo(sample_dataset_data)
 
     # Verify return value
-    assert record_id == sample_dataset_data.doi
+    assert record_id == placeholder_pid(sample_dataset_data.doi)
 
     # Verify record was created and stored locally
-    assert sample_dataset_data.doi in design._local_records
-    record = design._local_records[sample_dataset_data.doi]
+    assert placeholder_pid(sample_dataset_data.doi) in design._local_records
+    record = design._local_records[placeholder_pid(sample_dataset_data.doi)]
 
     # Verify identity
-    assert record.getId() == sample_dataset_data.doi
+    assert record.getId() == placeholder_pid(sample_dataset_data.doi)
     assert record.getPid() == ""
 
     # Convert tuples to dict for easier lookup
@@ -104,9 +105,13 @@ async def test_create_fdo_basic(sample_dataset_data):
 
     # Verify versionable attributes
     assert sample_dataset_data.version_label in attr_dict[INFOTYPES["version"]]
-    assert sample_dataset_data.next_version_doi in attr_dict[INFOTYPES["nextVersion"]]
     assert (
-        sample_dataset_data.latest_version_doi in attr_dict[INFOTYPES["latestVersion"]]
+        placeholder_pid(sample_dataset_data.next_version_doi)
+        in attr_dict[INFOTYPES["nextVersion"]]
+    )
+    assert (
+        placeholder_pid(sample_dataset_data.latest_version_doi)
+        in attr_dict[INFOTYPES["latestVersion"]]
     )
 
     # Verify backlinks
@@ -121,7 +126,7 @@ async def test_create_fdo_with_creators(sample_dataset_data):
 
     await design.create_fdo(sample_dataset_data)
 
-    record = design._local_records[sample_dataset_data.doi]
+    record = design._local_records[placeholder_pid(sample_dataset_data.doi)]
     attr_dict = {}
     for k, v in record._tuples:
         if k not in attr_dict:
@@ -149,7 +154,7 @@ async def test_create_fdo_with_keywords(sample_dataset_data):
 
     await design.create_fdo(sample_dataset_data)
 
-    record = design._local_records[sample_dataset_data.doi]
+    record = design._local_records[placeholder_pid(sample_dataset_data.doi)]
     attr_dict = {}
     for k, v in record._tuples:
         if k not in attr_dict:
@@ -169,7 +174,7 @@ async def test_create_fdo_with_html_stripping(dataset_with_version_chain):
 
     await design.create_fdo(dataset_with_version_chain)
 
-    record = design._local_records[dataset_with_version_chain.doi]
+    record = design._local_records[placeholder_pid(dataset_with_version_chain.doi)]
     attr_dict = {}
     for k, v in record._tuples:
         if k not in attr_dict:
@@ -190,7 +195,7 @@ async def test_create_fdo_version_chain(dataset_with_version_chain):
 
     await design.create_fdo(dataset_with_version_chain)
 
-    record = design._local_records[dataset_with_version_chain.doi]
+    record = design._local_records[placeholder_pid(dataset_with_version_chain.doi)]
     attr_dict = {}
     for k, v in record._tuples:
         if k not in attr_dict:
@@ -200,21 +205,21 @@ async def test_create_fdo_version_chain(dataset_with_version_chain):
     # Verify previous version
     assert INFOTYPES["previousVersion"] in attr_dict
     assert (
-        dataset_with_version_chain.previous_version_doi
+        placeholder_pid(dataset_with_version_chain.previous_version_doi)
         in attr_dict[INFOTYPES["previousVersion"]]
     )
 
     # Verify next version
     assert INFOTYPES["nextVersion"] in attr_dict
     assert (
-        dataset_with_version_chain.next_version_doi
+        placeholder_pid(dataset_with_version_chain.next_version_doi)
         in attr_dict[INFOTYPES["nextVersion"]]
     )
 
     # Verify latest version (should not be set when it equals current DOI)
     assert INFOTYPES["latestVersion"] in attr_dict
     assert (
-        dataset_with_version_chain.latest_version_doi
+        placeholder_pid(dataset_with_version_chain.latest_version_doi)
         in attr_dict[INFOTYPES["latestVersion"]]
     )
 

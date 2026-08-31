@@ -11,7 +11,7 @@ compliant with Base + Versionable profiles from the BAM creep-reference schema.
 import logging
 from typing import TYPE_CHECKING
 
-from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign
+from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign, placeholder_pid
 from fdo_usecases.designs.zenodo.constants import (
     BACKLINK_DATASET_FILE,
     BACKLINK_VERSION_CHAIN,
@@ -85,7 +85,7 @@ class ZenodoDatasetDesign(RecordDesign):
 
         # Create PidRecord directly
         record = PidRecord()
-        record.setId(data.doi)
+        record.setId(placeholder_pid(data.doi))
         record.setPid("")
 
         # Profiles - Base + Versionable
@@ -123,18 +123,26 @@ class ZenodoDatasetDesign(RecordDesign):
         record.addAttribute(INFOTYPES["version"], data.version_label)
 
         if data.previous_version_doi:
-            record.addAttribute(INFOTYPES["previousVersion"], data.previous_version_doi)
+            record.addAttribute(
+                INFOTYPES["previousVersion"],
+                placeholder_pid(data.previous_version_doi),
+            )
 
         if data.next_version_doi:
-            record.addAttribute(INFOTYPES["nextVersion"], data.next_version_doi)
+            record.addAttribute(
+                INFOTYPES["nextVersion"], placeholder_pid(data.next_version_doi)
+            )
 
         if data.latest_version_doi and data.latest_version_doi != data.doi:
-            record.addAttribute(INFOTYPES["latestVersion"], data.latest_version_doi)
+            record.addAttribute(
+                INFOTYPES["latestVersion"],
+                placeholder_pid(data.latest_version_doi),
+            )
 
         # Forward links: hasPart - link this dataset version to its files
         if data.files:
             for checksum in data.files:
-                record.addAttribute(INFOTYPES["hasPart"], checksum)
+                record.addAttribute(INFOTYPES["hasPart"], placeholder_pid(checksum))
 
         # Landing page location
         if data.landing_page_url:
@@ -157,12 +165,13 @@ class ZenodoDatasetDesign(RecordDesign):
         self.addBacklink(*BACKLINK_VERSION_CHAIN)
 
         # Store locally for testing, or in orchestrator's graph
-        self._local_records[data.doi] = record
+        record_id = placeholder_pid(data.doi)
+        self._local_records[record_id] = record
         if self.orchestrator:
-            self.orchestrator._record_graph[data.doi] = record
+            self.orchestrator._record_graph[record_id] = record
 
         logger.debug(f"Created Dataset FDO record for {data.doi}")
-        return data.doi
+        return record_id
 
 
 __all__ = ["ZenodoDatasetDesign"]

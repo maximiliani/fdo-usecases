@@ -10,6 +10,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from fdo_usecases.designer_lib.executor import placeholder_pid
 from fdo_usecases.designs.zenodo.constants import (
     BACKLINK_PUBLICATION_CITATION,
     BACKLINK_PUBLICATION_REFERENCE,
@@ -72,14 +73,14 @@ async def test_create_fdo_basic(sample_publication_data):
     record_id = await design.create_fdo(sample_publication_data)
 
     # Verify return value
-    assert record_id == sample_publication_data.identifier
+    assert record_id == placeholder_pid(sample_publication_data.identifier)
 
     # Verify record was created and stored locally
-    assert sample_publication_data.identifier in design._local_records
-    record = design._local_records[sample_publication_data.identifier]
+    assert placeholder_pid(sample_publication_data.identifier) in design._local_records
+    record = design._local_records[placeholder_pid(sample_publication_data.identifier)]
 
     # Verify identity
-    assert record.getId() == sample_publication_data.identifier
+    assert record.getId() == placeholder_pid(sample_publication_data.identifier)
     assert record.getPid() == ""
 
     # Convert tuples to dict for easier lookup
@@ -122,7 +123,7 @@ async def test_create_fdo_minimal(minimal_publication_data):
 
     await design.create_fdo(minimal_publication_data)
 
-    record = design._local_records[minimal_publication_data.identifier]
+    record = design._local_records[placeholder_pid(minimal_publication_data.identifier)]
     attr_dict = {}
     for k, v in record._tuples:
         if k not in attr_dict:
@@ -149,7 +150,7 @@ async def test_create_fdo_with_html_stripping(publication_with_html):
 
     await design.create_fdo(publication_with_html)
 
-    record = design._local_records[publication_with_html.identifier]
+    record = design._local_records[placeholder_pid(publication_with_html.identifier)]
     attr_dict = {}
     for k, v in record._tuples:
         if k not in attr_dict:
@@ -184,7 +185,7 @@ async def test_create_fdo_multiple_creators():
 
     await design.create_fdo(publication)
 
-    record = design._local_records[publication.identifier]
+    record = design._local_records[placeholder_pid(publication.identifier)]
     attr_dict = {}
     for k, v in record._tuples:
         if k not in attr_dict:
@@ -241,7 +242,7 @@ async def test_different_publication_types():
 
         await design.create_fdo(pub_data)
 
-        record = design._local_records[pub_data.identifier]
+        record = design._local_records[placeholder_pid(pub_data.identifier)]
         attr_dict = {}
         for k, v in record._tuples:
             if k not in attr_dict:
@@ -284,10 +285,10 @@ async def test_create_fdo_accumulates_referencing_datasets():
     await pub_design.create_fdo(first)
     await pub_design.create_fdo(second)
 
-    record = design._record_graph["10.1016/j.actamat.2025.120735"]
+    record = design._record_graph["PID_10.1016/j.actamat.2025.120735"]
     referencing = [v for k, v in record._tuples if k == INFOTYPES["isReferencedBy"]]
-    assert "10.5281/zenodo.111111" in referencing
-    assert "10.5281/zenodo.222222" in referencing
+    assert "PID_10.5281/zenodo.111111" in referencing
+    assert "PID_10.5281/zenodo.222222" in referencing
 
 
 @pytest.mark.asyncio
@@ -302,5 +303,7 @@ async def test_identifier_as_record_id():
 
     record_id = await design.create_fdo(pub_data)
 
-    assert record_id == pub_data.identifier
-    assert design._local_records[pub_data.identifier].getId() == pub_data.identifier
+    assert record_id == placeholder_pid(pub_data.identifier)
+    assert design._local_records[
+        placeholder_pid(pub_data.identifier)
+    ].getId() == placeholder_pid(pub_data.identifier)

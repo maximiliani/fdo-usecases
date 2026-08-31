@@ -32,7 +32,7 @@ class TestCreepModels:
             },
             has_data=["md5:abc123"],
             has_metadata=["md5:def456"],
-            uses_material="CMSX-6_md5:chem123",
+            uses_material="PID_CMSX-6_md5:chem123",
             percentage_creep_extension=0.015,
             creators=["https://orcid.org/0000-0000-0000-0000"],
             keywords=["CMSX-6", "creep test"],
@@ -47,7 +47,7 @@ class TestCreepModels:
         """Test MaterialData creation."""
         material_data = MaterialData(
             material_id="CMSX-6",
-            pid_composition="CMSX-6_md5:chem123",
+            pid_composition="PID_CMSX-6_md5:chem123",
             has_chemical_composition="md5:chem123",
             has_heat_treatment="md5:heat456",
             descriptions=[
@@ -78,7 +78,7 @@ class TestCreepOrchestrator:
         # Create test data
         material_data = MaterialData(
             material_id="CMSX-6",
-            pid_composition="CMSX-6_md5:chem123",
+            pid_composition="PID_CMSX-6_md5:chem123",
             has_chemical_composition="md5:chem123",
             has_heat_treatment="md5:heat456",
             descriptions=["Test description"],
@@ -100,7 +100,7 @@ class TestCreepOrchestrator:
             },
             has_data=["md5:abc123"],
             has_metadata=["md5:def456"],
-            uses_material="CMSX-6_md5:chem123",
+            uses_material="PID_CMSX-6_md5:chem123",
         )
 
         # Create FDOs
@@ -109,8 +109,8 @@ class TestCreepOrchestrator:
 
         # Verify graph
         assert len(orchestrator._record_graph) == 2
-        assert "CMSX-6_md5:chem123" in orchestrator._record_graph
-        assert "Vh5205_C-78" in orchestrator._record_graph
+        assert "PID_CMSX-6_md5:chem123" in orchestrator._record_graph
+        assert "PID_Vh5205_C-78" in orchestrator._record_graph
 
         # Check profiles
         # material_record = orchestrator._record_graph["CMSX-6_md5:chem123"]  # Used for assertion below

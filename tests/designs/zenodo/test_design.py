@@ -11,7 +11,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from fdo_usecases.designer_lib.executor import PidRecord
+from fdo_usecases.designer_lib.executor import PidRecord, placeholder_pid
 from fdo_usecases.designs.zenodo.models import (
     Creator,
     Dataset,
@@ -241,7 +241,9 @@ async def test_execute_async_processes_all(mock_dataset):
     ):
         # Pre-populate graph with version FDOs (create_fdo is mocked)
         for version_doi in ["10.5281/zenodo.111111", "10.5281/zenodo.222222"]:
-            design._record_graph[version_doi] = PidRecord().setId(version_doi)
+            design._record_graph[placeholder_pid(version_doi)] = PidRecord().setId(
+                placeholder_pid(version_doi)
+            )
 
         await design.execute_async()
 
@@ -334,8 +336,8 @@ async def test_execute_with_references(mock_dataset_with_references):
         ) as mock_proc,
     ):
         # Pre-populate graph with version FDOs (create_fdo is mocked)
-        design._record_graph["10.5281/zenodo.111111"] = PidRecord().setId(
-            "10.5281/zenodo.111111"
+        design._record_graph[placeholder_pid("10.5281/zenodo.111111")] = (
+            PidRecord().setId(placeholder_pid("10.5281/zenodo.111111"))
         )
         await design.execute_async()
 
@@ -414,7 +416,9 @@ async def test_processes_references_for_each_version():
     ):
         # Pre-populate graph with version FDOs (create_fdo is mocked)
         for version_doi in ["10.5281/zenodo.111111", "10.5281/zenodo.222222"]:
-            design._record_graph[version_doi] = PidRecord().setId(version_doi)
+            design._record_graph[placeholder_pid(version_doi)] = PidRecord().setId(
+                placeholder_pid(version_doi)
+            )
 
         await design.execute_async()
 
@@ -446,8 +450,8 @@ async def test_skips_already_processed_reference_versions(mock_dataset_with_refe
             design.reference_processor, "process_all", new_callable=AsyncMock
         ) as mock_proc,
     ):
-        design._record_graph["10.5281/zenodo.111111"] = PidRecord().setId(
-            "10.5281/zenodo.111111"
+        design._record_graph[placeholder_pid("10.5281/zenodo.111111")] = (
+            PidRecord().setId(placeholder_pid("10.5281/zenodo.111111"))
         )
         await design.execute_async()
 

@@ -7,7 +7,7 @@
 import logging
 from typing import TYPE_CHECKING
 
-from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign
+from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign, placeholder_pid
 
 from ..constants import (
     BACKLINK_DATASET_EXPERIMENT,
@@ -58,7 +58,7 @@ class CreepExperimentDesign(RecordDesign):
         logger.info(f"Creating CreepExperiment FDO for {data.test_id}")
 
         record = PidRecord()
-        record.setId(data.test_id)
+        record.setId(placeholder_pid(data.test_id))
         record.setPid("")
 
         # Profiles
@@ -91,14 +91,14 @@ class CreepExperimentDesign(RecordDesign):
 
         # Relationships - Files
         for checksum in data.has_data:
-            record.addAttribute(INFOTYPES["hasData"], checksum)
+            record.addAttribute(INFOTYPES["hasData"], placeholder_pid(checksum))
 
         for checksum in data.has_metadata:
-            record.addAttribute(INFOTYPES["hasMetadata"], checksum)
+            record.addAttribute(INFOTYPES["hasMetadata"], placeholder_pid(checksum))
 
         # Link standalone LIS metadata files (e.g., Vh5205_C-85.LIS) via hasMetadata
         for checksum in data.standalone_metadata_files:
-            record.addAttribute(INFOTYPES["hasMetadata"], checksum)
+            record.addAttribute(INFOTYPES["hasMetadata"], placeholder_pid(checksum))
 
         # Relationship - Material
         record.addAttribute(INFOTYPES["usesMaterial"], data.uses_material)
@@ -150,7 +150,7 @@ class CreepExperimentDesign(RecordDesign):
 
         # Link to datasets containing this experiment's files (isPartOf)
         for dataset_doi in data.dataset_dois:
-            record.addAttribute(INFOTYPES["isPartOf"], dataset_doi)
+            record.addAttribute(INFOTYPES["isPartOf"], placeholder_pid(dataset_doi))
 
         # Backlinks for inference
         self.addBacklink(*BACKLINK_EXPERIMENT_FILE)
@@ -161,9 +161,10 @@ class CreepExperimentDesign(RecordDesign):
         )  # NEW: For dataset↔experiment bidirectional
 
         # Store in graph
-        self._local_records[data.test_id] = record
+        record_id = placeholder_pid(data.test_id)
+        self._local_records[record_id] = record
         if self.orchestrator:
-            self.orchestrator._record_graph[data.test_id] = record
+            self.orchestrator._record_graph[record_id] = record
 
         logger.debug(f"Created CreepExperiment FDO for {data.test_id}")
-        return data.test_id
+        return record_id

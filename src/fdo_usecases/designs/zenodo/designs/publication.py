@@ -11,7 +11,7 @@ compliant with Base + Publication profiles from the BAM creep-reference schema.
 import logging
 from typing import TYPE_CHECKING
 
-from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign
+from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign, placeholder_pid
 from fdo_usecases.designs.zenodo.constants import (
     BACKLINK_PUBLICATION_CITATION,
     BACKLINK_PUBLICATION_REFERENCE,
@@ -88,7 +88,7 @@ class PublicationDesign(RecordDesign):
 
         # Create PidRecord directly
         record = PidRecord()
-        record.setId(data.identifier)
+        record.setId(placeholder_pid(data.identifier))
         record.setPid("")
 
         # Profiles - Base + Publication
@@ -123,7 +123,9 @@ class PublicationDesign(RecordDesign):
         # Forward links: isReferencedBy - link this publication to datasets that reference it
         if data.referenced_by_datasets:
             for dataset_doi in data.referenced_by_datasets:
-                record.addAttribute(INFOTYPES["isReferencedBy"], dataset_doi)
+                record.addAttribute(
+                    INFOTYPES["isReferencedBy"], placeholder_pid(dataset_doi)
+                )
 
         # Landing page location
         if data.landing_page_url:
@@ -131,11 +133,12 @@ class PublicationDesign(RecordDesign):
 
         # Merge into an existing record if this publication was already created
         # (e.g. referenced by a different dataset earlier in the run).
+        record_id = placeholder_pid(data.identifier)
         existing = None
         if self.orchestrator:
-            existing = self.orchestrator._record_graph.get(data.identifier)
+            existing = self.orchestrator._record_graph.get(record_id)
         else:
-            existing = self._local_records.get(data.identifier)
+            existing = self._local_records.get(record_id)
 
         if existing is not None:
             for key, value in record._tuples:
@@ -151,12 +154,12 @@ class PublicationDesign(RecordDesign):
         self.addBacklink(*BACKLINK_PUBLICATION_REFERENCE)
 
         # Store locally for testing, or in orchestrator's graph
-        self._local_records[data.identifier] = record
+        self._local_records[record_id] = record
         if self.orchestrator:
-            self.orchestrator._record_graph[data.identifier] = record
+            self.orchestrator._record_graph[record_id] = record
 
         logger.debug(f"Created Publication FDO record for {data.identifier}")
-        return data.identifier
+        return record_id
 
 
 __all__ = ["PublicationDesign"]

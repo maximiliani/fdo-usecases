@@ -62,7 +62,7 @@ class GrantDesign(RecordDesign):
             project_website="https://nfdi-matwerk.de"
         )
         grant_id = await design.create_fdo(data)
-        # Returns: "grant:https://ror.org/018mejw64::460247524"
+        # Returns: "PID_grant:https://ror.org/018mejw64::460247524"
         ```
 
     Attributes:
@@ -101,7 +101,7 @@ class GrantDesign(RecordDesign):
                 funder name, and grant code.
 
         Returns:
-            Grant FDO ID string if created successfully (format: `grant:<funder_id>::<grant_code>`),
+            Grant FDO ID string if created successfully (format: `PID_grant:<funder_id>::<grant_code>`),
             None if validation failed with blocking errors.
 
         """

@@ -18,6 +18,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
+from fdo_usecases.designer_lib.executor import placeholder_pid
 from fdo_usecases.designs.zenodo.constants import (
     BACKLINK_DATASET_FILE,
     BACKLINK_PUBLICATION_CITATION,
@@ -204,12 +205,12 @@ class TestFDOGraphStructure:
 
         # Verify we have records (2 datasets + 3 files + 1 publication = 6)
         assert len(graph) == 6
-        assert "10.5281/zenodo.111111" in graph
-        assert "10.5281/zenodo.222222" in graph
-        assert "md5:28573899cc09a145ac2c69fc1370c0bf" in graph
-        assert "md5:abcdef12345678901234567890abcdef" in graph
-        assert "md5:1234567890abcdef1234567890abcdef" in graph
-        assert "10.1016/j.actamat.2025.120735" in graph
+        assert placeholder_pid("10.5281/zenodo.111111") in graph
+        assert placeholder_pid("10.5281/zenodo.222222") in graph
+        assert placeholder_pid("md5:28573899cc09a145ac2c69fc1370c0bf") in graph
+        assert placeholder_pid("md5:abcdef12345678901234567890abcdef") in graph
+        assert placeholder_pid("md5:1234567890abcdef1234567890abcdef") in graph
+        assert placeholder_pid("10.1016/j.actamat.2025.120735") in graph
 
     @pytest.mark.asyncio
     async def test_dataset_profile_compliance(self, real_world_dataset):
@@ -225,7 +226,7 @@ class TestFDOGraphStructure:
             await design.execute_async()
 
         for version_doi in ["10.5281/zenodo.111111", "10.5281/zenodo.222222"]:
-            record = design._record_graph[version_doi]
+            record = design._record_graph[placeholder_pid(version_doi)]
 
             # Convert tuples to dict for easier lookup
             attr_dict = {}
@@ -258,7 +259,7 @@ class TestFDOGraphStructure:
             await design.execute_async()
 
         for checksum in real_world_dataset.all_files.keys():
-            record = design._record_graph[checksum]
+            record = design._record_graph[placeholder_pid(checksum)]
 
             # Convert tuples to dict for easier lookup
             attr_dict = {}
@@ -291,7 +292,7 @@ class TestFDOGraphStructure:
             await design.execute_async()
 
         pub_doi = "10.1016/j.actamat.2025.120735"
-        record = design._record_graph[pub_doi]
+        record = design._record_graph[placeholder_pid(pub_doi)]
 
         # Convert tuples to dict for easier lookup
         attr_dict = {}
@@ -319,21 +320,27 @@ class TestFDOGraphStructure:
         ):
             await design.execute_async()
 
-        v1_record = design._record_graph["10.5281/zenodo.111111"]
-        v2_record = design._record_graph["10.5281/zenodo.222222"]
+        v1_record = design._record_graph[placeholder_pid("10.5281/zenodo.111111")]
+        v2_record = design._record_graph[placeholder_pid("10.5281/zenodo.222222")]
 
         # Convert tuples to dict for easier lookup
         v1_attrs = {k: v for k, v in v1_record._tuples}
         v2_attrs = {k: v for k, v in v2_record._tuples}
 
         assert INFOTYPES["nextVersion"] in v1_attrs
-        assert v1_attrs[INFOTYPES["nextVersion"]] == "10.5281/zenodo.222222"
+        assert v1_attrs[INFOTYPES["nextVersion"]] == placeholder_pid(
+            "10.5281/zenodo.222222"
+        )
 
         assert INFOTYPES["previousVersion"] in v2_attrs
-        assert v2_attrs[INFOTYPES["previousVersion"]] == "10.5281/zenodo.111111"
+        assert v2_attrs[INFOTYPES["previousVersion"]] == placeholder_pid(
+            "10.5281/zenodo.111111"
+        )
 
         assert INFOTYPES["latestVersion"] in v1_attrs
-        assert v1_attrs[INFOTYPES["latestVersion"]] == "10.5281/zenodo.222222"
+        assert v1_attrs[INFOTYPES["latestVersion"]] == placeholder_pid(
+            "10.5281/zenodo.222222"
+        )
 
         assert INFOTYPES["latestVersion"] not in v2_attrs
 
@@ -391,7 +398,7 @@ class TestCreatorAndAffiliationData:
         ):
             await design.execute_async()
 
-        v1_record = design._record_graph["10.5281/zenodo.111111"]
+        v1_record = design._record_graph[placeholder_pid("10.5281/zenodo.111111")]
         # Collect all values for each key (lists are flattened by PidRecord)
         attr_dict = {}
         for k, v in v1_record._tuples:
@@ -417,7 +424,7 @@ class TestCreatorAndAffiliationData:
         ):
             await design.execute_async()
 
-        v1_record = design._record_graph["10.5281/zenodo.111111"]
+        v1_record = design._record_graph[placeholder_pid("10.5281/zenodo.111111")]
         attr_dict = {k: v for k, v in v1_record._tuples}
 
         assert INFOTYPES["creatorAffiliation"] in attr_dict
@@ -442,10 +449,10 @@ class TestFileDeduplication:
             await design.execute_async()
 
         readme_checksum = "md5:1234567890abcdef1234567890abcdef"
-        assert readme_checksum in design._record_graph
+        assert placeholder_pid(readme_checksum) in design._record_graph
 
-        readme_record = design._record_graph[readme_checksum]
-        assert readme_record.getId() == readme_checksum
+        readme_record = design._record_graph[placeholder_pid(readme_checksum)]
+        assert readme_record.getId() == placeholder_pid(readme_checksum)
 
         versions_with_readme = [
             v for v in real_world_dataset.all_files[readme_checksum].present_in_versions
@@ -468,11 +475,11 @@ class TestFileDeduplication:
         v1_only = "md5:28573899cc09a145ac2c69fc1370c0bf"
         v2_only = "md5:abcdef12345678901234567890abcdef"
 
-        assert v1_only in design._record_graph
-        assert v2_only in design._record_graph
+        assert placeholder_pid(v1_only) in design._record_graph
+        assert placeholder_pid(v2_only) in design._record_graph
 
-        v1_record = design._record_graph[v1_only]
-        v2_record = design._record_graph[v2_only]
+        v1_record = design._record_graph[placeholder_pid(v1_only)]
+        v2_record = design._record_graph[placeholder_pid(v2_only)]
 
         assert v1_record.getId() != v2_record.getId()
 
@@ -494,7 +501,7 @@ class TestLicenseHandling:
             await design.execute_async()
 
         for checksum in real_world_dataset.all_files.keys():
-            record = design._record_graph[checksum]
+            record = design._record_graph[placeholder_pid(checksum)]
             attr_dict = {k: v for k, v in record._tuples}
             assert INFOTYPES["spdxLicense"] in attr_dict
             license_url = attr_dict[INFOTYPES["spdxLicense"]]
@@ -517,7 +524,7 @@ class TestKeywordsAndMetadata:
         ):
             await design.execute_async()
 
-        v1_record = design._record_graph["10.5281/zenodo.111111"]
+        v1_record = design._record_graph[placeholder_pid("10.5281/zenodo.111111")]
         # Collect all values for each key (lists are flattened by PidRecord)
         attr_dict = {}
         for k, v in v1_record._tuples:
@@ -531,7 +538,7 @@ class TestKeywordsAndMetadata:
         assert "superalloy" in keywords
         assert "reference data" in keywords
 
-        v2_record = design._record_graph["10.5281/zenodo.222222"]
+        v2_record = design._record_graph[placeholder_pid("10.5281/zenodo.222222")]
         attr_dict_v2 = {}
         for k, v in v2_record._tuples:
             if k not in attr_dict_v2:
@@ -558,8 +565,8 @@ class TestRecordIdentity:
             await design.execute_async()
 
         for version_doi in real_world_dataset.versions.keys():
-            record = design._record_graph[version_doi]
-            assert record.getId() == version_doi
+            record = design._record_graph[placeholder_pid(version_doi)]
+            assert record.getId() == placeholder_pid(version_doi)
 
     @pytest.mark.asyncio
     async def test_file_identity_is_checksum(self, real_world_dataset):
@@ -575,8 +582,8 @@ class TestRecordIdentity:
             await design.execute_async()
 
         for checksum in real_world_dataset.all_files.keys():
-            record = design._record_graph[checksum]
-            assert record.getId() == checksum
+            record = design._record_graph[placeholder_pid(checksum)]
+            assert record.getId() == placeholder_pid(checksum)
 
     @pytest.mark.asyncio
     async def test_publication_identity_is_identifier(self, real_world_dataset):
@@ -592,5 +599,5 @@ class TestRecordIdentity:
             await design.execute_async()
 
         pub_doi = "10.1016/j.actamat.2025.120735"
-        record = design._record_graph[pub_doi]
-        assert record.getId() == pub_doi
+        record = design._record_graph[placeholder_pid(pub_doi)]
+        assert record.getId() == placeholder_pid(pub_doi)

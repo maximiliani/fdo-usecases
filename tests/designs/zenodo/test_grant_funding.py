@@ -28,6 +28,7 @@ import asyncio
 import json
 from pathlib import Path
 
+from fdo_usecases.designer_lib.executor import placeholder_pid
 from fdo_usecases.designs.grant import PRE_REGISTERED_GRANTS
 from fdo_usecases.designs.zenodo import ZenodoFDODesign
 
@@ -57,7 +58,9 @@ async def test_grant_funding_extraction():
 
     # Find Grant FDOs in graph
     grant_fdos = {
-        k: v for k, v in design._record_graph.items() if k.startswith("grant:")
+        k: v
+        for k, v in design._record_graph.items()
+        if k.startswith(placeholder_pid("grant:"))
     }
 
     print(f"\n✅ Created {len(grant_fdos)} Grant FDO(s):")
@@ -92,7 +95,7 @@ async def test_grant_funding_extraction():
 
     # Verify MatWerk grant exists with correct ID
     matwerk_key = PRE_REGISTERED_GRANTS["matwerk"].unique_key
-    expected_grant_id = f"grant:{matwerk_key}"
+    expected_grant_id = placeholder_pid(f"grant:{matwerk_key}")
 
     assert expected_grant_id in grant_fdos, (
         f"MatWerk grant not found: {expected_grant_id}. "

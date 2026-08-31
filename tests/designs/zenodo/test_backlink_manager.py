@@ -8,7 +8,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from fdo_usecases.designer_lib.executor import PidRecord
+from fdo_usecases.designer_lib.executor import PidRecord, placeholder_pid
 from fdo_usecases.designs.zenodo.handlers.backlink_manager import BacklinkManager
 
 
@@ -76,13 +76,17 @@ class TestBacklinkManager:
         """Test flush creates backlinks when both nodes exist."""
         # Create mock records
         target_record = PidRecord()
-        target_record.setId("10.5281/zenodo.123")
+        target_record.setId(placeholder_pid("10.5281/zenodo.123"))
 
         referencing_record = PidRecord()
-        referencing_record.setId("10.5281/zenodo.456")
+        referencing_record.setId(placeholder_pid("10.5281/zenodo.456"))
 
-        backlink_manager._record_graph["10.5281/zenodo.123"] = target_record
-        backlink_manager._record_graph["10.5281/zenodo.456"] = referencing_record
+        backlink_manager._record_graph[placeholder_pid("10.5281/zenodo.123")] = (
+            target_record
+        )
+        backlink_manager._record_graph[placeholder_pid("10.5281/zenodo.456")] = (
+            referencing_record
+        )
 
         # Add pending backlink
         backlink_manager.add_pending_backlink(
@@ -104,7 +108,7 @@ class TestBacklinkManager:
         backlinks = [
             attr[1] for attr in target_record._tuples if attr[0] == is_referenced_by_pid
         ]
-        assert "10.5281/zenodo.456" in backlinks
+        assert placeholder_pid("10.5281/zenodo.456") in backlinks
 
     def test_flush_backlinks_skips_missing_target(self, backlink_manager, caplog):
         """Test flush gracefully skips missing targets."""
@@ -151,8 +155,8 @@ class TestBacklinkManager:
         # Create multiple records
         for doi in ["10.5281/zenodo.111", "10.5281/zenodo.222", "10.5281/zenodo.333"]:
             record = PidRecord()
-            record.setId(doi)
-            backlink_manager._record_graph[doi] = record
+            record.setId(placeholder_pid(doi))
+            backlink_manager._record_graph[placeholder_pid(doi)] = record
 
         # Add multiple backlinks
         backlink_manager.add_pending_backlink(
@@ -216,8 +220,8 @@ class TestCrossDatasetReferencesIntegration:
         # Create records for A, B, C
         for doi in ["10.5281/zenodo.A", "10.5281/zenodo.B", "10.5281/zenodo.C"]:
             record = PidRecord()
-            record.setId(doi)
-            mock_orchestrator._record_graph[doi] = record
+            record.setId(placeholder_pid(doi))
+            mock_orchestrator._record_graph[placeholder_pid(doi)] = record
 
         # Manually register backlinks as processor would
         mock_orchestrator._backlink_manager.add_pending_backlink(
@@ -247,11 +251,11 @@ class TestCrossDatasetReferencesIntegration:
             ("10.5281/zenodo.C", "10.5281/zenodo.B"),
             ("10.5281/zenodo.A", "10.5281/zenodo.C"),
         ]:
-            record = mock_orchestrator._record_graph[target]
+            record = mock_orchestrator._record_graph[placeholder_pid(target)]
             backlinks = [
                 attr[1] for attr in record._tuples if attr[0] == is_referenced_by_pid
             ]
-            assert expected_source in backlinks
+            assert placeholder_pid(expected_source) in backlinks
 
     @pytest.mark.asyncio
     async def test_deep_recursion_backlinks(self, mock_orchestrator):
@@ -260,8 +264,8 @@ class TestCrossDatasetReferencesIntegration:
         dois = [f"10.5281/zenodo.{i}" for i in range(5)]
         for doi in dois:
             record = PidRecord()
-            record.setId(doi)
-            mock_orchestrator._record_graph[doi] = record
+            record.setId(placeholder_pid(doi))
+            mock_orchestrator._record_graph[placeholder_pid(doi)] = record
 
         # Register backlinks for chain
         for i in range(len(dois) - 1):
@@ -280,17 +284,17 @@ class TestCrossDatasetReferencesIntegration:
         # Create records
         for doi in ["10.5281/zenodo.123", "10.5281/zenodo.456"]:
             record = PidRecord()
-            record.setId(doi)
-            mock_orchestrator._record_graph[doi] = record
+            record.setId(placeholder_pid(doi))
+            mock_orchestrator._record_graph[placeholder_pid(doi)] = record
 
         # Add forward reference (simulating what reference_processor does)
         from fdo_usecases.designs.zenodo.constants import INFOTYPES
 
         references_pid = INFOTYPES.get("references")
         assert references_pid is not None
-        mock_orchestrator._record_graph["10.5281/zenodo.123"].addAttribute(
-            references_pid, "10.5281/zenodo.456"
-        )
+        mock_orchestrator._record_graph[
+            placeholder_pid("10.5281/zenodo.123")
+        ].addAttribute(references_pid, placeholder_pid("10.5281/zenodo.456"))
 
         # Register backlink
         mock_orchestrator._backlink_manager.add_pending_backlink(
@@ -305,7 +309,9 @@ class TestCrossDatasetReferencesIntegration:
         assert named_ref_pid is None  # Should be removed from constants
 
         # Verify only simple references/isReferencedBy exist
-        target_record = mock_orchestrator._record_graph["10.5281/zenodo.456"]
+        target_record = mock_orchestrator._record_graph[
+            placeholder_pid("10.5281/zenodo.456")
+        ]
         is_referenced_by_pid = INFOTYPES.get("isReferencedBy")
         assert is_referenced_by_pid is not None
 
@@ -313,7 +319,7 @@ class TestCrossDatasetReferencesIntegration:
             attr for attr in target_record._tuples if attr[0] == is_referenced_by_pid
         ]
         assert len(backlinks) == 1
-        assert backlinks[0][1] == "10.5281/zenodo.123"
+        assert backlinks[0][1] == placeholder_pid("10.5281/zenodo.123")
 
 
 class TestReferenceProcessorRefactored:

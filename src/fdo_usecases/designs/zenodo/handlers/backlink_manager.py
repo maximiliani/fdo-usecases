@@ -39,6 +39,8 @@ Design Principles:
 import logging
 from typing import TYPE_CHECKING
 
+from fdo_usecases.designer_lib.executor import placeholder_pid
+
 if TYPE_CHECKING:
     from fdo_usecases.designer_lib.executor import PidRecord
 
@@ -149,7 +151,7 @@ class BacklinkManager:
             return 0, len(self._pending_backlinks)
 
         for target_doi, referencing_dois in self._pending_backlinks.items():
-            target_record = self._record_graph.get(target_doi)
+            target_record = self._record_graph.get(placeholder_pid(target_doi))
 
             if not target_record:
                 logger.warning(
@@ -175,7 +177,9 @@ class BacklinkManager:
                     continue
 
                 # Create the backlink
-                target_record.addAttribute(is_referenced_by_pid, referencing_doi)
+                target_record.addAttribute(
+                    is_referenced_by_pid, placeholder_pid(referencing_doi)
+                )
                 logger.info(
                     f"Added isReferencedBy backlink: {target_doi} <- {referencing_doi}"
                 )

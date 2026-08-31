@@ -33,6 +33,7 @@ Cross-Dataset References:
 import logging
 from typing import TYPE_CHECKING, Protocol
 
+from fdo_usecases.designer_lib.executor import placeholder_pid
 from fdo_usecases.designs.zenodo.constants import VERSIONING_RELATIONS
 from fdo_usecases.designs.zenodo.handlers.publication_handler import (
     PublicationReferenceHandler,
@@ -295,7 +296,9 @@ class ReferenceProcessor:
             return
 
         # Create forward reference link on the specific version DOI
-        referencing_record = self.orchestrator._record_graph.get(actual_referencing_doi)
+        referencing_record = self.orchestrator._record_graph.get(
+            placeholder_pid(actual_referencing_doi)
+        )
 
         if referencing_record:
             from fdo_usecases.designs.zenodo.constants import INFOTYPES
@@ -308,8 +311,9 @@ class ReferenceProcessor:
                     for attr in referencing_record._tuples
                     if attr[0] == references_pid
                 ]
-                if target_doi not in existing_refs:
-                    referencing_record.addAttribute(references_pid, target_doi)
+                target_placeholder = placeholder_pid(target_doi)
+                if target_placeholder not in existing_refs:
+                    referencing_record.addAttribute(references_pid, target_placeholder)
                     logger.info(
                         f"Added references link: {actual_referencing_doi} -> {target_doi}"
                     )
@@ -332,8 +336,8 @@ class ReferenceProcessor:
                 f"{target_doi} <- {actual_referencing_doi}"
             )
             self.orchestrator._backlink_manager.add_pending_backlink(
-                target_doi=target_doi,
-                referencing_doi=actual_referencing_doi,
+                target_doi=placeholder_pid(target_doi),
+                referencing_doi=placeholder_pid(actual_referencing_doi),
             )
             return
 
@@ -348,8 +352,8 @@ class ReferenceProcessor:
 
         # Register backlink for deferred creation
         self.orchestrator._backlink_manager.add_pending_backlink(
-            target_doi=target_doi,
-            referencing_doi=actual_referencing_doi,
+            target_doi=placeholder_pid(target_doi),
+            referencing_doi=placeholder_pid(actual_referencing_doi),
         )
         logger.debug(
             f"Registered pending backlink: {target_doi} <- {actual_referencing_doi}"

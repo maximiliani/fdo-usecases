@@ -10,6 +10,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from fdo_usecases.designer_lib.executor import placeholder_pid
 from fdo_usecases.designs.zenodo.constants import (
     BACKLINK_DATASET_FILE,
     BASE_PROFILE,
@@ -74,14 +75,14 @@ async def test_create_fdo_basic(sample_file_data):
     record_id = await design.create_fdo(sample_file_data)
 
     # Verify return value
-    assert record_id == sample_file_data.checksum
+    assert record_id == placeholder_pid(sample_file_data.checksum)
 
     # Verify record was created and stored locally
-    assert sample_file_data.checksum in design._local_records
-    record = design._local_records[sample_file_data.checksum]
+    assert placeholder_pid(sample_file_data.checksum) in design._local_records
+    record = design._local_records[placeholder_pid(sample_file_data.checksum)]
 
     # Verify identity
-    assert record.getId() == sample_file_data.checksum
+    assert record.getId() == placeholder_pid(sample_file_data.checksum)
     assert record.getPid() == ""
 
     # Convert tuples to dict for easier lookup
@@ -156,7 +157,7 @@ async def test_create_fdo_required_fields_only():
 
     await design.create_fdo(minimal_file)
 
-    record = design._local_records[minimal_file.checksum]
+    record = design._local_records[placeholder_pid(minimal_file.checksum)]
     attr_dict = {}
     for k, v in record._tuples:
         if k not in attr_dict:
@@ -199,7 +200,7 @@ async def test_different_file_types():
 
         await design.create_fdo(file_data)
 
-        record = design._local_records[checksum]
+        record = design._local_records[placeholder_pid(checksum)]
         attr_dict = {}
         for k, v in record._tuples:
             if k not in attr_dict:
@@ -254,8 +255,8 @@ async def test_checksum_as_record_id():
     id2 = await design.create_fdo(file_v2)
 
     # Both should return the same checksum as record ID
-    assert id1 == file_v1.checksum
-    assert id2 == file_v2.checksum
+    assert id1 == placeholder_pid(file_v1.checksum)
+    assert id2 == placeholder_pid(file_v2.checksum)
     assert id1 == id2
 
 
@@ -277,7 +278,7 @@ async def test_no_self_referencing_latest_version():
     design = ZenodoFileDesign()
     await design.create_fdo(file_data)
 
-    record = design._local_records[file_data.checksum]
+    record = design._local_records[placeholder_pid(file_data.checksum)]
     latest_version_pid = INFOTYPES["latestVersion"]
 
     # No latestVersion attribute should exist (self-reference blocked)

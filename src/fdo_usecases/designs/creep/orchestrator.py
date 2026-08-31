@@ -9,7 +9,12 @@ import logging
 from datetime import timedelta
 from typing import TYPE_CHECKING, Optional
 
-from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign
+from fdo_usecases.designer_lib.executor import (
+    PidRecord,
+    RecordDesign,
+    from_placeholder,
+    placeholder_pid,
+)
 
 from .constants import INFOTYPES
 from .designs.experiment import CreepExperimentDesign
@@ -147,8 +152,8 @@ class CreepFDOOrchestrator(RecordDesign):
         # Create material PID mapping (used by both Material and Experiment FDOs)
         material_pid_map = {}
         for material_id in unique_materials:
-            pid_composition = (
-                f"{material_id}_{complementary_files.chemical_composition_measured}"
+            pid_composition = placeholder_pid(
+                f"{material_id}_{from_placeholder(complementary_files.chemical_composition_measured)}"
             )
             material_pid_map[material_id] = pid_composition
 
@@ -261,7 +266,7 @@ class CreepFDOOrchestrator(RecordDesign):
                     complementary_files.data_acquisition,
                     complementary_files.primary_processed_data,
                 ],
-                uses_material=material_pid_map[material_id],
+                uses_material=material_pid_map[metadata.material_id],
                 creators=dataset_creators,
                 creator_affiliations=dataset_affiliations,
                 keywords=keywords,

@@ -7,7 +7,7 @@
 import logging
 from typing import TYPE_CHECKING
 
-from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign
+from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign, placeholder_pid
 
 from ..constants import (
     BACKLINK_MATERIAL_EXPERIMENT,
@@ -69,13 +69,16 @@ class MaterialDesign(RecordDesign):
             record.addAttribute(INFOTYPES["previewImage"], url)
 
         for checksum in data.sem_images:
-            record.addAttribute(INFOTYPES["semImage"], checksum)
+            record.addAttribute(INFOTYPES["semImage"], placeholder_pid(checksum))
 
         # File references
         record.addAttribute(
-            INFOTYPES["hasChemicalComposition"], data.has_chemical_composition
+            INFOTYPES["hasChemicalComposition"],
+            placeholder_pid(data.has_chemical_composition),
         )
-        record.addAttribute(INFOTYPES["hasHeatTreatment"], data.has_heat_treatment)
+        record.addAttribute(
+            INFOTYPES["hasHeatTreatment"], placeholder_pid(data.has_heat_treatment)
+        )
 
         # Referenced files (only if no other relationship exists)
         for file_pid in data.referenced_files:

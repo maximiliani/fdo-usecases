@@ -39,6 +39,46 @@ from .conditionals import is_emptyish
 
 logger = logging.getLogger(__name__)
 
+#: Prefix that marks placeholder (local) PIDs, distinguishing them from literal
+#: attribute values such as a file's checksum or an experiment's test ID.
+PID_PREFIX = "PID_"
+
+
+def placeholder_pid(identifier: str) -> str:
+    """Return the placeholder PID for a local identifier.
+
+    Placeholder PIDs connect records in the Typed PID Maker batch endpoint.
+    Prefixing them with ``PID_`` prevents the service from confusing them with
+    literal attribute values that happen to equal a local identifier (e.g. a
+    file FDO whose ``checksum`` is ``md5:...``).
+
+    Args:
+        identifier: Raw local identifier (DOI, checksum, test ID, ...).
+
+    Returns:
+        The prefixed placeholder PID.
+
+    """
+    if identifier.startswith(PID_PREFIX):
+        return identifier
+    return PID_PREFIX + identifier
+
+
+def from_placeholder(placeholder: str) -> str:
+    """Strip the placeholder PID prefix from ``placeholder``.
+
+    Args:
+        placeholder: A (possibly prefixed) PID.
+
+    Returns:
+        The raw identifier without the ``PID_`` prefix.
+
+    """
+    if placeholder.startswith(PID_PREFIX):
+        return placeholder[len(PID_PREFIX) :]
+    return placeholder
+
+
 Primitive = str | bool | int | float
 # ---Types-for-designs------------------------------------------- #
 JsonType = str | Sequence[Any] | Mapping[str, Any]

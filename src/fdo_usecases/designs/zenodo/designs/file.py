@@ -11,7 +11,7 @@ compliant with Base + DataResource + Versionable profiles from the BAM creep-ref
 import logging
 from typing import TYPE_CHECKING
 
-from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign
+from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign, placeholder_pid
 from fdo_usecases.designs.zenodo.constants import (
     BACKLINK_DATASET_FILE,
     BACKLINK_FILE_VERSION_CHAIN,
@@ -80,7 +80,7 @@ class ZenodoFileDesign(RecordDesign):
 
         # Create PidRecord directly
         record = PidRecord()
-        record.setId(data.checksum)
+        record.setId(placeholder_pid(data.checksum))
         record.setPid("")
 
         # Profiles - Base + DataResource + Versionable
@@ -118,21 +118,25 @@ class ZenodoFileDesign(RecordDesign):
         # Versionable profile - file version chain
         if data.previous_version_checksum:
             record.addAttribute(
-                INFOTYPES["previousVersion"], data.previous_version_checksum
+                INFOTYPES["previousVersion"],
+                placeholder_pid(data.previous_version_checksum),
             )
 
         if data.next_version_checksum:
-            record.addAttribute(INFOTYPES["nextVersion"], data.next_version_checksum)
+            record.addAttribute(
+                INFOTYPES["nextVersion"], placeholder_pid(data.next_version_checksum)
+            )
 
         if data.latest_version_checksum:
             record.addAttribute(
-                INFOTYPES["latestVersion"], data.latest_version_checksum
+                INFOTYPES["latestVersion"],
+                placeholder_pid(data.latest_version_checksum),
             )
 
         # Forward links: isPartOf - link this file to all dataset versions it belongs to
         if data.dataset_versions:
             for dataset_doi in data.dataset_versions:
-                record.addAttribute(INFOTYPES["isPartOf"], dataset_doi)
+                record.addAttribute(INFOTYPES["isPartOf"], placeholder_pid(dataset_doi))
 
         # Landing page location
         if data.landing_page_url:
@@ -143,12 +147,13 @@ class ZenodoFileDesign(RecordDesign):
         self.addBacklink(*BACKLINK_FILE_VERSION_CHAIN)
 
         # Store locally for testing, or in orchestrator's graph
-        self._local_records[data.checksum] = record
+        record_id = placeholder_pid(data.checksum)
+        self._local_records[record_id] = record
         if self.orchestrator:
-            self.orchestrator._record_graph[data.checksum] = record
+            self.orchestrator._record_graph[record_id] = record
 
         logger.debug(f"Created File FDO record for {data.checksum}")
-        return data.checksum
+        return record_id
 
 
 __all__ = ["ZenodoFileDesign"]

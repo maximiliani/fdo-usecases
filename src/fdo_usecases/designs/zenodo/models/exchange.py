@@ -19,6 +19,7 @@ from datetime import date
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from fdo_usecases.designer_lib.executor import placeholder_pid
 from fdo_usecases.designs.zenodo.constants import VALID_RESOURCE_TYPES
 
 
@@ -71,7 +72,7 @@ class GrantFDOData(BaseModel):
     @property
     def grant_fdo_id(self) -> str:
         """Generate Grant FDO record ID."""
-        return f"grant:{self.unique_key}"
+        return placeholder_pid(f"grant:{self.unique_key}")
 
     @model_validator(mode="after")
     def validate_funder_id_present(self) -> "GrantFDOData":

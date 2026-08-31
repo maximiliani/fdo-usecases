@@ -20,7 +20,11 @@ Architecture:
 import asyncio
 import logging
 
-from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign
+from fdo_usecases.designer_lib.executor import (
+    PidRecord,
+    RecordDesign,
+    placeholder_pid,
+)
 from fdo_usecases.designs.grant import GrantDesign
 from fdo_usecases.designs.zenodo.designs import (
     PublicationDesign,
@@ -545,7 +549,7 @@ class ZenodoFDODesign(RecordDesign):
 
         # Link datasets to grants via fundedBy relation
         for dataset_data in dataset_datas:
-            record = self._record_graph[dataset_data.doi]
+            record = self._record_graph[placeholder_pid(dataset_data.doi)]
             for grant_id in grant_ids:
                 record.addAttribute("21.T11969/funded0000000000001", grant_id)
 
@@ -568,7 +572,7 @@ class ZenodoFDODesign(RecordDesign):
                 continue
 
             # Only create forward links on versions that exist in the graph
-            if version_doi not in self._record_graph:
+            if placeholder_pid(version_doi) not in self._record_graph:
                 logger.warning(
                     f"Skipping reference processing for {version_doi}: "
                     f"version FDO not found in graph"

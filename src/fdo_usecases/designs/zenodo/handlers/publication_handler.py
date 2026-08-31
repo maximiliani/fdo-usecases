@@ -7,6 +7,7 @@
 import logging
 from typing import TYPE_CHECKING
 
+from fdo_usecases.designer_lib.executor import placeholder_pid
 from fdo_usecases.designs.zenodo.constants import (
     INFOTYPES,
     RESOURCE_TYPE_MAPPING,
@@ -123,7 +124,7 @@ class PublicationReferenceHandler:
                 title=None,
                 description=None,
                 creator_orcids=[],
-                referenced_by_datasets=[referencing_dataset_doi],
+                referenced_by_datasets=[placeholder_pid(referencing_dataset_doi)],
                 landing_page_url=landing_page_url,
             )
 
@@ -132,13 +133,18 @@ class PublicationReferenceHandler:
 
             # Add forward link from dataset to publication
             if identifier.relation in ["cites", "references"]:
-                record = self.orchestrator._record_graph.get(referencing_dataset_doi)
+                record = self.orchestrator._record_graph.get(
+                    placeholder_pid(referencing_dataset_doi)
+                )
                 if record:
                     if identifier.relation == "cites":
-                        record.addAttribute(INFOTYPES["cites"], identifier.identifier)
+                        record.addAttribute(
+                            INFOTYPES["cites"], placeholder_pid(identifier.identifier)
+                        )
                     else:
                         record.addAttribute(
-                            INFOTYPES["references"], identifier.identifier
+                            INFOTYPES["references"],
+                            placeholder_pid(identifier.identifier),
                         )
                     logger.debug(
                         f"Added {identifier.relation} link from {referencing_dataset_doi} to {identifier.identifier}"
