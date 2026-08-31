@@ -162,6 +162,58 @@ python run.py
 Output:
 - `fdo_graph_merged.json` - Unified FDO graph
 - Console statistics on parsed tests
+- If Elasticsearch is configured (see below): sync artifacts for the Elasticsearch / Typed PID Maker step
+
+## Elasticsearch / Typed PID Maker Sync
+
+`run.py` has a final step that compares the freshly built graph against the FDOs
+already published in a remote Elasticsearch index and keeps the Typed PID Maker
+in sync with the latest state of the graph.
+
+How it works:
+
+1. **Compare** - Every record is matched to the index by its *placeholder PID*.
+   Placeholder PIDs are prefixed with `PID_` (e.g. `PID_10.5281/zenodo.20132712`,
+   `PID_md5:...`, `PID_Vh5205_C-89`) so they can never be confused with literal
+   attribute values such as a file's checksum. If the index is missing or empty,
+   the comparison is skipped and every record is treated as new.
+2. **Create** - Records that do not exist yet are sent to the Typed PID Maker's
+   batch endpoint (`POST /api/v1/pit/pids`). The service replaces the `PID_`
+   placeholders with real Handle PIDs and returns a placeholder-to-PID mapping.
+3. **Update** - Records that already exist but whose content changed are updated
+   via `PUT /api/v1/pit/pid/{pid}` with the `If-Match` ETag; references to other
+   FDOs are fixed to their real Handle PIDs first.
+4. **Export** - The complete graph is written out with real Handle PIDs, ready
+   to be ingested into Elasticsearch.
+
+The Typed PID Maker is **only contacted** when `FDO_ES_BASE_URL` and
+`FDO_ES_INDEX` are set (otherwise the whole sync step is skipped) and
+`FDO_SYNC_DRYRUN` is not `1` (in dry-run mode all artifacts are written but
+nothing is created or updated). The logs state explicitly whether the Typed PID
+Maker was involved and how many FDOs were created or updated.
+
+Output files (written next to `fdo_graph_merged.json`):
+
+| File | Meaning |
+|------|---------|
+| `bulk_create.json` | Payload for the Typed PID Maker batch endpoint: the new FDOs as SimpleJSON records with `PID_` placeholders. |
+| `updates.json` | Human-readable list of changes detected for existing FDOs (before PID resolution), including the changed attribute keys. |
+| `mapping.json` | Placeholder PID -> real Handle PID mapping after creation (only written when FDOs were actually created). |
+| `updates_resolved.json` | Final update payloads with placeholder PIDs fixed to real Handle PIDs, ready for `PUT /api/v1/pit/pid/{pid}`. |
+| `fdo_graph_es_ingest.json` | The full graph as Elasticsearch documents (`{"pid": ..., "<infoTypePID>": [...]}`) with real Handle PIDs - ingest this into the index. |
+| `sync_summary.json` | Machine-readable summary: counts of new/changed/unchanged records, dry-run flag, and the full mapping. |
+
+Configuration (via `.env` or environment variables):
+
+| Variable | Purpose |
+|----------|---------|
+| `FDO_ES_BASE_URL` | Elasticsearch base URL (e.g. `https://.../es_proxy`). Required to enable the sync step. |
+| `FDO_ES_INDEX` | Elasticsearch index name. Required to enable the sync step. |
+| `FDO_ES_API_KEY` | Elasticsearch API key (`Authorization: ApiKey ...`). |
+| `FDO_ES_USERNAME` / `FDO_ES_PASSWORD` | Alternative basic authentication for Elasticsearch. |
+| `FDO_TPM_HOST` | Typed PID Maker base URL (default `http://typed-pid-maker.datamanager.kit.edu/preview`). |
+| `FDO_TPM_API_KEY` | Optional bearer token for the Typed PID Maker. |
+| `FDO_SYNC_DRYRUN` | Set to `1` to only write the JSON artifacts without contacting the Typed PID Maker. |
 
 ## Testing
 
@@ -241,6 +293,7 @@ bam_creep_reference/
 ├── image_extractor.py       # Image extraction (~80 lines)
 ├── dataset_metadata.py      # Dataset metadata (~60 lines)
 ├── lis_parser.py            # Facade (~150 lines)
+├── sync.py                  # Elasticsearch comparison + Typed PID Maker sync
 └── README.md                # This file
 ```
 
