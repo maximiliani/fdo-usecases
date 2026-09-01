@@ -61,6 +61,7 @@ class DatasetMetadataExtractor:
     CREATOR_KEY = "21.T11969/7c67083a5d218e544063"
     AFFILIATION_KEY = "21.T11969/ea9f6b3d78c6608fe801"
     KEYWORD_KEY = "21.T11969/793ff5c33c3aeb32907a"
+    FUNDED_BY_KEY = "21.T11969/28ca0d5c50678433e5a8"
 
     def get_creators_from_dataset(self, zenodo_graph: dict) -> list[str]:
         """Extract creator ORCIDs from Dataset FDO.
@@ -165,6 +166,55 @@ class DatasetMetadataExtractor:
             keywords.extend(kw_attrs)
 
         return list(set(keywords))  # Deduplicate
+
+    def get_funders_from_dataset(
+        self,
+        zenodo_graph: dict,
+        dataset_dois: list[str] | None = None,
+    ) -> list[str]:
+        """Extract fundedBy grant PIDs from Dataset FDOs.
+
+        Reads the ``fundedBy`` attributes off the Dataset FDO records so that
+        dependent research outputs (e.g. creep experiments) can inherit the
+        funding information already provided in the dataset FDOs.
+
+        Args:
+            zenodo_graph: Pre-populated graph from ZenodoFDODesign.
+                Keys are record IDs, values are PidRecord objects.
+            dataset_dois: Optional list of record IDs to restrict the scan to.
+                When omitted, all dataset records (IDs containing "zenodo")
+                in the graph are scanned.
+
+        Returns:
+            List of unique grant PIDs (placeholder IDs like
+            ``PID_grant:<funder>::<code>``) that fund the datasets.
+
+        Example:
+            >>> extractor = DatasetMetadataExtractor()
+            >>> funders = extractor.get_funders_from_dataset(graph)
+            >>> "PID_grant:https://ror.org/018mejw64::460247524" in funders
+            True
+
+        """
+        funders: list[str] = []
+        for record_id, record in zenodo_graph.items():
+            if dataset_dois is not None:
+                if record_id not in dataset_dois:
+                    continue
+            elif "zenodo" not in record_id:
+                continue
+
+            # Convert PidRecord to dict
+            record_dict = record.toSimpleJSON()
+            # Look for fundedBy attributes
+            funded_by_attrs = [
+                attr["value"]
+                for attr in record_dict["record"]
+                if attr["key"] == self.FUNDED_BY_KEY
+            ]
+            funders.extend(funded_by_attrs)
+
+        return list(set(funders))  # Deduplicate
 
     def extract_keywords(self, metadata: ParsedTestMetadata) -> list[str]:
         """Extract domain keywords from parsed test metadata.

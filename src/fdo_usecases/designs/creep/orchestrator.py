@@ -239,6 +239,11 @@ class CreepFDOOrchestrator(RecordDesign):
                 ):
                     dataset_dois_for_test.add(doi)
 
+            # Inherit funding from the dataset FDOs that contain this experiment's files
+            funded_by_for_test = lis_parser.get_funders_from_dataset(
+                self._record_graph, list(dataset_dois_for_test)
+            )
+
             # Resolve file references
             referenced_files = []
             if hasattr(metadata, "file_references"):
@@ -273,6 +278,7 @@ class CreepFDOOrchestrator(RecordDesign):
                 referenced_files=referenced_files,
                 standalone_metadata_files=collection.standalone_lis_files,
                 dataset_dois=list(dataset_dois_for_test),  # NEW
+                funded_by=funded_by_for_test,  # Inherited from dataset FDOs
             )
             experiment_tasks.append(self.experiment_design.create_fdo(experiment_data))
 

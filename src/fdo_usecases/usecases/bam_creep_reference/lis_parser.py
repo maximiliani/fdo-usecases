@@ -338,6 +338,28 @@ class LISParser:
         """
         return self._metadata_extractor.get_keywords_from_dataset(zenodo_graph)
 
+    def get_funders_from_dataset(
+        self,
+        zenodo_graph: dict,
+        dataset_dois: list[str] | None = None,
+    ) -> list[str]:
+        """Extract fundedBy grant PIDs from Dataset FDOs.
+
+        Delegates to DatasetMetadataExtractor component so experiments can
+        inherit the funding relationship provided in the dataset FDOs.
+
+        Args:
+            zenodo_graph: Pre-populated graph
+            dataset_dois: Optional list of record IDs to restrict the scan to
+
+        Returns:
+            List of unique grant PIDs that fund the datasets
+
+        """
+        return self._metadata_extractor.get_funders_from_dataset(
+            zenodo_graph, dataset_dois
+        )
+
     def extract_keywords(self, metadata: ParsedTestMetadata) -> list[str]:
         """Extract domain keywords from metadata.
 

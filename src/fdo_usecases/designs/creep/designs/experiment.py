@@ -12,6 +12,7 @@ from fdo_usecases.designer_lib.executor import PidRecord, RecordDesign, placehol
 from ..constants import (
     BACKLINK_DATASET_EXPERIMENT,
     BACKLINK_EXPERIMENT_FILE,
+    BACKLINK_EXPERIMENT_GRANT,
     BACKLINK_EXPERIMENT_REFERENCES_FILE,
     BACKLINK_MATERIAL_EXPERIMENT,
     BASE_PROFILE,
@@ -152,6 +153,15 @@ class CreepExperimentDesign(RecordDesign):
         for dataset_doi in data.dataset_dois:
             record.addAttribute(INFOTYPES["isPartOf"], placeholder_pid(dataset_doi))
 
+        # Funding relationship inherited from the dataset FDOs (bidirectional via funds)
+        record_id = placeholder_pid(data.test_id)
+        for grant_id in data.funded_by:
+            record.addAttribute(INFOTYPES["fundedBy"], grant_id)
+            if self.orchestrator:
+                grant_record = self.orchestrator._record_graph.get(grant_id)
+                if grant_record:
+                    grant_record.addAttribute(INFOTYPES["funds"], record_id)
+
         # Backlinks for inference
         self.addBacklink(*BACKLINK_EXPERIMENT_FILE)
         self.addBacklink(*BACKLINK_MATERIAL_EXPERIMENT)
@@ -159,6 +169,7 @@ class CreepExperimentDesign(RecordDesign):
         self.addBacklink(
             *BACKLINK_DATASET_EXPERIMENT
         )  # NEW: For dataset↔experiment bidirectional
+        self.addBacklink(*BACKLINK_EXPERIMENT_GRANT)  # For grant↔experiment funding
 
         # Store in graph
         record_id = placeholder_pid(data.test_id)

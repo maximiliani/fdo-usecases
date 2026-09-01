@@ -49,6 +49,9 @@ class CreepExperimentData:
     dataset_dois: list[str] = field(
         default_factory=list
     )  # NEW: Datasets containing this experiment's files
+    funded_by: list[str] = field(
+        default_factory=list
+    )  # Grant PIDs inherited from the dataset FDOs
 
 
 @dataclass

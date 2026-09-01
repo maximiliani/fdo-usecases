@@ -37,6 +37,9 @@ INFOTYPES = {
     "isPartOf": "21.T11969/30f4a1f8aacab81faf38",
     "isReferencedBy": "21.T11969/e5945ef3ff07f314a146",
     "references": "21.T11969/f4c9a69f715c3c60aa2f",
+    # Funding relationships
+    "fundedBy": "21.T11969/28ca0d5c50678433e5a8",
+    "funds": "21.T11969/67b90082413e5e3547ff",
     # Base profile
     "name": "21.T11969/bd3e9fb9b606d2198c9e",
     "description": "21.T11969/880724416f5857987e70",
@@ -57,3 +60,4 @@ BACKLINK_DATASET_EXPERIMENT = (
     "hasPart",
     "isPartOf",
 )  # NEW: Dataset↔Experiment bidirectional
+BACKLINK_EXPERIMENT_GRANT = ("fundedBy", "funds")
