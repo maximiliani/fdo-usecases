@@ -1,5 +1,6 @@
-{
-  "PID_10.5281/zenodo.13937987": {
+[
+  {
+    "pid": "PID_10.5281/zenodo.13937987",
     "record": [
       {
         "key": "21.T11969/39c056d0cc63e2d0ff17",
@@ -205,10 +206,10 @@
         "key": "21.T11969/39c056d0cc63e2d0ff17",
         "value": "PID_Vh5205_C-99"
       }
-    ],
-    "pid": "PID_10.5281/zenodo.13937987"
+    ]
   },
-  "PID_10.5281/zenodo.14750432": {
+  {
+    "pid": "PID_10.5281/zenodo.14750432",
     "record": [
       {
         "key": "21.T11969/39c056d0cc63e2d0ff17",
@@ -418,10 +419,10 @@
         "key": "21.T11969/39c056d0cc63e2d0ff17",
         "value": "PID_Vh5205_C-99"
       }
-    ],
-    "pid": "PID_10.5281/zenodo.14750432"
+    ]
   },
-  "PID_10.5281/zenodo.18933930": {
+  {
+    "pid": "PID_10.5281/zenodo.18933930",
     "record": [
       {
         "key": "21.T11969/39c056d0cc63e2d0ff17",
@@ -795,10 +796,10 @@
         "key": "21.T11969/39c056d0cc63e2d0ff17",
         "value": "PID_md5:b357fdeb5dd5fa3457517b957f1fdbc1"
       }
-    ],
-    "pid": "PID_10.5281/zenodo.18933930"
+    ]
   },
-  "PID_10.5281/zenodo.20132712": {
+  {
+    "pid": "PID_10.5281/zenodo.20132712",
     "record": [
       {
         "key": "21.T11969/39c056d0cc63e2d0ff17",
@@ -1188,10 +1189,10 @@
         "key": "21.T11969/39c056d0cc63e2d0ff17",
         "value": "PID_md5:d365dd3513b11f21b7cecd48365223b8"
       }
-    ],
-    "pid": "PID_10.5281/zenodo.20132712"
+    ]
   },
-  "PID_md5:c9a1e0cf2430762634b8da84cfe10fdd": {
+  {
+    "pid": "PID_md5:c9a1e0cf2430762634b8da84cfe10fdd",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -1253,10 +1254,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:c9a1e0cf2430762634b8da84cfe10fdd"
+    ]
   },
-  "PID_md5:fe162872f162b0545a454b938aada6e2": {
+  {
+    "pid": "PID_md5:fe162872f162b0545a454b938aada6e2",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -1314,10 +1315,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "pdf"
       }
-    ],
-    "pid": "PID_md5:fe162872f162b0545a454b938aada6e2"
+    ]
   },
-  "PID_md5:6d67061d05a6036785b4e5032f1088c7": {
+  {
+    "pid": "PID_md5:6d67061d05a6036785b4e5032f1088c7",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -1379,10 +1380,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "pdf"
       }
-    ],
-    "pid": "PID_md5:6d67061d05a6036785b4e5032f1088c7"
+    ]
   },
-  "PID_md5:d59a1be8f22264cebe5abfd11ee7ce62": {
+  {
+    "pid": "PID_md5:d59a1be8f22264cebe5abfd11ee7ce62",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -1444,10 +1445,10 @@
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
         "value": "md5:d59a1be8f22264cebe5abfd11ee7ce62"
       }
-    ],
-    "pid": "PID_md5:d59a1be8f22264cebe5abfd11ee7ce62"
+    ]
   },
-  "PID_md5:bef806111786f889a7fcff8d18e7e80d": {
+  {
+    "pid": "PID_md5:bef806111786f889a7fcff8d18e7e80d",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -1517,10 +1518,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "pdf"
       }
-    ],
-    "pid": "PID_md5:bef806111786f889a7fcff8d18e7e80d"
+    ]
   },
-  "PID_md5:a4aea87e91ff3620fb5ce287a2036c98": {
+  {
+    "pid": "PID_md5:a4aea87e91ff3620fb5ce287a2036c98",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -1582,10 +1583,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "pdf"
       }
-    ],
-    "pid": "PID_md5:a4aea87e91ff3620fb5ce287a2036c98"
+    ]
   },
-  "PID_md5:91815206431ce302eeab88b3cc3a8f5e": {
+  {
+    "pid": "PID_md5:91815206431ce302eeab88b3cc3a8f5e",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -1647,10 +1648,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:91815206431ce302eeab88b3cc3a8f5e"
+    ]
   },
-  "PID_md5:99c704e85e87597ab1f5041144285241": {
+  {
+    "pid": "PID_md5:99c704e85e87597ab1f5041144285241",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -1712,10 +1713,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:99c704e85e87597ab1f5041144285241"
+    ]
   },
-  "PID_md5:cb48a3a5ef62597e0e9f0b58c5fb144c": {
+  {
+    "pid": "PID_md5:cb48a3a5ef62597e0e9f0b58c5fb144c",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -1777,10 +1778,10 @@
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
         "value": "md5:cb48a3a5ef62597e0e9f0b58c5fb144c"
       }
-    ],
-    "pid": "PID_md5:cb48a3a5ef62597e0e9f0b58c5fb144c"
+    ]
   },
-  "PID_md5:89a2e4e8657f19b687a65e90dea16725": {
+  {
+    "pid": "PID_md5:89a2e4e8657f19b687a65e90dea16725",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -1842,10 +1843,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:89a2e4e8657f19b687a65e90dea16725"
+    ]
   },
-  "PID_md5:56d3b4db93dccd821944dc44fcc5d288": {
+  {
+    "pid": "PID_md5:56d3b4db93dccd821944dc44fcc5d288",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -1907,10 +1908,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:56d3b4db93dccd821944dc44fcc5d288"
+    ]
   },
-  "PID_md5:26b49c8c989aeffa5cc4a49c8d37ab82": {
+  {
+    "pid": "PID_md5:26b49c8c989aeffa5cc4a49c8d37ab82",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -1972,10 +1973,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:26b49c8c989aeffa5cc4a49c8d37ab82"
+    ]
   },
-  "PID_md5:80f392962b757be4a0e3af5727cb449f": {
+  {
+    "pid": "PID_md5:80f392962b757be4a0e3af5727cb449f",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -2037,10 +2038,10 @@
         "key": "21.T11969/479febb2bbe8400da547",
         "value": "https://zenodo.org/api/records/13937987/files/Vh5205_C-85.LIS/content"
       }
-    ],
-    "pid": "PID_md5:80f392962b757be4a0e3af5727cb449f"
+    ]
   },
-  "PID_md5:7ac2bdd5961562f26bf2f884636c8190": {
+  {
+    "pid": "PID_md5:7ac2bdd5961562f26bf2f884636c8190",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -2102,10 +2103,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:7ac2bdd5961562f26bf2f884636c8190"
+    ]
   },
-  "PID_md5:610326ba69e38a3287d20b173e1629dd": {
+  {
+    "pid": "PID_md5:610326ba69e38a3287d20b173e1629dd",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -2167,10 +2168,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:610326ba69e38a3287d20b173e1629dd"
+    ]
   },
-  "PID_md5:3df58f302a589f6ab334cb66b7880f84": {
+  {
+    "pid": "PID_md5:3df58f302a589f6ab334cb66b7880f84",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -2232,10 +2233,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:3df58f302a589f6ab334cb66b7880f84"
+    ]
   },
-  "PID_md5:cddbb74a27ad8b2f1f42b02363fe528f": {
+  {
+    "pid": "PID_md5:cddbb74a27ad8b2f1f42b02363fe528f",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -2297,10 +2298,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:cddbb74a27ad8b2f1f42b02363fe528f"
+    ]
   },
-  "PID_md5:8af06d8febceb0f2263772ebafdfb1d7": {
+  {
+    "pid": "PID_md5:8af06d8febceb0f2263772ebafdfb1d7",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -2358,10 +2359,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "pdf"
       }
-    ],
-    "pid": "PID_md5:8af06d8febceb0f2263772ebafdfb1d7"
+    ]
   },
-  "PID_md5:748db68cc1478138f3d2c7a8fd7c371a": {
+  {
+    "pid": "PID_md5:748db68cc1478138f3d2c7a8fd7c371a",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -2427,10 +2428,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:748db68cc1478138f3d2c7a8fd7c371a"
+    ]
   },
-  "PID_md5:ba495de3bd48f7fee78e1ab0f65d4a2d": {
+  {
+    "pid": "PID_md5:ba495de3bd48f7fee78e1ab0f65d4a2d",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -2488,10 +2489,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:ba495de3bd48f7fee78e1ab0f65d4a2d"
+    ]
   },
-  "PID_md5:ab271e824a0557a04738d68f7df6eb54": {
+  {
+    "pid": "PID_md5:ab271e824a0557a04738d68f7df6eb54",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -2557,10 +2558,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:ab271e824a0557a04738d68f7df6eb54"
+    ]
   },
-  "PID_md5:69565c0084378c8797c850ef639491f7": {
+  {
+    "pid": "PID_md5:69565c0084378c8797c850ef639491f7",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -2618,10 +2619,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:69565c0084378c8797c850ef639491f7"
+    ]
   },
-  "PID_md5:04009d0e4c12d7da0fe865241e65a7df": {
+  {
+    "pid": "PID_md5:04009d0e4c12d7da0fe865241e65a7df",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -2683,10 +2684,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:04009d0e4c12d7da0fe865241e65a7df"
+    ]
   },
-  "PID_md5:f82ad60db72760c4a63fae82b190f7f2": {
+  {
+    "pid": "PID_md5:f82ad60db72760c4a63fae82b190f7f2",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -2744,10 +2745,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:f82ad60db72760c4a63fae82b190f7f2"
+    ]
   },
-  "PID_md5:b357fdeb5dd5fa3457517b957f1fdbc1": {
+  {
+    "pid": "PID_md5:b357fdeb5dd5fa3457517b957f1fdbc1",
     "record": [
       {
         "key": "21.T11969/2b4d6ceda80ddd63f7a9",
@@ -2813,10 +2814,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:b357fdeb5dd5fa3457517b957f1fdbc1"
+    ]
   },
-  "PID_md5:6ddd1701fb6c6c89a0bd61093911e107": {
+  {
+    "pid": "PID_md5:6ddd1701fb6c6c89a0bd61093911e107",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -2878,10 +2879,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:6ddd1701fb6c6c89a0bd61093911e107"
+    ]
   },
-  "PID_md5:304c8173812684e934ff78ea7b4e46ec": {
+  {
+    "pid": "PID_md5:304c8173812684e934ff78ea7b4e46ec",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -2939,10 +2940,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:304c8173812684e934ff78ea7b4e46ec"
+    ]
   },
-  "PID_md5:124b59e34ca3c7af55d5b316790beac5": {
+  {
+    "pid": "PID_md5:124b59e34ca3c7af55d5b316790beac5",
     "record": [
       {
         "key": "21.T11969/30f4a1f8aacab81faf38",
@@ -3000,10 +3001,10 @@
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
         "value": "Interdentritic-region-overview.jpg"
       }
-    ],
-    "pid": "PID_md5:124b59e34ca3c7af55d5b316790beac5"
+    ]
   },
-  "PID_md5:bca1012cfddead226eff51638125b126": {
+  {
+    "pid": "PID_md5:bca1012cfddead226eff51638125b126",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -3069,10 +3070,10 @@
         "key": "21.T11969/2b4d6ceda80ddd63f7a9",
         "value": "PID_md5:db46e8a671eeb2abf04ee88760780d40"
       }
-    ],
-    "pid": "PID_md5:bca1012cfddead226eff51638125b126"
+    ]
   },
-  "PID_md5:a92757e01dcfea78f1db9e7159bc4066": {
+  {
+    "pid": "PID_md5:a92757e01dcfea78f1db9e7159bc4066",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -3134,10 +3135,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:a92757e01dcfea78f1db9e7159bc4066"
+    ]
   },
-  "PID_md5:1e5d421620f8746e93b30e4f5846ff5b": {
+  {
+    "pid": "PID_md5:1e5d421620f8746e93b30e4f5846ff5b",
     "record": [
       {
         "key": "21.T11969/7f1a6afddcfeefbf195b",
@@ -3203,10 +3204,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:1e5d421620f8746e93b30e4f5846ff5b"
+    ]
   },
-  "PID_md5:7b1bb9852b761c925aad9839f6bb66ba": {
+  {
+    "pid": "PID_md5:7b1bb9852b761c925aad9839f6bb66ba",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -3268,10 +3269,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:7b1bb9852b761c925aad9839f6bb66ba"
+    ]
   },
-  "PID_md5:b73ebdef2f73a86096eb73e6d6c93d19": {
+  {
+    "pid": "PID_md5:b73ebdef2f73a86096eb73e6d6c93d19",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -3337,10 +3338,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:b73ebdef2f73a86096eb73e6d6c93d19"
+    ]
   },
-  "PID_md5:8447dff1601a597f16a4789add5f9db1": {
+  {
+    "pid": "PID_md5:8447dff1601a597f16a4789add5f9db1",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -3406,10 +3407,10 @@
         "key": "21.T11969/479febb2bbe8400da547",
         "value": "https://zenodo.org/api/records/18933930/files/Vh5205_C-95-Creep.LIS/content"
       }
-    ],
-    "pid": "PID_md5:8447dff1601a597f16a4789add5f9db1"
+    ]
   },
-  "PID_md5:e67b912c7552c62c709ce42f9ecc9a1e": {
+  {
+    "pid": "PID_md5:e67b912c7552c62c709ce42f9ecc9a1e",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -3467,10 +3468,10 @@
         "key": "21.T11969/479febb2bbe8400da547",
         "value": "https://zenodo.org/api/records/18933930/files/Vh5205_MD-TR_C-85.LIS/content"
       }
-    ],
-    "pid": "PID_md5:e67b912c7552c62c709ce42f9ecc9a1e"
+    ]
   },
-  "PID_md5:71308114049fdfba6830b5cdade92cf5": {
+  {
+    "pid": "PID_md5:71308114049fdfba6830b5cdade92cf5",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -3528,10 +3529,10 @@
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
         "value": "md5:71308114049fdfba6830b5cdade92cf5"
       }
-    ],
-    "pid": "PID_md5:71308114049fdfba6830b5cdade92cf5"
+    ]
   },
-  "PID_md5:9411c77aa57fda2f9f20f6f670cef5f5": {
+  {
+    "pid": "PID_md5:9411c77aa57fda2f9f20f6f670cef5f5",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -3589,10 +3590,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:9411c77aa57fda2f9f20f6f670cef5f5"
+    ]
   },
-  "PID_md5:10209431098d4baccf8d19203b3e8a5e": {
+  {
+    "pid": "PID_md5:10209431098d4baccf8d19203b3e8a5e",
     "record": [
       {
         "key": "21.T11969/2b4d6ceda80ddd63f7a9",
@@ -3658,10 +3659,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:10209431098d4baccf8d19203b3e8a5e"
+    ]
   },
-  "PID_md5:26b99a055e11d0496f7128279874f0d9": {
+  {
+    "pid": "PID_md5:26b99a055e11d0496f7128279874f0d9",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -3719,10 +3720,10 @@
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
         "value": "md5:26b99a055e11d0496f7128279874f0d9"
       }
-    ],
-    "pid": "PID_md5:26b99a055e11d0496f7128279874f0d9"
+    ]
   },
-  "PID_md5:62742405f3de46332575ea3ff14de10a": {
+  {
+    "pid": "PID_md5:62742405f3de46332575ea3ff14de10a",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -3784,10 +3785,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:62742405f3de46332575ea3ff14de10a"
+    ]
   },
-  "PID_md5:8ae16b282a7ed0802bb5c8d636afb5cf": {
+  {
+    "pid": "PID_md5:8ae16b282a7ed0802bb5c8d636afb5cf",
     "record": [
       {
         "key": "21.T11969/7f1a6afddcfeefbf195b",
@@ -3853,10 +3854,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:8ae16b282a7ed0802bb5c8d636afb5cf"
+    ]
   },
-  "PID_md5:2909fc1d994a226d98df546e26ac88b6": {
+  {
+    "pid": "PID_md5:2909fc1d994a226d98df546e26ac88b6",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -3918,10 +3919,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:2909fc1d994a226d98df546e26ac88b6"
+    ]
   },
-  "PID_md5:19bf68e020059bbad7fcf6969eebee5e": {
+  {
+    "pid": "PID_md5:19bf68e020059bbad7fcf6969eebee5e",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -3987,10 +3988,10 @@
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
         "value": "Vh5205_Complementary_Data-acquisition.LIS"
       }
-    ],
-    "pid": "PID_md5:19bf68e020059bbad7fcf6969eebee5e"
+    ]
   },
-  "PID_md5:d53a948bcd37838a6c4c643a4cc71326": {
+  {
+    "pid": "PID_md5:d53a948bcd37838a6c4c643a4cc71326",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -4056,10 +4057,10 @@
         "key": "21.T11969/479febb2bbe8400da547",
         "value": "https://zenodo.org/api/records/18933930/files/Vh5205_Complementary_Primary-and-processed-data-series.LIS/content"
       }
-    ],
-    "pid": "PID_md5:d53a948bcd37838a6c4c643a4cc71326"
+    ]
   },
-  "PID_md5:cdb111721844647b900f8d922c9d5d54": {
+  {
+    "pid": "PID_md5:cdb111721844647b900f8d922c9d5d54",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -4117,10 +4118,10 @@
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
         "value": "md5:cdb111721844647b900f8d922c9d5d54"
       }
-    ],
-    "pid": "PID_md5:cdb111721844647b900f8d922c9d5d54"
+    ]
   },
-  "PID_md5:d7553459781320fa997e70ba7492a5e4": {
+  {
+    "pid": "PID_md5:d7553459781320fa997e70ba7492a5e4",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -4186,10 +4187,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:d7553459781320fa997e70ba7492a5e4"
+    ]
   },
-  "PID_md5:0f44cd52bde1b15f78d2860ffdb72bac": {
+  {
+    "pid": "PID_md5:0f44cd52bde1b15f78d2860ffdb72bac",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -4247,10 +4248,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:0f44cd52bde1b15f78d2860ffdb72bac"
+    ]
   },
-  "PID_md5:cfed4b53f240d9062951100ac2eac8dc": {
+  {
+    "pid": "PID_md5:cfed4b53f240d9062951100ac2eac8dc",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -4308,10 +4309,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:cfed4b53f240d9062951100ac2eac8dc"
+    ]
   },
-  "PID_md5:836edb4f36a300be7b0ad18146cf7928": {
+  {
+    "pid": "PID_md5:836edb4f36a300be7b0ad18146cf7928",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -4377,10 +4378,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:836edb4f36a300be7b0ad18146cf7928"
+    ]
   },
-  "PID_md5:c6199e7bb64e1ebd35ecaa9e1b6796af": {
+  {
+    "pid": "PID_md5:c6199e7bb64e1ebd35ecaa9e1b6796af",
     "record": [
       {
         "key": "21.T11969/2b4d6ceda80ddd63f7a9",
@@ -4446,10 +4447,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:c6199e7bb64e1ebd35ecaa9e1b6796af"
+    ]
   },
-  "PID_md5:8be2398521399a2297c8c17dbadc3601": {
+  {
+    "pid": "PID_md5:8be2398521399a2297c8c17dbadc3601",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -4511,10 +4512,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:8be2398521399a2297c8c17dbadc3601"
+    ]
   },
-  "PID_md5:4c244a1f4d6a5854d6310e3aa1a0be48": {
+  {
+    "pid": "PID_md5:4c244a1f4d6a5854d6310e3aa1a0be48",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -4580,10 +4581,10 @@
         "key": "21.T11969/7f1a6afddcfeefbf195b",
         "value": "PID_md5:ff2ef233a0abc264c09cfdcea9b505f0"
       }
-    ],
-    "pid": "PID_md5:4c244a1f4d6a5854d6310e3aa1a0be48"
+    ]
   },
-  "PID_md5:0e6d9ef8a5f1f12dfed538ac6288eb5f": {
+  {
+    "pid": "PID_md5:0e6d9ef8a5f1f12dfed538ac6288eb5f",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -4641,10 +4642,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:0e6d9ef8a5f1f12dfed538ac6288eb5f"
+    ]
   },
-  "PID_md5:0cb87d6a96773ed87b297a79228fcb36": {
+  {
+    "pid": "PID_md5:0cb87d6a96773ed87b297a79228fcb36",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -4702,10 +4703,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:0cb87d6a96773ed87b297a79228fcb36"
+    ]
   },
-  "PID_md5:4ab405bd43c6ed5532f810dbce1fe944": {
+  {
+    "pid": "PID_md5:4ab405bd43c6ed5532f810dbce1fe944",
     "record": [
       {
         "key": "21.T11969/7f1a6afddcfeefbf195b",
@@ -4771,10 +4772,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:4ab405bd43c6ed5532f810dbce1fe944"
+    ]
   },
-  "PID_md5:c5a9c346955c5b5976029c7a2c336570": {
+  {
+    "pid": "PID_md5:c5a9c346955c5b5976029c7a2c336570",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -4840,10 +4841,10 @@
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
         "value": "md5:c5a9c346955c5b5976029c7a2c336570"
       }
-    ],
-    "pid": "PID_md5:c5a9c346955c5b5976029c7a2c336570"
+    ]
   },
-  "PID_md5:4ea6e5e3282b6749a1745acb2a6beabb": {
+  {
+    "pid": "PID_md5:4ea6e5e3282b6749a1745acb2a6beabb",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -4909,10 +4910,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:4ea6e5e3282b6749a1745acb2a6beabb"
+    ]
   },
-  "PID_md5:ef27ff3350d9d734f3aad22af9e35938": {
+  {
+    "pid": "PID_md5:ef27ff3350d9d734f3aad22af9e35938",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -4978,10 +4979,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:ef27ff3350d9d734f3aad22af9e35938"
+    ]
   },
-  "PID_md5:0eefd60406dc3d326febed36e5f95ff0": {
+  {
+    "pid": "PID_md5:0eefd60406dc3d326febed36e5f95ff0",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -5047,10 +5048,10 @@
         "key": "21.T11969/7f1a6afddcfeefbf195b",
         "value": "PID_md5:4e3455610bbb395d9059b485c3101d97"
       }
-    ],
-    "pid": "PID_md5:0eefd60406dc3d326febed36e5f95ff0"
+    ]
   },
-  "PID_md5:bf81cd6d31275b5f505de216f81c610e": {
+  {
+    "pid": "PID_md5:bf81cd6d31275b5f505de216f81c610e",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -5116,10 +5117,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:bf81cd6d31275b5f505de216f81c610e"
+    ]
   },
-  "PID_md5:d402861bb36f2e5b45a72e6d3d142bf0": {
+  {
+    "pid": "PID_md5:d402861bb36f2e5b45a72e6d3d142bf0",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -5185,10 +5186,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:d402861bb36f2e5b45a72e6d3d142bf0"
+    ]
   },
-  "PID_md5:505fb2f2b5e95c1117054d5994e4b399": {
+  {
+    "pid": "PID_md5:505fb2f2b5e95c1117054d5994e4b399",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -5254,10 +5255,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:505fb2f2b5e95c1117054d5994e4b399"
+    ]
   },
-  "PID_md5:28573899cc09a145ac2c69fc1370c0bf": {
+  {
+    "pid": "PID_md5:28573899cc09a145ac2c69fc1370c0bf",
     "record": [
       {
         "key": "21.T11969/30f4a1f8aacab81faf38",
@@ -5315,10 +5316,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:28573899cc09a145ac2c69fc1370c0bf"
+    ]
   },
-  "PID_md5:20d1b9eec092f6edcce75f56c41a0430": {
+  {
+    "pid": "PID_md5:20d1b9eec092f6edcce75f56c41a0430",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -5380,10 +5381,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:20d1b9eec092f6edcce75f56c41a0430"
+    ]
   },
-  "PID_md5:10318429e5179bda300249066bdbb3b0": {
+  {
+    "pid": "PID_md5:10318429e5179bda300249066bdbb3b0",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -5449,10 +5450,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:10318429e5179bda300249066bdbb3b0"
+    ]
   },
-  "PID_md5:ee8408af22cd7d11ef86bcf489950604": {
+  {
+    "pid": "PID_md5:ee8408af22cd7d11ef86bcf489950604",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -5510,10 +5511,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:ee8408af22cd7d11ef86bcf489950604"
+    ]
   },
-  "PID_md5:7c20a4c765b7db1201f9ae4625dc2a32": {
+  {
+    "pid": "PID_md5:7c20a4c765b7db1201f9ae4625dc2a32",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -5579,10 +5580,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:7c20a4c765b7db1201f9ae4625dc2a32"
+    ]
   },
-  "PID_md5:0f19309dac621c8ae3bc45e13827bb7b": {
+  {
+    "pid": "PID_md5:0f19309dac621c8ae3bc45e13827bb7b",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -5648,10 +5649,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:0f19309dac621c8ae3bc45e13827bb7b"
+    ]
   },
-  "PID_md5:844cf37d100005a58ce4c35250351a35": {
+  {
+    "pid": "PID_md5:844cf37d100005a58ce4c35250351a35",
     "record": [
       {
         "key": "21.T11969/2b4d6ceda80ddd63f7a9",
@@ -5717,10 +5718,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:844cf37d100005a58ce4c35250351a35"
+    ]
   },
-  "PID_md5:98cadcedf48ba8d838542b930ef570e3": {
+  {
+    "pid": "PID_md5:98cadcedf48ba8d838542b930ef570e3",
     "record": [
       {
         "key": "21.T11969/2b4d6ceda80ddd63f7a9",
@@ -5786,10 +5787,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:98cadcedf48ba8d838542b930ef570e3"
+    ]
   },
-  "PID_md5:4dbb1c653814c7efa061580e2a23d6a9": {
+  {
+    "pid": "PID_md5:4dbb1c653814c7efa061580e2a23d6a9",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -5851,10 +5852,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:4dbb1c653814c7efa061580e2a23d6a9"
+    ]
   },
-  "PID_md5:79d7db46bd35cd4062fd921633e67355": {
+  {
+    "pid": "PID_md5:79d7db46bd35cd4062fd921633e67355",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -5912,10 +5913,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:79d7db46bd35cd4062fd921633e67355"
+    ]
   },
-  "PID_md5:bbb56d8654cab3db76efed3b978a2c08": {
+  {
+    "pid": "PID_md5:bbb56d8654cab3db76efed3b978a2c08",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -5977,10 +5978,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:bbb56d8654cab3db76efed3b978a2c08"
+    ]
   },
-  "PID_md5:f607d12dc149040ed2d4275ac94d044e": {
+  {
+    "pid": "PID_md5:f607d12dc149040ed2d4275ac94d044e",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -6038,10 +6039,10 @@
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
         "value": "Vh5205_C-95-MD-TR_translated.json"
       }
-    ],
-    "pid": "PID_md5:f607d12dc149040ed2d4275ac94d044e"
+    ]
   },
-  "PID_md5:ebb5bfa49bc72b91c057c66347c67be8": {
+  {
+    "pid": "PID_md5:ebb5bfa49bc72b91c057c66347c67be8",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -6099,10 +6100,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:ebb5bfa49bc72b91c057c66347c67be8"
+    ]
   },
-  "PID_md5:c7d7edba271e5376a19364f17743805b": {
+  {
+    "pid": "PID_md5:c7d7edba271e5376a19364f17743805b",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -6160,10 +6161,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:c7d7edba271e5376a19364f17743805b"
+    ]
   },
-  "PID_md5:6655040e7c0874bc6749b0d01255122f": {
+  {
+    "pid": "PID_md5:6655040e7c0874bc6749b0d01255122f",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -6221,10 +6222,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:6655040e7c0874bc6749b0d01255122f"
+    ]
   },
-  "PID_md5:82e04a482dc67460af6d61e28dc970ac": {
+  {
+    "pid": "PID_md5:82e04a482dc67460af6d61e28dc970ac",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -6282,10 +6283,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:82e04a482dc67460af6d61e28dc970ac"
+    ]
   },
-  "PID_md5:58dd5cb29181f93a2169b591e2fbb176": {
+  {
+    "pid": "PID_md5:58dd5cb29181f93a2169b591e2fbb176",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -6343,10 +6344,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:58dd5cb29181f93a2169b591e2fbb176"
+    ]
   },
-  "PID_md5:142fdd4e9691a4c26f65c9eda91ceb80": {
+  {
+    "pid": "PID_md5:142fdd4e9691a4c26f65c9eda91ceb80",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -6408,10 +6409,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:142fdd4e9691a4c26f65c9eda91ceb80"
+    ]
   },
-  "PID_md5:456033f212f37e712bda5a0cb4dddd80": {
+  {
+    "pid": "PID_md5:456033f212f37e712bda5a0cb4dddd80",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -6469,10 +6470,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:456033f212f37e712bda5a0cb4dddd80"
+    ]
   },
-  "PID_md5:928ddafb800128033b1d53f46106235a": {
+  {
+    "pid": "PID_md5:928ddafb800128033b1d53f46106235a",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -6534,10 +6535,10 @@
         "key": "21.T11969/479febb2bbe8400da547",
         "value": "https://zenodo.org/api/records/20132712/files/Vh5205_Complementary_Rp0.2.LIS/content"
       }
-    ],
-    "pid": "PID_md5:928ddafb800128033b1d53f46106235a"
+    ]
   },
-  "PID_md5:1e8d9ad5a64d3631d27d28d1951a6ca4": {
+  {
+    "pid": "PID_md5:1e8d9ad5a64d3631d27d28d1951a6ca4",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -6599,10 +6600,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:1e8d9ad5a64d3631d27d28d1951a6ca4"
+    ]
   },
-  "PID_md5:d365dd3513b11f21b7cecd48365223b8": {
+  {
+    "pid": "PID_md5:d365dd3513b11f21b7cecd48365223b8",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -6660,10 +6661,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:d365dd3513b11f21b7cecd48365223b8"
+    ]
   },
-  "PID_md5:159381f3cbc760a6864832b5df732199": {
+  {
+    "pid": "PID_md5:159381f3cbc760a6864832b5df732199",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -6725,10 +6726,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:159381f3cbc760a6864832b5df732199"
+    ]
   },
-  "PID_md5:7be2efcc5c2a0789c0a5bfd12c8212df": {
+  {
+    "pid": "PID_md5:7be2efcc5c2a0789c0a5bfd12c8212df",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -6790,10 +6791,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:7be2efcc5c2a0789c0a5bfd12c8212df"
+    ]
   },
-  "PID_md5:0b1236100c7d5379512e076722f264b5": {
+  {
+    "pid": "PID_md5:0b1236100c7d5379512e076722f264b5",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -6851,10 +6852,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:0b1236100c7d5379512e076722f264b5"
+    ]
   },
-  "PID_md5:2a0daebfae2e27d88e87aba9fad368a1": {
+  {
+    "pid": "PID_md5:2a0daebfae2e27d88e87aba9fad368a1",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -6912,10 +6913,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:2a0daebfae2e27d88e87aba9fad368a1"
+    ]
   },
-  "PID_md5:7b77967a0aa8493a3b3221ff74ef8f5c": {
+  {
+    "pid": "PID_md5:7b77967a0aa8493a3b3221ff74ef8f5c",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -6973,10 +6974,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:7b77967a0aa8493a3b3221ff74ef8f5c"
+    ]
   },
-  "PID_md5:2aef95e72498758bdabef907e63ae5fe": {
+  {
+    "pid": "PID_md5:2aef95e72498758bdabef907e63ae5fe",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -7038,10 +7039,10 @@
         "key": "21.T11969/7c97f00a2a95826c1a8f",
         "value": "PID_md5:d7553459781320fa997e70ba7492a5e4"
       }
-    ],
-    "pid": "PID_md5:2aef95e72498758bdabef907e63ae5fe"
+    ]
   },
-  "PID_md5:45a012d344107b4755c510116b291d43": {
+  {
+    "pid": "PID_md5:45a012d344107b4755c510116b291d43",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -7099,10 +7100,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:45a012d344107b4755c510116b291d43"
+    ]
   },
-  "PID_md5:6341548c595a0a07e09ecff310e0b410": {
+  {
+    "pid": "PID_md5:6341548c595a0a07e09ecff310e0b410",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -7164,10 +7165,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:6341548c595a0a07e09ecff310e0b410"
+    ]
   },
-  "PID_md5:34a686d0405287ffa949bb29ff4c777c": {
+  {
+    "pid": "PID_md5:34a686d0405287ffa949bb29ff4c777c",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -7229,10 +7230,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:34a686d0405287ffa949bb29ff4c777c"
+    ]
   },
-  "PID_md5:ce648cebc735b6053a0111171ed4edf1": {
+  {
+    "pid": "PID_md5:ce648cebc735b6053a0111171ed4edf1",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -7294,10 +7295,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:ce648cebc735b6053a0111171ed4edf1"
+    ]
   },
-  "PID_md5:a70d727f57fe5952481a2acf23656276": {
+  {
+    "pid": "PID_md5:a70d727f57fe5952481a2acf23656276",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -7355,10 +7356,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:a70d727f57fe5952481a2acf23656276"
+    ]
   },
-  "PID_md5:0fedf19a7f13a6d5fcddff4a88afba8b": {
+  {
+    "pid": "PID_md5:0fedf19a7f13a6d5fcddff4a88afba8b",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -7420,10 +7421,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:0fedf19a7f13a6d5fcddff4a88afba8b"
+    ]
   },
-  "PID_md5:3f2b3df26ed3190e3b9e0f91a6b2add7": {
+  {
+    "pid": "PID_md5:3f2b3df26ed3190e3b9e0f91a6b2add7",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -7481,10 +7482,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:3f2b3df26ed3190e3b9e0f91a6b2add7"
+    ]
   },
-  "PID_md5:50fd1bd52957deb4e947c483d34cf88c": {
+  {
+    "pid": "PID_md5:50fd1bd52957deb4e947c483d34cf88c",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -7546,10 +7547,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:50fd1bd52957deb4e947c483d34cf88c"
+    ]
   },
-  "PID_md5:c64127d22f3e4e2e84d3345b560eb645": {
+  {
+    "pid": "PID_md5:c64127d22f3e4e2e84d3345b560eb645",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -7607,10 +7608,10 @@
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
         "value": "Vh5205_C-80-MD-TR.lis"
       }
-    ],
-    "pid": "PID_md5:c64127d22f3e4e2e84d3345b560eb645"
+    ]
   },
-  "PID_md5:5f3a52b295e4bb3d4bfb0fa8bb6ed15b": {
+  {
+    "pid": "PID_md5:5f3a52b295e4bb3d4bfb0fa8bb6ed15b",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -7668,10 +7669,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:5f3a52b295e4bb3d4bfb0fa8bb6ed15b"
+    ]
   },
-  "PID_md5:c6ef9dad6c470a7c47febb68c0f57871": {
+  {
+    "pid": "PID_md5:c6ef9dad6c470a7c47febb68c0f57871",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -7733,10 +7734,10 @@
         "key": "21.T11969/479febb2bbe8400da547",
         "value": "https://zenodo.org/api/records/20132712/files/Vh5205_Complementary_Primary-and-processed-data-series.LIS/content"
       }
-    ],
-    "pid": "PID_md5:c6ef9dad6c470a7c47febb68c0f57871"
+    ]
   },
-  "PID_md5:8c15185c172c8fe3e6ad585776deab00": {
+  {
+    "pid": "PID_md5:8c15185c172c8fe3e6ad585776deab00",
     "record": [
       {
         "key": "21.T11969/7c97f00a2a95826c1a8f",
@@ -7798,10 +7799,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:8c15185c172c8fe3e6ad585776deab00"
+    ]
   },
-  "PID_md5:10e4b63bd1e1e299b8ed58c36620ce40": {
+  {
+    "pid": "PID_md5:10e4b63bd1e1e299b8ed58c36620ce40",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -7859,10 +7860,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:10e4b63bd1e1e299b8ed58c36620ce40"
+    ]
   },
-  "PID_md5:27522bcdf5d544662898cecf8022617b": {
+  {
+    "pid": "PID_md5:27522bcdf5d544662898cecf8022617b",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -7924,10 +7925,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:27522bcdf5d544662898cecf8022617b"
+    ]
   },
-  "PID_md5:712b7b6341abd1fc43d3506bb88ea9bb": {
+  {
+    "pid": "PID_md5:712b7b6341abd1fc43d3506bb88ea9bb",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -7989,10 +7990,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:712b7b6341abd1fc43d3506bb88ea9bb"
+    ]
   },
-  "PID_md5:21264d3de9ef2a7923742de8aa881b71": {
+  {
+    "pid": "PID_md5:21264d3de9ef2a7923742de8aa881b71",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -8050,10 +8051,10 @@
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
         "value": "Vh5205_C-91-MD-TR_translated.json"
       }
-    ],
-    "pid": "PID_md5:21264d3de9ef2a7923742de8aa881b71"
+    ]
   },
-  "PID_md5:6b167c493641cc883a54ae3f9a720f75": {
+  {
+    "pid": "PID_md5:6b167c493641cc883a54ae3f9a720f75",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -8111,10 +8112,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:6b167c493641cc883a54ae3f9a720f75"
+    ]
   },
-  "PID_md5:db46e8a671eeb2abf04ee88760780d40": {
+  {
+    "pid": "PID_md5:db46e8a671eeb2abf04ee88760780d40",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -8176,10 +8177,10 @@
         "key": "21.T11969/7c97f00a2a95826c1a8f",
         "value": "PID_md5:bca1012cfddead226eff51638125b126"
       }
-    ],
-    "pid": "PID_md5:db46e8a671eeb2abf04ee88760780d40"
+    ]
   },
-  "PID_md5:7961703d245e2485ead1cadfa681cc10": {
+  {
+    "pid": "PID_md5:7961703d245e2485ead1cadfa681cc10",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -8241,10 +8242,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:7961703d245e2485ead1cadfa681cc10"
+    ]
   },
-  "PID_md5:43a2ca169370ff8435e8d9a1063f673b": {
+  {
+    "pid": "PID_md5:43a2ca169370ff8435e8d9a1063f673b",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -8306,10 +8307,10 @@
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
         "value": "Vh5205_Complementary_Data-acquisition.LIS"
       }
-    ],
-    "pid": "PID_md5:43a2ca169370ff8435e8d9a1063f673b"
+    ]
   },
-  "PID_md5:bd07b0d0647deef390c2966776c71e0a": {
+  {
+    "pid": "PID_md5:bd07b0d0647deef390c2966776c71e0a",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -8367,10 +8368,10 @@
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
         "value": "Vh5205_C-82-MD-TR.lis"
       }
-    ],
-    "pid": "PID_md5:bd07b0d0647deef390c2966776c71e0a"
+    ]
   },
-  "PID_md5:a78698551e18ea3787aaecadd01291a5": {
+  {
+    "pid": "PID_md5:a78698551e18ea3787aaecadd01291a5",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -8432,10 +8433,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:a78698551e18ea3787aaecadd01291a5"
+    ]
   },
-  "PID_md5:f0494a4356e853f322a490a97d51eca5": {
+  {
+    "pid": "PID_md5:f0494a4356e853f322a490a97d51eca5",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -8497,10 +8498,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:f0494a4356e853f322a490a97d51eca5"
+    ]
   },
-  "PID_md5:9e64072bd008b6e8245409f9944e1eaa": {
+  {
+    "pid": "PID_md5:9e64072bd008b6e8245409f9944e1eaa",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -8558,10 +8559,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:9e64072bd008b6e8245409f9944e1eaa"
+    ]
   },
-  "PID_md5:9fc96c87ec5dc3160227714f97d2e1ce": {
+  {
+    "pid": "PID_md5:9fc96c87ec5dc3160227714f97d2e1ce",
     "record": [
       {
         "key": "21.T11969/7c97f00a2a95826c1a8f",
@@ -8623,10 +8624,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:9fc96c87ec5dc3160227714f97d2e1ce"
+    ]
   },
-  "PID_md5:1167984b97473ca321864cc53ac6bef1": {
+  {
+    "pid": "PID_md5:1167984b97473ca321864cc53ac6bef1",
     "record": [
       {
         "key": "21.T11969/7c97f00a2a95826c1a8f",
@@ -8688,10 +8689,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:1167984b97473ca321864cc53ac6bef1"
+    ]
   },
-  "PID_md5:4e3455610bbb395d9059b485c3101d97": {
+  {
+    "pid": "PID_md5:4e3455610bbb395d9059b485c3101d97",
     "record": [
       {
         "key": "21.T11969/7c97f00a2a95826c1a8f",
@@ -8753,10 +8754,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:4e3455610bbb395d9059b485c3101d97"
+    ]
   },
-  "PID_md5:ff2ef233a0abc264c09cfdcea9b505f0": {
+  {
+    "pid": "PID_md5:ff2ef233a0abc264c09cfdcea9b505f0",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -8818,10 +8819,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:ff2ef233a0abc264c09cfdcea9b505f0"
+    ]
   },
-  "PID_md5:2794915601921b596973287face6b826": {
+  {
+    "pid": "PID_md5:2794915601921b596973287face6b826",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -8879,10 +8880,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:2794915601921b596973287face6b826"
+    ]
   },
-  "PID_md5:cb9de3af641b6eea45f34ca713e764a5": {
+  {
+    "pid": "PID_md5:cb9de3af641b6eea45f34ca713e764a5",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -8944,10 +8945,10 @@
         "key": "21.T11969/479febb2bbe8400da547",
         "value": "https://zenodo.org/api/records/20132712/files/Vh5205_Complementary_Data-processing.LIS/content"
       }
-    ],
-    "pid": "PID_md5:cb9de3af641b6eea45f34ca713e764a5"
+    ]
   },
-  "PID_md5:ecf0d54d916fcc6a31b12a8b94df19ef": {
+  {
+    "pid": "PID_md5:ecf0d54d916fcc6a31b12a8b94df19ef",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -9009,10 +9010,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:ecf0d54d916fcc6a31b12a8b94df19ef"
+    ]
   },
-  "PID_md5:e5628023998d75a74fabd42c79329f83": {
+  {
+    "pid": "PID_md5:e5628023998d75a74fabd42c79329f83",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -9070,10 +9071,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:e5628023998d75a74fabd42c79329f83"
+    ]
   },
-  "PID_md5:360daff4a300946ec05f8e95bb98189e": {
+  {
+    "pid": "PID_md5:360daff4a300946ec05f8e95bb98189e",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -9131,10 +9132,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:360daff4a300946ec05f8e95bb98189e"
+    ]
   },
-  "PID_grant:https://ror.org/018mejw64::460247524": {
+  {
+    "pid": "PID_grant:https://ror.org/018mejw64::460247524",
     "record": [
       {
         "key": "21.T11969/8710d753ad10f371189b",
@@ -9168,10 +9169,10 @@
         "key": "21.T11969/112427d2da588bf46e53",
         "value": "NFDI-MatWerk"
       }
-    ],
-    "pid": "PID_grant:https://ror.org/018mejw64::460247524"
+    ]
   },
-  "PID_grant:https://ror.org/018mejw64::Po 405/2-1": {
+  {
+    "pid": "PID_grant:https://ror.org/018mejw64::Po 405/2-1",
     "record": [
       {
         "key": "21.T11969/8710d753ad10f371189b",
@@ -9193,10 +9194,10 @@
         "key": "21.T11969/4b9e95b6d60f47c5620f",
         "value": "https://ror.org/018mejw64"
       }
-    ],
-    "pid": "PID_grant:https://ror.org/018mejw64::Po 405/2-1"
+    ]
   },
-  "PID_10.5281/zenodo.11668376": {
+  {
+    "pid": "PID_10.5281/zenodo.11668376",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -9310,10 +9311,10 @@
         "key": "21.T11969/7c67083a5d218e544063",
         "value": "https://orcid.org/0000-0003-0727-5499"
       }
-    ],
-    "pid": "PID_10.5281/zenodo.11668376"
+    ]
   },
-  "PID_10.5281/zenodo.13820070": {
+  {
+    "pid": "PID_10.5281/zenodo.13820070",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -9431,10 +9432,10 @@
         "key": "21.T11969/39c056d0cc63e2d0ff17",
         "value": "PID_md5:6d33f245a541d895be358ddea78bfca4"
       }
-    ],
-    "pid": "PID_10.5281/zenodo.13820070"
+    ]
   },
-  "PID_10.5281/zenodo.17975526": {
+  {
+    "pid": "PID_10.5281/zenodo.17975526",
     "record": [
       {
         "key": "21.T11969/7c97f00a2a95826c1a8f",
@@ -9572,10 +9573,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "data schema"
       }
-    ],
-    "pid": "PID_10.5281/zenodo.17975526"
+    ]
   },
-  "PID_10.5281/zenodo.20132382": {
+  {
+    "pid": "PID_10.5281/zenodo.20132382",
     "record": [
       {
         "key": "21.T11969/813e06c1441327b72e68",
@@ -9729,10 +9730,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "data schema"
       }
-    ],
-    "pid": "PID_10.5281/zenodo.20132382"
+    ]
   },
-  "PID_md5:282ecf5411a97b8ad8da14acc5a43313": {
+  {
+    "pid": "PID_md5:282ecf5411a97b8ad8da14acc5a43313",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -9790,10 +9791,10 @@
         "key": "21.T11969/479febb2bbe8400da547",
         "value": "https://zenodo.org/api/records/11668376/files/2407_Data-Schema_Creep_v1.0.csv/content"
       }
-    ],
-    "pid": "PID_md5:282ecf5411a97b8ad8da14acc5a43313"
+    ]
   },
-  "PID_md5:8a1c85973dd31907be2cec6f497f6c00": {
+  {
+    "pid": "PID_md5:8a1c85973dd31907be2cec6f497f6c00",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -9851,10 +9852,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:8a1c85973dd31907be2cec6f497f6c00"
+    ]
   },
-  "PID_md5:f3fdf1630cc2a058102a346634249783": {
+  {
+    "pid": "PID_md5:f3fdf1630cc2a058102a346634249783",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -9912,10 +9913,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "pdf"
       }
-    ],
-    "pid": "PID_md5:f3fdf1630cc2a058102a346634249783"
+    ]
   },
-  "PID_md5:d03862280989be01a25ea869ea3a0444": {
+  {
+    "pid": "PID_md5:d03862280989be01a25ea869ea3a0444",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -9973,10 +9974,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:d03862280989be01a25ea869ea3a0444"
+    ]
   },
-  "PID_md5:ce681eb2a7e297012472a7a51c838bfa": {
+  {
+    "pid": "PID_md5:ce681eb2a7e297012472a7a51c838bfa",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -10034,10 +10035,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "pdf"
       }
-    ],
-    "pid": "PID_md5:ce681eb2a7e297012472a7a51c838bfa"
+    ]
   },
-  "PID_md5:e9118168d9c923f42bca91033f94d6c0": {
+  {
+    "pid": "PID_md5:e9118168d9c923f42bca91033f94d6c0",
     "record": [
       {
         "key": "21.T11969/30f4a1f8aacab81faf38",
@@ -10095,10 +10096,10 @@
         "key": "21.T11969/479febb2bbe8400da547",
         "value": "https://zenodo.org/api/records/13820070/files/2024-09_Data-Schema_Creep_v1.1.xlsx/content"
       }
-    ],
-    "pid": "PID_md5:e9118168d9c923f42bca91033f94d6c0"
+    ]
   },
-  "PID_md5:008b132bb55a312aeae75644c0e4c945": {
+  {
+    "pid": "PID_md5:008b132bb55a312aeae75644c0e4c945",
     "record": [
       {
         "key": "21.T11969/30f4a1f8aacab81faf38",
@@ -10156,10 +10157,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:008b132bb55a312aeae75644c0e4c945"
+    ]
   },
-  "PID_md5:6d33f245a541d895be358ddea78bfca4": {
+  {
+    "pid": "PID_md5:6d33f245a541d895be358ddea78bfca4",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -10217,10 +10218,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:6d33f245a541d895be358ddea78bfca4"
+    ]
   },
-  "PID_md5:387c505977ca8f31fffa7d9234c468f0": {
+  {
+    "pid": "PID_md5:387c505977ca8f31fffa7d9234c468f0",
     "record": [
       {
         "key": "21.T11969/29f92bd203dd3eaa5a1f",
@@ -10278,10 +10279,10 @@
         "key": "21.T11969/30f4a1f8aacab81faf38",
         "value": "PID_10.5281/zenodo.17975526"
       }
-    ],
-    "pid": "PID_md5:387c505977ca8f31fffa7d9234c468f0"
+    ]
   },
-  "PID_md5:9825274e6375d749b9b4a489d9e7819c": {
+  {
+    "pid": "PID_md5:9825274e6375d749b9b4a489d9e7819c",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -10339,10 +10340,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "pdf"
       }
-    ],
-    "pid": "PID_md5:9825274e6375d749b9b4a489d9e7819c"
+    ]
   },
-  "PID_md5:5c682614f82f85b41bcc56a6d18b3d82": {
+  {
+    "pid": "PID_md5:5c682614f82f85b41bcc56a6d18b3d82",
     "record": [
       {
         "key": "21.T11969/29f92bd203dd3eaa5a1f",
@@ -10400,10 +10401,10 @@
         "key": "21.T11969/30f4a1f8aacab81faf38",
         "value": "PID_10.5281/zenodo.17975526"
       }
-    ],
-    "pid": "PID_md5:5c682614f82f85b41bcc56a6d18b3d82"
+    ]
   },
-  "PID_md5:1314060484d02661b382b09ec0bb0c2c": {
+  {
+    "pid": "PID_md5:1314060484d02661b382b09ec0bb0c2c",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -10461,10 +10462,10 @@
         "key": "21.T11969/30f4a1f8aacab81faf38",
         "value": "PID_10.5281/zenodo.17975526"
       }
-    ],
-    "pid": "PID_md5:1314060484d02661b382b09ec0bb0c2c"
+    ]
   },
-  "PID_md5:2a23846d476c502ab7f81b03a29a4a04": {
+  {
+    "pid": "PID_md5:2a23846d476c502ab7f81b03a29a4a04",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -10522,10 +10523,10 @@
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
         "value": "2026-05_Data-Schema_Creep_v2.1.json"
       }
-    ],
-    "pid": "PID_md5:2a23846d476c502ab7f81b03a29a4a04"
+    ]
   },
-  "PID_md5:9efab8e7d18a070165d3ef25a2b1a673": {
+  {
+    "pid": "PID_md5:9efab8e7d18a070165d3ef25a2b1a673",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -10583,10 +10584,10 @@
         "key": "21.T11969/479febb2bbe8400da547",
         "value": "https://zenodo.org/api/records/20132382/files/2026-05_Data-Schema_Creep_v2.1.xlsx/content"
       }
-    ],
-    "pid": "PID_md5:9efab8e7d18a070165d3ef25a2b1a673"
+    ]
   },
-  "PID_md5:38f694f553d749860d9f3c936301883d": {
+  {
+    "pid": "PID_md5:38f694f553d749860d9f3c936301883d",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -10644,10 +10645,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "pdf"
       }
-    ],
-    "pid": "PID_md5:38f694f553d749860d9f3c936301883d"
+    ]
   },
-  "PID_md5:c4852bbfe1dd0ed816f95dcf5101d519": {
+  {
+    "pid": "PID_md5:c4852bbfe1dd0ed816f95dcf5101d519",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -10705,10 +10706,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:c4852bbfe1dd0ed816f95dcf5101d519"
+    ]
   },
-  "PID_10.5281/zenodo.11667674": {
+  {
+    "pid": "PID_10.5281/zenodo.11667674",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -10822,10 +10823,10 @@
         "key": "21.T11969/8710d753ad10f371189b",
         "value": "https://doi.org/10.5281/zenodo.11667674"
       }
-    ],
-    "pid": "PID_10.5281/zenodo.11667674"
+    ]
   },
-  "PID_md5:0a30f64d1c89cccfea006d1b77424cd5": {
+  {
+    "pid": "PID_md5:0a30f64d1c89cccfea006d1b77424cd5",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -10883,10 +10884,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "pdf"
       }
-    ],
-    "pid": "PID_md5:0a30f64d1c89cccfea006d1b77424cd5"
+    ]
   },
-  "PID_10.1016/j.actamat.2025.120735": {
+  {
+    "pid": "PID_10.1016/j.actamat.2025.120735",
     "record": [
       {
         "key": "21.T11969/48e563f148dc04d8b31c",
@@ -10936,10 +10937,10 @@
         "key": "21.T11148/076759916209e5d62bd5",
         "value": "21.T11969/077fe9c54ed5ed26fa54"
       }
-    ],
-    "pid": "PID_10.1016/j.actamat.2025.120735"
+    ]
   },
-  "PID_10.1016/j.dib.2025.112436": {
+  {
+    "pid": "PID_10.1016/j.dib.2025.112436",
     "record": [
       {
         "key": "21.T11969/e5945ef3ff07f314a146",
@@ -10973,10 +10974,10 @@
         "key": "21.T11969/8710d753ad10f371189b",
         "value": "https://doi.org/10.1016/j.dib.2025.112436"
       }
-    ],
-    "pid": "PID_10.1016/j.dib.2025.112436"
+    ]
   },
-  "PID_10.5281/zenodo.17846617": {
+  {
+    "pid": "PID_10.5281/zenodo.17846617",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -11126,10 +11127,10 @@
         "key": "21.T11969/39c056d0cc63e2d0ff17",
         "value": "PID_md5:28573899cc09a145ac2c69fc1370c0bf"
       }
-    ],
-    "pid": "PID_10.5281/zenodo.17846617"
+    ]
   },
-  "PID_md5:f3c9defb8cb3e11d8de9cad849e3eb7c": {
+  {
+    "pid": "PID_md5:f3c9defb8cb3e11d8de9cad849e3eb7c",
     "record": [
       {
         "key": "21.T11969/30f4a1f8aacab81faf38",
@@ -11187,10 +11188,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:f3c9defb8cb3e11d8de9cad849e3eb7c"
+    ]
   },
-  "PID_md5:554a397d927779435b9ae8dea393123f": {
+  {
+    "pid": "PID_md5:554a397d927779435b9ae8dea393123f",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -11248,10 +11249,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "pdf"
       }
-    ],
-    "pid": "PID_md5:554a397d927779435b9ae8dea393123f"
+    ]
   },
-  "PID_md5:e85ef58139a68592f36452de195a0a10": {
+  {
+    "pid": "PID_md5:e85ef58139a68592f36452de195a0a10",
     "record": [
       {
         "key": "21.T11969/30f4a1f8aacab81faf38",
@@ -11309,10 +11310,10 @@
         "key": "21.T11969/479febb2bbe8400da547",
         "value": "https://zenodo.org/api/records/17846617/files/2025-12_HT-Tensile-reference-data-CMSX-6_v1.0.xlsx/content"
       }
-    ],
-    "pid": "PID_md5:e85ef58139a68592f36452de195a0a10"
+    ]
   },
-  "PID_md5:6afb90c18e98ad22c549c8ae76cb621f": {
+  {
+    "pid": "PID_md5:6afb90c18e98ad22c549c8ae76cb621f",
     "record": [
       {
         "key": "21.T11969/30f4a1f8aacab81faf38",
@@ -11370,10 +11371,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:6afb90c18e98ad22c549c8ae76cb621f"
+    ]
   },
-  "PID_md5:c97a17cdd139e928d0134a4697f61073": {
+  {
+    "pid": "PID_md5:c97a17cdd139e928d0134a4697f61073",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -11431,10 +11432,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:c97a17cdd139e928d0134a4697f61073"
+    ]
   },
-  "PID_md5:cbdcba23b8c84485991cc85ddb060d7f": {
+  {
+    "pid": "PID_md5:cbdcba23b8c84485991cc85ddb060d7f",
     "record": [
       {
         "key": "21.T11969/479febb2bbe8400da547",
@@ -11492,10 +11493,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:cbdcba23b8c84485991cc85ddb060d7f"
+    ]
   },
-  "PID_md5:f4f0f1d219ac0f66df753cabe0b79684": {
+  {
+    "pid": "PID_md5:f4f0f1d219ac0f66df753cabe0b79684",
     "record": [
       {
         "key": "21.T11969/30f4a1f8aacab81faf38",
@@ -11553,10 +11554,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "digital object"
       }
-    ],
-    "pid": "PID_md5:f4f0f1d219ac0f66df753cabe0b79684"
+    ]
   },
-  "PID_md5:763fdfb2ac9406518fb560188f5f8dd4": {
+  {
+    "pid": "PID_md5:763fdfb2ac9406518fb560188f5f8dd4",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -11614,10 +11615,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "lis"
       }
-    ],
-    "pid": "PID_md5:763fdfb2ac9406518fb560188f5f8dd4"
+    ]
   },
-  "PID_10.5281/zenodo.17846436": {
+  {
+    "pid": "PID_10.5281/zenodo.17846436",
     "record": [
       {
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
@@ -11711,10 +11712,10 @@
         "key": "21.T11969/29f92bd203dd3eaa5a1f",
         "value": "2025-12-08"
       }
-    ],
-    "pid": "PID_10.5281/zenodo.17846436"
+    ]
   },
-  "PID_md5:be4cdcde938753c448e1bec239480c82": {
+  {
+    "pid": "PID_md5:be4cdcde938753c448e1bec239480c82",
     "record": [
       {
         "key": "21.T11969/a80ed2ef79e22f1d8af8",
@@ -11772,10 +11773,10 @@
         "key": "21.T11969/29f92bd203dd3eaa5a1f",
         "value": "2025-12-08"
       }
-    ],
-    "pid": "PID_md5:be4cdcde938753c448e1bec239480c82"
+    ]
   },
-  "PID_md5:3b5aa58ce87e8fdf821d51569ee80f57": {
+  {
+    "pid": "PID_md5:3b5aa58ce87e8fdf821d51569ee80f57",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -11833,10 +11834,10 @@
         "key": "21.T11969/793ff5c33c3aeb32907a",
         "value": "pdf"
       }
-    ],
-    "pid": "PID_md5:3b5aa58ce87e8fdf821d51569ee80f57"
+    ]
   },
-  "PID_md5:330a8405f6cb9c4fcfe221baea7ced27": {
+  {
+    "pid": "PID_md5:330a8405f6cb9c4fcfe221baea7ced27",
     "record": [
       {
         "key": "21.T11148/076759916209e5d62bd5",
@@ -11894,10 +11895,10 @@
         "key": "21.T11969/479febb2bbe8400da547",
         "value": "https://zenodo.org/api/records/17846436/files/2025-12_Data-Schema-Tensile-HT_v1.0.csv/content"
       }
-    ],
-    "pid": "PID_md5:330a8405f6cb9c4fcfe221baea7ced27"
+    ]
   },
-  "PID_CMSX-6_md5:20d1b9eec092f6edcce75f56c41a0430": {
+  {
+    "pid": "PID_CMSX-6_md5:20d1b9eec092f6edcce75f56c41a0430",
     "record": [
       {
         "key": "21.T11969/925e3f9925a88476ffba",
@@ -12023,10 +12024,10 @@
         "key": "21.T11969/19a94f596420bb274408",
         "value": "PID_md5:c97a17cdd139e928d0134a4697f61073"
       }
-    ],
-    "pid": "PID_CMSX-6_md5:20d1b9eec092f6edcce75f56c41a0430"
+    ]
   },
-  "PID_Vh5205_C-97": {
+  {
+    "pid": "PID_Vh5205_C-97",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -12192,10 +12193,10 @@
         "key": "21.T11969/880724416f5857987e70",
         "value": "Creep test at 0.0°C, 200.0 MPa"
       }
-    ],
-    "pid": "PID_Vh5205_C-97"
+    ]
   },
-  "PID_Vh5205_C-89": {
+  {
+    "pid": "PID_Vh5205_C-89",
     "record": [
       {
         "key": "21.T11969/8bd53487030550ee2e94",
@@ -12361,10 +12362,10 @@
         "key": "21.T11969/d0773859091aeb451528",
         "value": "PID_md5:91815206431ce302eeab88b3cc3a8f5e"
       }
-    ],
-    "pid": "PID_Vh5205_C-89"
+    ]
   },
-  "PID_Vh5205_C-82": {
+  {
+    "pid": "PID_Vh5205_C-82",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -12534,10 +12535,10 @@
         "key": "21.T11969/bd3e9fb9b606d2198c9e",
         "value": "Creep Test Vh5205_C-82"
       }
-    ],
-    "pid": "PID_Vh5205_C-82"
+    ]
   },
-  "PID_Vh5205_C-80": {
+  {
+    "pid": "PID_Vh5205_C-80",
     "record": [
       {
         "key": "21.T11969/8bd53487030550ee2e94",
@@ -12703,10 +12704,10 @@
         "key": "21.T11969/880724416f5857987e70",
         "value": "Creep test at 0.0°C, 230.0 MPa"
       }
-    ],
-    "pid": "PID_Vh5205_C-80"
+    ]
   },
-  "PID_Vh5205_C-91": {
+  {
+    "pid": "PID_Vh5205_C-91",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -12872,10 +12873,10 @@
         "key": "21.T11969/cc230f978e8add2e2520",
         "value": "PID_md5:89a2e4e8657f19b687a65e90dea16725"
       }
-    ],
-    "pid": "PID_Vh5205_C-91"
+    ]
   },
-  "PID_Vh5205_C-99": {
+  {
+    "pid": "PID_Vh5205_C-99",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -13041,10 +13042,10 @@
         "key": "21.T11969/4597cf0db467d7e365a9",
         "value": "3.3"
       }
-    ],
-    "pid": "PID_Vh5205_C-99"
+    ]
   },
-  "PID_Vh5205_C-94": {
+  {
+    "pid": "PID_Vh5205_C-94",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -13214,10 +13215,10 @@
         "key": "21.T11969/880724416f5857987e70",
         "value": "Creep test at 0.0°C, 140.0 MPa"
       }
-    ],
-    "pid": "PID_Vh5205_C-94"
+    ]
   },
-  "PID_Vh5205_C-85": {
+  {
+    "pid": "PID_Vh5205_C-85",
     "record": [
       {
         "key": "21.T11969/1a34a6966f91cc341f58",
@@ -13383,10 +13384,10 @@
         "key": "21.T11969/29f92bd203dd3eaa5a1f",
         "value": "2023-12-04T09:08:00"
       }
-    ],
-    "pid": "PID_Vh5205_C-85"
+    ]
   },
-  "PID_Vh5205_C-98": {
+  {
+    "pid": "PID_Vh5205_C-98",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -13552,10 +13553,10 @@
         "key": "21.T11969/7c67083a5d218e544063",
         "value": "https://orcid.org/0000-0003-0727-5499"
       }
-    ],
-    "pid": "PID_Vh5205_C-98"
+    ]
   },
-  "PID_Vh5205_C-78": {
+  {
+    "pid": "PID_Vh5205_C-78",
     "record": [
       {
         "key": "21.T11969/8bd53487030550ee2e94",
@@ -13721,10 +13722,10 @@
         "key": "21.T11969/880724416f5857987e70",
         "value": "Creep test at 0.0°C, 230.0 MPa"
       }
-    ],
-    "pid": "PID_Vh5205_C-78"
+    ]
   },
-  "PID_Vh5205_C-95": {
+  {
+    "pid": "PID_Vh5205_C-95",
     "record": [
       {
         "key": "21.T11969/793ff5c33c3aeb32907a",
@@ -13890,10 +13891,10 @@
         "key": "21.T11969/880724416f5857987e70",
         "value": "Creep test at 0.0°C, 140.0 MPa"
       }
-    ],
-    "pid": "PID_Vh5205_C-95"
+    ]
   },
-  "PID_Vh5205_C-81": {
+  {
+    "pid": "PID_Vh5205_C-81",
     "record": [
       {
         "key": "21.T11969/cc230f978e8add2e2520",
@@ -14059,7 +14060,6 @@
         "key": "21.T11969/d0773859091aeb451528",
         "value": "PID_md5:cddbb74a27ad8b2f1f42b02363fe528f"
       }
-    ],
-    "pid": "PID_Vh5205_C-81"
+    ]
   }
-}
+]
