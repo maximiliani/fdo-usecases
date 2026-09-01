@@ -123,6 +123,7 @@ classDiagram
     Dataset "1" <--> "0..*" File : hasPart / isPartOf
     Dataset "1" <--> "0..*" CreepExperiment : hasPart / isPartOf
     Dataset "0..*" <--> "1" Grant : fundedBy / funds
+    CreepExperiment "0..*" <--> "1" Grant : fundedBy / funds
     Dataset "0..*" <--> "0..*" Publication : references / isReferencedBy
     CreepExperiment "*" <--> "1" Material : usesMaterial / isPartOf
     CreepExperiment "*" <--> "*" File : hasData / isPartOf
@@ -187,6 +188,7 @@ classDiagram
     v2_1 <--> f_ht : hasPart
     v2_1 <--> exp : hasPart
     v2_1 <--> grant : fundedBy
+    exp <--> grant : fundedBy
     v2_1 <--> pub : references
     f_chem <--> v2_1 : isPartOf
     mat <--> f_chem : hasChemicalComposition
