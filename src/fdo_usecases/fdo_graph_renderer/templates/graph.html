@@ -768,7 +768,59 @@
 
     <script>
         // Raw JSON injected from Python
-        const RAW_GRAPH_DATA = $raw_json;
+        let RAW_GRAPH_DATA = $raw_json;
+
+        /**
+         * Normalize the embedded graph into the canonical shape
+         * `{pid: {record: [{key, value}]}}` used throughout this viewer.
+         *
+         * Supported input formats:
+         *   1. Canonical (output of `toSimpleJSON`, e.g. fdo_graph_merged.json):
+         *      `{pid: {record: [{key, value}, ...]}}` - used as-is.
+         *   2. Flat ES-document list (output of `build_es_documents`,
+         *      e.g. fdo_graph_es_ingest.json): `[{pid, "<infoTypePID>": [values]|value, ...}]`
+         *      - each entry is expanded into `{pid: {record: [{key, value}, ...]}}`,
+         *      flattening list values into one attribute per element.
+         *
+         * Any other format is returned unchanged.
+         */
+        function normalizeGraphData(raw) {
+            if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+                const first = Object.values(raw)[0];
+                if (first && typeof first === 'object' && 'record' in first) {
+                    return raw;
+                }
+            }
+
+            if (Array.isArray(raw)) {
+                const normalized = {};
+                let converted = false;
+
+                raw.forEach(entry => {
+                    if (!entry || typeof entry !== 'object' || !entry.pid) {
+                        return;
+                    }
+                    const record = [];
+                    Object.entries(entry).forEach(([key, value]) => {
+                        if (key === 'pid') {
+                            return;
+                        }
+                        converted = true;
+                        const values = Array.isArray(value) ? value : [value];
+                        values.forEach(v => {
+                            record.push({ key: key, value: v });
+                        });
+                    });
+                    normalized[entry.pid] = { record: record };
+                });
+
+                if (converted) {
+                    return normalized;
+                }
+            }
+
+            return raw;
+        }
         const DEFAULT_LAYOUT = '$layout_algorithm';
 
         let cy;
@@ -1272,6 +1324,7 @@
             let resolvedCount = 0;
 
             if (totalToResolve === 0) {
+                hideLoadingOverlay();
                 return;
             }
 
@@ -1296,12 +1349,14 @@
                 updateLoading(3, (resolvedCount / totalToResolve) * 100);
             }
 
-            for (let i = 0; i < keysArray.length; i += batchSize) {
-                const batch = keysArray.slice(i, i + batchSize);
-                await resolveBatchWithConcurrency(batch);
+            try {
+                for (let i = 0; i < keysArray.length; i += batchSize) {
+                    const batch = keysArray.slice(i, i + batchSize);
+                    await resolveBatchWithConcurrency(batch);
+                }
+            } finally {
+                hideLoadingOverlay();
             }
-
-            hideLoadingOverlay();
         }
 
         /**
@@ -1674,7 +1729,10 @@
                                 const stats = window.superNodeStats;
                                 if (!stats) return baseSize;
 
-                                const scale = Math.min(1, (degree - stats.mean) / (stats.threshold - stats.mean));
+                                const scale = (stats.threshold === stats.mean)
+                                    ? 0
+                                    : Math.min(1, (degree - stats.mean) / (stats.threshold - stats.mean));
+                                if (!isFinite(scale)) return baseSize;
                                 return baseSize + (maxSize - baseSize) * scale;
                             },
                             'height': function(node) {
@@ -1684,7 +1742,10 @@
                                 const stats = window.superNodeStats;
                                 if (!stats) return baseSize;
 
-                                const scale = Math.min(1, (degree - stats.mean) / (stats.threshold - stats.mean));
+                                const scale = (stats.threshold === stats.mean)
+                                    ? 0
+                                    : Math.min(1, (degree - stats.mean) / (stats.threshold - stats.mean));
+                                if (!isFinite(scale)) return baseSize;
                                 return baseSize + (maxSize - baseSize) * scale;
                             },
                             'border-width': 4,
@@ -2875,6 +2936,10 @@
 
             setTimeout(async () => {
                 updateLoading(1, 0);
+
+                // Normalize the embedded data into the canonical graph shape so
+                // both the merged graph and the flat ES-document list render.
+                RAW_GRAPH_DATA = normalizeGraphData(RAW_GRAPH_DATA);
 
                 // Load customizations FIRST so they're available for color calculation
                 loadCustomizationsFromUrl();

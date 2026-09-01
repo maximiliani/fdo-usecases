@@ -44,6 +44,18 @@ poetry run fdo-usecases-cli render-graph fdo_graph.json --offline
 poetry run fdo-usecases-cli render-graph fdo_graph.json --dtr-path ./path/to/dtr
 ```
 
+### Supported input formats
+
+The renderer accepts two graph layouts (normalized in the browser before rendering):
+
+- **Canonical SimpleJSON** (`{pid: {record: [{key, value}, ...]}}`), as produced by
+  `toSimpleJSON` and written to `fdo_graph_merged.json` by the BAM use case.
+- **Flat ES-document list** (`[{pid, "<infoTypePID>": [values]|value, ...}]`), as produced
+  by `build_es_documents` and written to `fdo_graph_es_ingest.json` by the sync step
+  (the format required by the Typed PID Maker).
+
+Any other JSON format is embedded as-is and may render with missing profiles/edges.
+
 ### Python API
 
 ```python
