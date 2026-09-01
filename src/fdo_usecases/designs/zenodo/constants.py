@@ -64,6 +64,9 @@ INFOTYPES = {
     "description": "21.T11969/880724416f5857987e70",
     #: Digital Object Identifier
     "doi": "21.T11969/48e563f148dc04d8b31c",
+    #: Funding relationship between grant and publication/dataset
+    "fundedBy": "21.T11969/28ca0d5c50678433e5a8",
+    "funds": "21.T11969/67b90082413e5e3547ff",
     #: Dataset hasData relationship (linking to files)
     "hasData": "21.T11969/cc230f978e8add2e2520",
     "hasPart": "21.T11969/39c056d0cc63e2d0ff17",

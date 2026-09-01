@@ -26,6 +26,7 @@ from fdo_usecases.designer_lib.executor import (
     placeholder_pid,
 )
 from fdo_usecases.designs.grant import GrantDesign
+from fdo_usecases.designs.zenodo.constants import INFOTYPES
 from fdo_usecases.designs.zenodo.designs import (
     PublicationDesign,
     ZenodoDatasetDesign,
@@ -547,11 +548,15 @@ class ZenodoFDODesign(RecordDesign):
                 f"skipping FDO creation for {doi}"
             )
 
-        # Link datasets to grants via fundedBy relation
+        # Link datasets to grants via fundedBy relation (bidirectional via funds)
         for dataset_data in dataset_datas:
-            record = self._record_graph[placeholder_pid(dataset_data.doi)]
+            dataset_placeholder = placeholder_pid(dataset_data.doi)
+            record = self._record_graph[dataset_placeholder]
             for grant_id in grant_ids:
-                record.addAttribute("21.T11969/funded0000000000001", grant_id)
+                record.addAttribute(INFOTYPES["fundedBy"], grant_id)
+                grant_record = self._record_graph.get(grant_id)
+                if grant_record:
+                    grant_record.addAttribute(INFOTYPES["funds"], dataset_placeholder)
 
         # Always process references - each version may carry its own related
         # identifiers that need to be handled (e.g. a new version citing a work
