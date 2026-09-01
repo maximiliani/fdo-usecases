@@ -109,6 +109,75 @@ class TestDatasetMetadataExtractor:
         assert "creep test" in keywords
         assert "Ni-based superalloy" in keywords
 
+    def test_get_funders_from_dataset(self, extractor):
+        """Test fundedBy grant PID extraction from Dataset FDOs."""
+        mock_record = MagicMock()
+        mock_record.toSimpleJSON.return_value = {
+            "record": [
+                {
+                    "key": "21.T11969/28ca0d5c50678433e5a8",
+                    "value": "PID_grant:https://ror.org/018mejw64::460247524",
+                },
+            ]
+        }
+
+        mock_graph = {"PID_10.5281/zenodo.20132712": mock_record}
+        funders = extractor.get_funders_from_dataset(mock_graph)
+
+        assert len(funders) == 1
+        assert "PID_grant:https://ror.org/018mejw64::460247524" in funders
+
+    def test_get_funders_from_dataset_deduplicated(self, extractor):
+        """Test that duplicate grant PIDs are removed."""
+        mock_record = MagicMock()
+        mock_record.toSimpleJSON.return_value = {
+            "record": [
+                {
+                    "key": "21.T11969/28ca0d5c50678433e5a8",
+                    "value": "PID_grant:https://ror.org/018mejw64::460247524",
+                },
+                {
+                    "key": "21.T11969/28ca0d5c50678433e5a8",
+                    "value": "PID_grant:https://ror.org/018mejw64::460247524",  # Same grant
+                },
+            ]
+        }
+
+        mock_graph = {"PID_10.5281/zenodo.20132712": mock_record}
+        funders = extractor.get_funders_from_dataset(mock_graph)
+        assert len(funders) == 1  # Deduplicated
+
+    def test_get_funders_restricted_to_dataset_dois(self, extractor):
+        """Test filtering funders by a specific set of dataset records."""
+        mock_record = MagicMock()
+        mock_record.toSimpleJSON.return_value = {
+            "record": [
+                {
+                    "key": "21.T11969/28ca0d5c50678433e5a8",
+                    "value": "PID_grant:https://ror.org/018mejw64::460247524",
+                },
+            ]
+        }
+        other_record = MagicMock()
+        other_record.toSimpleJSON.return_value = {
+            "record": [
+                {
+                    "key": "21.T11969/28ca0d5c50678433e5a8",
+                    "value": "PID_grant:https://ror.org/other::999",
+                },
+            ]
+        }
+
+        mock_graph = {
+            "PID_10.5281/zenodo.20132712": mock_record,
+            "PID_10.5281/zenodo.11668376": other_record,
+        }
+
+        funders = extractor.get_funders_from_dataset(
+            mock_graph, ["PID_10.5281/zenodo.20132712"]
+        )
+        assert funders == ["PID_grant:https://ror.org/018mejw64::460247524"]
+
     def test_extract_keywords_from_metadata(self, extractor):
         """Test keyword extraction from parsed metadata."""
         metadata = ParsedTestMetadata(

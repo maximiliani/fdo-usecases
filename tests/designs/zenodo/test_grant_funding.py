@@ -31,6 +31,7 @@ from pathlib import Path
 from fdo_usecases.designer_lib.executor import placeholder_pid
 from fdo_usecases.designs.grant import PRE_REGISTERED_GRANTS
 from fdo_usecases.designs.zenodo import ZenodoFDODesign
+from fdo_usecases.designs.zenodo.constants import INFOTYPES
 
 
 async def test_grant_funding_extraction():
@@ -87,11 +88,21 @@ async def test_grant_funding_extraction():
     funded_datasets = [
         (k, v)
         for k, v in design._record_graph.items()
-        if any(attr[0] == "21.T11969/funded0000000000001" for attr in v._tuples)
+        if any(attr[0] == INFOTYPES["fundedBy"] for attr in v._tuples)
     ]
 
     print(f"\n📊 Datasets with funding relations: {len(funded_datasets)}")
     assert len(funded_datasets) > 0, "No datasets have fundedBy relations"
+
+    # Verify the relationship is bidirectional: grants must carry a funds
+    # backlink pointing back at the datasets they fund.
+    funded_grants = [
+        (k, v)
+        for k, v in grant_fdos.items()
+        if any(attr[0] == INFOTYPES["funds"] for attr in v._tuples)
+    ]
+    print(f"📊 Grants with funds backlinks: {len(funded_grants)}")
+    assert len(funded_grants) > 0, "No grants have funds backlinks to datasets"
 
     # Verify MatWerk grant exists with correct ID
     matwerk_key = PRE_REGISTERED_GRANTS["matwerk"].unique_key
