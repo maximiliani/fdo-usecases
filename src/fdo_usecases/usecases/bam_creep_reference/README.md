@@ -43,6 +43,175 @@ flowchart TB
     MFDO --> UG
 ```
 
+## Domain Model
+
+The use case is built around six domain classes, each of which is materialized
+as a FAIR Digital Object (FDO) carrying one or more profiles (Base, Versionable,
+DataResource, Publication, Grant, Creep, Material). The following **Mermaid
+class diagram** shows the type-level structure of the domain: the classes, their
+attributes, and the associations between them. Edge labels are written as
+`forwardLink / backlink` because FDO relationships are bidirectional - the
+backlink is inferred automatically when the FDOs are created.
+
+```mermaid
+classDiagram
+    direction LR
+
+    class Dataset {
+        +string doi
+        +string title
+        +string description
+        +date publication_date
+        +string version_label
+        +string[] creators
+        +string[] creator_affiliations
+        +string[] keywords
+        +string[] preview_images
+        +string landing_page_url
+    }
+
+    class File {
+        +string checksum
+        +string filename
+        +string mimetype
+        +string download_url
+        +string spdx_license
+        +date date_created
+    }
+
+    class Material {
+        +string material_id
+        +string pid_composition
+        +string name
+        +string[] descriptions
+        +string[] preview_images
+        +string[] sem_images
+    }
+
+    class CreepExperiment {
+        +string test_id
+        +string applicable_standard
+        +float specified_temperature
+        +float initial_stress
+        +string test_duration
+        +float percentage_creep_extension
+        +float single_crystal_orientation
+        +datetime date_created
+    }
+
+    class Publication {
+        +string identifier
+        +string resource_type
+        +string publisher
+        +date publication_date
+        +string title
+        +string description
+        +string[] creators
+    }
+
+    class Grant {
+        +string funder_ror_id
+        +string funder_doi
+        +string funder_name
+        +string grant_code
+        +string project_name
+        +string project_website
+    }
+
+    Dataset "0..*" <--> "0..1" Dataset : previousVersion / isNewVersionOf
+    File "0..*" <--> "0..1" File : previousVersion / isNewVersionOf
+    Dataset "1" <--> "0..*" File : hasPart / isPartOf
+    Dataset "1" <--> "0..*" CreepExperiment : hasPart / isPartOf
+    Dataset "0..*" <--> "1" Grant : fundedBy / funds
+    Dataset "0..*" <--> "0..*" Publication : references / isReferencedBy
+    CreepExperiment "*" <--> "1" Material : usesMaterial / isPartOf
+    CreepExperiment "*" <--> "*" File : hasData / isPartOf
+    CreepExperiment "*" <--> "*" File : hasMetadata / isPartOf
+    CreepExperiment "*" <--> "*" File : references / isReferencedBy
+    Material "*" <--> "*" File : hasChemicalComposition / isReferencedBy
+    Material "*" <--> "*" File : hasHeatTreatment / isReferencedBy
+    Material "*" <--> "*" File : references / isReferencedBy
+```
+
+While the class diagram describes the *schema* of the domain, the diagram below
+shows a concrete *snapshot*: actual FDO instances from the dataset
+`10.5281/zenodo.20132712` (BAM reference data for the single-crystal Ni-based
+superalloy CMSX-6, version 2.1). Mermaid has no dedicated object-diagram type,
+so the snapshot is drawn as a class diagram whose "classes" are the concrete
+instances (labelled e.g. `v2.1 : Dataset`). Attribute values and links are
+taken from `fdo_graph_merged.json`.
+
+```mermaid
+classDiagram
+    direction LR
+
+    class v2_1["v2.1 : Dataset"] {
+        +string doi = "10.5281/zenodo.20132712"
+        +string version = "2.1"
+        +date publication_date = "2026-05-12"
+    }
+    class v2_0["v2.0 : Dataset"] {
+        +string doi = "10.5281/zenodo.18933930"
+        +string version = "2.0"
+    }
+    class f_chem["Ch.-Comp.-measured.LIS : File"] {
+        +string checksum = "md5:20d1b9..."
+        +string name = "Vh5205_Complementary_Ch.-Comp.-measured.LIS"
+    }
+    class f_ht["Heat-treatment.LIS : File"] {
+        +string checksum = "md5:ecf0d5..."
+        +string name = "Vh5205_Complementary_Heat-treatment.LIS"
+    }
+    class f_data["Vh5205_C-78.LIS : File"] {
+        +string checksum = "md5:610326..."
+        +string name = "Vh5205_C-78.LIS"
+    }
+    class mat["CMSX-6 : Material"] {
+        +string materialID = "CMSX-6"
+    }
+    class exp["Vh5205_C-78 : CreepExperiment"] {
+        +string applicableStandard = "DIN EN ISO 204:2019-4"
+        +float initialStress = "230.0 MPa"
+        +string testDuration = "P3DT6H42M"
+    }
+    class pub["dib.2025.112436 : Publication"] {
+        +string resource_type = "JournalArticle"
+    }
+    class grant["NFDI-MatWerk : Grant"] {
+        +string grantCode = "460247524"
+        +string funderName = "Deutsche Forschungsgemeinschaft"
+    }
+
+    v2_1 <--> v2_0 : previousVersion
+    v2_1 <--> f_chem : hasPart
+    v2_1 <--> f_ht : hasPart
+    v2_1 <--> exp : hasPart
+    v2_1 <--> grant : fundedBy
+    v2_1 <--> pub : references
+    f_chem <--> v2_1 : isPartOf
+    mat <--> f_chem : hasChemicalComposition
+    mat <--> f_ht : hasHeatTreatment
+    exp <--> mat : usesMaterial
+    exp <--> f_data : hasData
+    exp <--> v2_1 : isPartOf
+```
+
+> Both diagrams render natively on GitHub. To export SVG/PNG for a paper, use
+> the Mermaid CLI (`mmdc`), the Mermaid live editor (mermaid.live), or Kroki
+> (kroki.io).
+
+### Class Diagram vs. Object Diagram
+
+| Aspect | Class Diagram | Object Diagram |
+|--------|---------------|----------------|
+| **Purpose** | Describes the type-level structure of the domain: which classes exist, their attributes, and how they are associated | Describes one concrete state: specific FDO instances, their attribute values, and the links actually present in the graph |
+| **Abstraction** | High, dataset-independent; valid for every creep dataset processed by the use case | Low, dataset-specific; a snapshot that changes with each data release |
+| **Elements** | Classes, typed attributes, associations with multiplicities | Objects (instances), concrete attribute values, links without multiplicities |
+| **Size / stability** | Fixed number of elements, stable across datasets | Grows with the number of instances and changes over time |
+| **Multiplicities** | Shown (`1`, `0..*`, `*`) | Not shown - each link is one concrete fact |
+| **Best used for** | The paper's main domain model figure; schema documentation; API/design discussions | Explaining a concrete example, verifying a specific dataset, debugging the generated FDO graph |
+| **Limitations** | Cannot show real attribute values or a concrete configuration | Cannot show the full schema, multiplicities, or constraints; becomes cluttered for large datasets |
+
 ## Component Responsibilities
 
 ```mermaid
