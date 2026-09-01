@@ -371,7 +371,7 @@ Output files (written next to `fdo_graph_merged.json`):
 | `updates.json` | Human-readable list of changes detected for existing FDOs (before PID resolution), including the changed attribute keys. |
 | `mapping.json` | Placeholder PID -> real Handle PID mapping after creation (only written when FDOs were actually created). |
 | `updates_resolved.json` | Final update payloads with placeholder PIDs fixed to real Handle PIDs, ready for `PUT /api/v1/pit/pid/{pid}`. |
-| `fdo_graph_es_ingest.json` | The full graph as Elasticsearch documents (`{"pid": ..., "<infoTypePID>": [...]}`) with real Handle PIDs - ingest this into the index. |
+| `fdo_graph_es_ingest.json` | The full graph as Elasticsearch documents (`{"pid": ..., "entries": {"<infoTypePID>": [{"key", "value", "name"}]}}`) with real Handle PIDs - ingest this into the index. |
 | `sync_summary.json` | Machine-readable summary: counts of new/changed/unchanged records, dry-run flag, and the full mapping. |
 
 Configuration (via `.env` or environment variables):

@@ -50,9 +50,8 @@ The renderer accepts two graph layouts (normalized in the browser before renderi
 
 - **Canonical SimpleJSON** (`{pid: {record: [{key, value}, ...]}}`), as produced by
   `toSimpleJSON` and written to `fdo_graph_merged.json` by the BAM use case.
-- **Flat ES-document list** (`[{pid, "<infoTypePID>": [values]|value, ...}]`), as produced
-  by `build_es_documents` and written to `fdo_graph_es_ingest.json` by the sync step
-  (the format required by the Typed PID Maker).
+- **ES-document list** (`[{pid, "entries": {"<infoTypePID>": [{"key", "value", "name"}]}}]`), as
+  produced by `build_es_documents` and written to `fdo_graph_es_ingest.json` by the sync step.
 
 Any other JSON format is embedded as-is and may render with missing profiles/edges.
 

@@ -75,6 +75,48 @@ _INFO_KEYS = {
     "grantCode": GRANT_INFOTYPES["grantCode"],
 }
 
+#: Kernel information profile type PID (special, not part of the local DTR).
+_PROFILE_KEY = "21.T11148/076759916209e5d62bd5"
+
+#: External InfoTypes used by the graphs but not registered in the local DTR.
+_EXTERNAL_INFO_NAMES = {
+    _PROFILE_KEY: "Kernel Information Profile",
+    ZENODO_INFOTYPES["landingPageLocation"]: "landingPageLocation",
+}
+
+
+def _load_infotype_names() -> dict[str, str]:
+    """Map InfoType/profile/basic-type PIDs to their human-readable names.
+
+    Names are read from the local DTR type definitions under
+    ``dtr/info_types``, ``dtr/profiles``, ``dtr/basic_info_types`` and
+    ``dtr/measurement_units``. Types not registered locally fall back to a
+    small set of known kernel/external types.
+
+    Returns:
+        Mapping from type PID to human-readable name.
+
+    """
+    names: dict[str, str] = {}
+    dtr_dir = Path(__file__).resolve().parent / "dtr"
+    for subdir in ("info_types", "profiles", "basic_info_types", "measurement_units"):
+        for path in sorted((dtr_dir / subdir).glob("*.json")):
+            try:
+                with open(path, encoding="utf-8") as file:
+                    data = json.load(file)
+            except OSError:
+                continue
+            ident = data.get("Identifier")
+            name = data.get("name")
+            if ident and name:
+                names.setdefault(ident, name)
+    names.update(_EXTERNAL_INFO_NAMES)
+    return names
+
+
+#: Mapping from InfoType PID to human-readable name for the ES ingest export.
+INFO_TYPE_NAMES = _load_infotype_names()
+
 
 def _values(attrs: dict[str, Any], key: str) -> list[str]:
     """Return the string values stored under ``key`` in ``attrs``."""
@@ -167,23 +209,29 @@ def normalize_attrs(record: dict[str, Any]) -> dict[str, set[str]]:
 def attrs_from_es_doc(doc: dict[str, Any]) -> dict[str, set[str]]:
     """Extract the attribute mapping from an Elasticsearch document.
 
-    The ``pid`` field is excluded. Values are coerced to strings so that
-    numeric attributes stored by Elasticsearch compare equal to their JSON
-    string representation.
+    Documents follow the ingest layout ``{"pid": ..., "entries": {"<infoTypePID>":
+    [{"key", "value", "name"}, ...]}}``. Only the ``value`` of each entry is
+    kept. Values are coerced to strings so that numeric attributes stored by
+    Elasticsearch compare equal to their JSON string representation.
 
     Args:
-        doc: Elasticsearch document, i.e. ``{"pid": ..., "<infoTypePID>": [...]}``.
+        doc: Elasticsearch document in the ``entries`` layout.
 
     Returns:
         Mapping of InfoType PID to the set of string values.
 
     """
     result: dict[str, set[str]] = {}
-    for key, value in doc.items():
-        if key == "pid":
-            continue
+    entries = doc.get("entries")
+    if not isinstance(entries, dict):
+        return result
+    for key, value in entries.items():
         values = value if isinstance(value, (list, tuple, set)) else [value]
-        result.setdefault(key, set()).update(str(item) for item in values)
+        for item in values:
+            if isinstance(item, dict):
+                result.setdefault(key, set()).add(str(item.get("value", item)))
+            else:
+                result.setdefault(key, set()).add(str(item))
     return result
 
 
@@ -404,8 +452,10 @@ def build_es_documents(
 ) -> list[dict[str, Any]]:
     """Serialize the finished graph for ingestion into Elasticsearch.
 
-    Each document follows the index layout ``{"pid": ..., "<infoTypePID>": [...]}``
-    with all placeholder references replaced by real Handle PIDs.
+    Each document follows the index layout ``{"pid": ..., "entries":
+    {"<infoTypePID>": [{"key", "value", "name"}, ...]}}`` with all placeholder
+    references replaced by real Handle PIDs and a human-readable ``name`` for
+    every InfoType.
 
     Args:
         graph_dict: SimpleJSON graph keyed by placeholder PID.
@@ -418,10 +468,19 @@ def build_es_documents(
     documents: list[dict[str, Any]] = []
     for placeholder, record in graph_dict.items():
         resolved = resolve_record_pids(record, pid_map)
-        document: dict[str, Any] = {"pid": pid_map.get(placeholder, placeholder)}
+        entries: dict[str, list[dict[str, str]]] = {}
         for attr in resolved["record"]:
-            document.setdefault(attr["key"], []).append(attr["value"])
-        documents.append(document)
+            key = str(attr["key"])
+            entries.setdefault(key, []).append(
+                {
+                    "key": key,
+                    "value": str(attr["value"]),
+                    "name": INFO_TYPE_NAMES.get(key, key),
+                }
+            )
+        documents.append(
+            {"pid": pid_map.get(placeholder, placeholder), "entries": entries}
+        )
     return documents
 
 
@@ -706,7 +765,8 @@ async def run_sync(
     - ``updates.json``: The changes detected for existing FDOs.
     - ``mapping.json``: The placeholder-to-real-PID mapping (after creation).
     - ``updates_resolved.json``: The update payloads with fixed placeholder PIDs.
-    - ``fdo_graph_es_ingest.json``: The full graph ready for ES ingestion.
+    - ``fdo_graph_es_ingest.json``: The full graph ready for ES ingestion, in the
+      ``{"pid", "entries": {"<infoTypePID>": [{"key", "value", "name"}]}}`` layout.
     - ``sync_summary.json``: Counts and the placeholder-to-real-PID mapping.
 
     Args:

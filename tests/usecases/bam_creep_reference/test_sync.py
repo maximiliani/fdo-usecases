@@ -70,12 +70,34 @@ def test_compute_placeholder_unknown_returns_none():
     assert compute_placeholder({ZENODO["keyword"]: "creep test"}) is None
 
 
+def _es_doc(pid: str, entries: dict[str, list[str]]) -> dict[str, object]:
+    """Build an ES document in the ``entries`` ingest layout."""
+    return {
+        "pid": pid,
+        "entries": {
+            key: [{"key": key, "value": value, "name": key} for value in values]
+            for key, values in entries.items()
+        },
+    }
+
+
 def test_attrs_from_es_doc_coerces_numbers_and_lists():
-    doc = {"pid": "21.T11148/1", CREEP["initialStress"]: 230.0, ZENODO["keyword"]: "a"}
+    doc = _es_doc(
+        "21.T11148/1",
+        {
+            CREEP["initialStress"]: ["230.0", "230.0"],
+            ZENODO["keyword"]: ["a"],
+        },
+    )
     attrs = attrs_from_es_doc(doc)
     assert attrs[CREEP["initialStress"]] == {"230.0"}
     assert attrs[ZENODO["keyword"]] == {"a"}
     assert "pid" not in attrs
+
+
+def test_attrs_from_es_doc_ignores_missing_entries():
+    assert attrs_from_es_doc({"pid": "21.T11148/1"}) == {}
+    assert attrs_from_es_doc({}) == {}
 
 
 def test_resolve_placeholders_and_record():
@@ -137,19 +159,23 @@ def test_compare_graph_classification():
         },
     }
     es_docs = [
-        {
-            "pid": "21.T11148/100",
-            ZENODO["checksum"]: ["md5:abc"],
-            ZENODO["name"]: ["a.LIS"],
-            ZENODO["keyword"]: ["file"],
-        },
-        {
-            "pid": "21.T11148/200",
-            ZENODO["landingPageLocation"]: ["https://doi.org/10.5281/zenodo.1"],
-            ZENODO["name"]: ["My Dataset"],
-            ZENODO["hasPart"]: ["21.T11148/100"],
-            ZENODO["keyword"]: ["dataset"],
-        },
+        _es_doc(
+            "21.T11148/100",
+            {
+                ZENODO["checksum"]: ["md5:abc"],
+                ZENODO["name"]: ["a.LIS"],
+                ZENODO["keyword"]: ["file"],
+            },
+        ),
+        _es_doc(
+            "21.T11148/200",
+            {
+                ZENODO["landingPageLocation"]: ["https://doi.org/10.5281/zenodo.1"],
+                ZENODO["name"]: ["My Dataset"],
+                ZENODO["hasPart"]: ["21.T11148/100"],
+                ZENODO["keyword"]: ["dataset"],
+            },
+        ),
     ]
 
     result = compare_graph(graph, es_docs)
@@ -176,13 +202,15 @@ def test_compare_graph_detects_changes():
         },
     }
     es_docs = [
-        {
-            "pid": "21.T11148/200",
-            ZENODO["landingPageLocation"]: ["https://doi.org/10.5281/zenodo.1"],
-            ZENODO["name"]: ["My Dataset"],
-            ZENODO["hasPart"]: ["21.T11148/100"],
-            ZENODO["keyword"]: ["dataset"],
-        }
+        _es_doc(
+            "21.T11148/200",
+            {
+                ZENODO["landingPageLocation"]: ["https://doi.org/10.5281/zenodo.1"],
+                ZENODO["name"]: ["My Dataset"],
+                ZENODO["hasPart"]: ["21.T11148/100"],
+                ZENODO["keyword"]: ["dataset"],
+            },
+        )
     ]
     result = compare_graph(graph, es_docs)
     assert len(result.to_update) == 1
@@ -209,9 +237,21 @@ def test_build_es_documents(merged_graph):
     }
     for key, doc in by_placeholder.items():
         assert doc["pid"] == key
-        assert ZENODO["checksum"] not in doc or isinstance(
-            doc[ZENODO["checksum"]], list
-        )
+        entries = doc["entries"]
+        assert isinstance(entries, dict)
+        assert entries
+        for info_type, values in entries.items():
+            assert isinstance(values, list) and values
+            for entry in values:
+                assert set(entry) == {"key", "value", "name"}
+                assert entry["key"] == info_type
+                assert isinstance(entry["value"], str)
+                assert entry["name"]
+    if ZENODO["checksum"] in next(iter(by_placeholder.values()))["entries"]:
+        checksum_entries = next(iter(by_placeholder.values()))["entries"][
+            ZENODO["checksum"]
+        ]
+        assert all(e["key"] == ZENODO["checksum"] for e in checksum_entries)
 
 
 def test_compare_full_graph_against_derived_index(merged_graph):
@@ -237,19 +277,23 @@ async def test_run_sync_dry_run_writes_artifacts(tmp_path, monkeypatch):
         },
     }
     es_docs = [
-        {
-            "pid": "21.T11148/100",
-            ZENODO["checksum"]: ["md5:abc"],
-            ZENODO["name"]: ["a.LIS"],
-            ZENODO["keyword"]: ["file"],
-        },
-        {
-            "pid": "21.T11148/200",
-            ZENODO["landingPageLocation"]: ["https://doi.org/10.5281/zenodo.1"],
-            ZENODO["name"]: ["My Dataset"],
-            ZENODO["hasPart"]: ["21.T11148/100"],
-            ZENODO["keyword"]: ["dataset"],
-        },
+        _es_doc(
+            "21.T11148/100",
+            {
+                ZENODO["checksum"]: ["md5:abc"],
+                ZENODO["name"]: ["a.LIS"],
+                ZENODO["keyword"]: ["file"],
+            },
+        ),
+        _es_doc(
+            "21.T11148/200",
+            {
+                ZENODO["landingPageLocation"]: ["https://doi.org/10.5281/zenodo.1"],
+                ZENODO["name"]: ["My Dataset"],
+                ZENODO["hasPart"]: ["21.T11148/100"],
+                ZENODO["keyword"]: ["dataset"],
+            },
+        ),
     ]
 
     async def fake_fetch(session, *args, **kwargs):
